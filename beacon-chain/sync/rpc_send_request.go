@@ -22,7 +22,6 @@ import (
 	pb "github.com/prysmaticlabs/prysm/v4/proto/prysm/v1alpha1"
 	"github.com/prysmaticlabs/prysm/v4/runtime/version"
 	"github.com/prysmaticlabs/prysm/v4/time/slots"
-	"github.com/sirupsen/logrus"
 )
 
 // ErrInvalidFetchedData is used to signal that an error occurred which should result in peer downscoring.
@@ -152,11 +151,7 @@ func SendBlobsByRangeRequest(ctx context.Context, tor blockchain.TemporalOracle,
 	if err != nil {
 		return nil, err
 	}
-	log.WithFields(logrus.Fields{
-		"topic":     topic,
-		"startSlot": req.StartSlot,
-		"count":     req.Count,
-	}).Debug("Sending blob by range request")
+	log.WithField("topic", topic).Debug("Sending blob by range request")
 	stream, err := p2pApi.Send(ctx, req, topic, pid)
 	if err != nil {
 		return nil, err

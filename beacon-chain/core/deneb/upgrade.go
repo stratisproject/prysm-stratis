@@ -57,6 +57,10 @@ func UpgradeToDeneb(state state.BeaconState) (state.BeaconState, error) {
 	if err != nil {
 		return nil, err
 	}
+	stakingContractAddress, err := state.StakingContractAddress()
+	if err != nil {
+		return nil, err
+	}
 
 	s := &ethpb.BeaconStateDeneb{
 		GenesisTime:           state.GenesisTime(),
@@ -109,6 +113,7 @@ func UpgradeToDeneb(state state.BeaconState) (state.BeaconState, error) {
 		NextWithdrawalIndex:          wi,
 		NextWithdrawalValidatorIndex: vi,
 		HistoricalSummaries:          summaries,
+		StakingContractAddress:       stakingContractAddress,
 	}
 
 	return state_native.InitializeFromProtoUnsafeDeneb(s)

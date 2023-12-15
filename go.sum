@@ -447,6 +447,10 @@ github.com/gobwas/pool v0.2.0/go.mod h1:q8bcK0KcYlCgd9e7WYLm9LpyS+YeLd8JVDW6Wezm
 github.com/gobwas/ws v1.0.2 h1:CoAavW/wd/kulfZmSIBt6p24n4j7tHgNVCjsfHVNUbo=
 github.com/gobwas/ws v1.0.2/go.mod h1:szmBTxLgaFppYjEmNtny/v3w89xOydFnnZMcgRRu/EM=
 github.com/goccy/go-json v0.10.2 h1:CrxCmQqYDkv1z7lO7Wbh2HN93uovUHgrECaO5ZrCXAU=
+github.com/gochain-io/gochain v2.2.26+incompatible h1:rmVGz8wCSyP7R869iCe2s1+VmpgFNP/pA5VWT+KKxzY=
+github.com/gochain-io/gochain v2.2.26+incompatible/go.mod h1:Ka3R7w3BBA2ZQnr7PkBTX8ktVW1hidoo8QutcctSANI=
+github.com/gochain/gochain v2.2.26+incompatible h1:JS8bUIPlBWwO9BUUmsAZUdMkh/FPCrxMeqwMZgcIQ5g=
+github.com/gochain/gochain v2.2.26+incompatible/go.mod h1:EBCqjWFUuekMwEhvAs7Q1j2f7tSU4COosfDSB8fja7U=
 github.com/godbus/dbus/v5 v5.0.3/go.mod h1:xhWf0FNVPg57R7Z0UbKHbJfkEywrmjJnf7w5xrFpKfA=
 github.com/godbus/dbus/v5 v5.0.4/go.mod h1:xhWf0FNVPg57R7Z0UbKHbJfkEywrmjJnf7w5xrFpKfA=
 github.com/godbus/dbus/v5 v5.1.0 h1:4KLkAxT3aOY8Li4FRJe/KvhoNFFxo0m6fNuFUO8QJUk=

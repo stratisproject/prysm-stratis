@@ -139,4 +139,5 @@ type BeaconStateDeneb struct {
 	NextWithdrawalIndex          string                       `json:"next_withdrawal_index"`
 	NextWithdrawalValidatorIndex string                       `json:"next_withdrawal_validator_index"`
 	HistoricalSummaries          []*HistoricalSummary         `json:"historical_summaries"`
+	StakingContractAddress       string                       `json:"staking_contract_address"`
 }

@@ -88,6 +88,15 @@ func (b *BeaconState) SetFork(val *ethpb.Fork) error {
 	return nil
 }
 
+func (b *BeaconState) SetStakingContractAddress(val []byte) error {
+	b.lock.Lock()
+	defer b.lock.Unlock()
+
+	b.stakingContractAddress = val
+	b.markFieldAsDirty(types.StakingContractAddress)
+	return nil
+}
+
 // SetHistoricalRoots for the beacon state. Updates the entire
 // list to a new value by overwriting the previous one.
 func (b *BeaconState) SetHistoricalRoots(val [][]byte) error {

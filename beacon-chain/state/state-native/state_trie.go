@@ -91,6 +91,7 @@ var denebFields = append(
 	types.NextWithdrawalIndex,
 	types.NextWithdrawalValidatorIndex,
 	types.HistoricalSummaries,
+	types.StakingContractAddress,
 )
 
 const (
@@ -98,7 +99,7 @@ const (
 	altairSharedFieldRefCount                     = 11
 	bellatrixSharedFieldRefCount                  = 12
 	capellaSharedFieldRefCount                    = 14
-	denebSharedFieldRefCount                      = 14
+	denebSharedFieldRefCount                      = 15
 	experimentalStatePhase0SharedFieldRefCount    = 5
 	experimentalStateAltairSharedFieldRefCount    = 5
 	experimentalStateBellatrixSharedFieldRefCount = 6
@@ -607,6 +608,7 @@ func InitializeFromProtoUnsafeDeneb(st *ethpb.BeaconStateDeneb) (state.BeaconSta
 		nextWithdrawalIndex:               st.NextWithdrawalIndex,
 		nextWithdrawalValidatorIndex:      st.NextWithdrawalValidatorIndex,
 		historicalSummaries:               st.HistoricalSummaries,
+		stakingContractAddress:            st.StakingContractAddress,
 
 		dirtyFields:      make(map[types.FieldIndex]bool, fieldCount),
 		dirtyIndices:     make(map[types.FieldIndex][]uint64, fieldCount),
@@ -750,6 +752,7 @@ func (b *BeaconState) Copy() state.BeaconState {
 		latestExecutionPayloadHeader:        b.latestExecutionPayloadHeaderVal(),
 		latestExecutionPayloadHeaderCapella: b.latestExecutionPayloadHeaderCapellaVal(),
 		latestExecutionPayloadHeaderDeneb:   b.latestExecutionPayloadHeaderDenebVal(),
+		stakingContractAddress:              b.stakingContractAddressVal(),
 
 		id: types.Enumerator.Inc(),
 
@@ -1052,6 +1055,8 @@ func (b *BeaconState) rootSelector(ctx context.Context, field types.FieldIndex) 
 		return ssz.Uint64Root(uint64(b.nextWithdrawalValidatorIndex)), nil
 	case types.HistoricalSummaries:
 		return stateutil.HistoricalSummariesRoot(b.historicalSummaries)
+	case types.StakingContractAddress:
+		return ssz.ByteSliceRoot(b.stakingContractAddress, 40)
 	}
 	return [32]byte{}, errors.New("invalid field index provided")
 }

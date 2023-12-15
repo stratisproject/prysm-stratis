@@ -16,6 +16,7 @@ import (
 	"github.com/prysmaticlabs/prysm/v4/config/features"
 	fieldparams "github.com/prysmaticlabs/prysm/v4/config/fieldparams"
 	"github.com/prysmaticlabs/prysm/v4/config/params"
+	"github.com/prysmaticlabs/prysm/v4/consensus-types/blocks"
 	"github.com/prysmaticlabs/prysm/v4/consensus-types/primitives"
 	"github.com/prysmaticlabs/prysm/v4/encoding/bytesutil"
 	ethpb "github.com/prysmaticlabs/prysm/v4/proto/prysm/v1alpha1"
@@ -481,7 +482,7 @@ func TestServer_WaitToSlotOneThird_CanWait(t *testing.T) {
 
 	v := &validator{
 		genesisTime: genesisTime,
-		slotFeed:    new(event.Feed),
+		blockFeed:   new(event.Feed),
 	}
 
 	timeToSleep := params.BeaconConfig().SecondsPerSlot / 3
@@ -500,7 +501,7 @@ func TestServer_WaitToSlotOneThird_SameReqSlot(t *testing.T) {
 
 	v := &validator{
 		genesisTime:      genesisTime,
-		slotFeed:         new(event.Feed),
+		blockFeed:        new(event.Feed),
 		highestValidSlot: currentSlot,
 	}
 
@@ -521,14 +522,19 @@ func TestServer_WaitToSlotOneThird_ReceiveBlockSlot(t *testing.T) {
 
 	v := &validator{
 		genesisTime: genesisTime,
-		slotFeed:    new(event.Feed),
+		blockFeed:   new(event.Feed),
 	}
 
 	wg := &sync.WaitGroup{}
 	wg.Add(1)
 	go func() {
 		time.Sleep(100 * time.Millisecond)
-		v.slotFeed.Send(currentSlot)
+		wsb, err := blocks.NewSignedBeaconBlock(
+			&ethpb.SignedBeaconBlock{
+				Block: &ethpb.BeaconBlock{Slot: currentSlot, Body: &ethpb.BeaconBlockBody{}},
+			})
+		require.NoError(t, err)
+		v.blockFeed.Send(wsb)
 		wg.Done()
 	}()
 

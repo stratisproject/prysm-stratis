@@ -59,6 +59,7 @@ type BeaconState struct {
 	latestExecutionPayloadHeaderDeneb   *enginev1.ExecutionPayloadHeaderDeneb
 	nextWithdrawalIndex                 uint64
 	nextWithdrawalValidatorIndex        primitives.ValidatorIndex
+	stakingContractAddress              []byte
 
 	id                    uint64
 	lock                  sync.RWMutex
@@ -104,6 +105,7 @@ type beaconStateMarshalable struct {
 	LatestExecutionPayloadHeaderCapella *enginev1.ExecutionPayloadHeaderCapella `json:"latest_execution_payload_header_capella" yaml:"latest_execution_payload_header_capella"`
 	NextWithdrawalIndex                 uint64                                  `json:"next_withdrawal_index" yaml:"next_withdrawal_index"`
 	NextWithdrawalValidatorIndex        primitives.ValidatorIndex               `json:"next_withdrawal_validator_index" yaml:"next_withdrawal_validator_index"`
+	StakingContractAddress              []byte                                  `json:"staking_contract_address" yaml:"staking_contract_address"`
 }
 
 func (b *BeaconState) MarshalJSON() ([]byte, error) {
@@ -163,6 +165,7 @@ func (b *BeaconState) MarshalJSON() ([]byte, error) {
 		LatestExecutionPayloadHeaderCapella: b.latestExecutionPayloadHeaderCapella,
 		NextWithdrawalIndex:                 b.nextWithdrawalIndex,
 		NextWithdrawalValidatorIndex:        b.nextWithdrawalValidatorIndex,
+		StakingContractAddress:              b.stakingContractAddress,
 	}
 	return json.Marshal(marshalable)
 }

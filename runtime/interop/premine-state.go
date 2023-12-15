@@ -3,6 +3,7 @@ package interop
 import (
 	"context"
 
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/pkg/errors"
 	"github.com/prysmaticlabs/prysm/v4/beacon-chain/core/altair"
@@ -26,12 +27,13 @@ import (
 var errUnsupportedVersion = errors.New("schema version not supported by PremineGenesisConfig")
 
 type PremineGenesisConfig struct {
-	GenesisTime     uint64
-	NVals           uint64
-	PregenesisCreds uint64
-	Version         int          // as in "github.com/prysmaticlabs/prysm/v4/runtime/version"
-	GB              *types.Block // geth genesis block
-	depositEntries  *depositEntries
+	GenesisTime            uint64
+	NVals                  uint64
+	PregenesisCreds        uint64
+	Version                int          // as in "github.com/prysmaticlabs/prysm/v4/runtime/version"
+	GB                     *types.Block // geth genesis block
+	depositEntries         *depositEntries
+	stakingContractAddress []byte
 }
 
 type depositEntries struct {
@@ -47,6 +49,12 @@ func WithDepositData(dds []*ethpb.Deposit_Data, roots [][]byte) PremineGenesisOp
 			dds:   dds,
 			roots: roots,
 		}
+	}
+}
+
+func WithStakingContractAddress(address []byte) PremineGenesisOpt {
+	return func(cfg *PremineGenesisConfig) {
+		cfg.stakingContractAddress = address
 	}
 }
 
@@ -152,7 +160,9 @@ func (s *PremineGenesisConfig) empty() (state.BeaconState, error) {
 			return nil, err
 		}
 	case version.Deneb:
-		e, err = state_native.InitializeFromProtoDeneb(&ethpb.BeaconStateDeneb{})
+		e, err = state_native.InitializeFromProtoDeneb(&ethpb.BeaconStateDeneb{
+			StakingContractAddress: common.Address{}.Bytes(),
+		})
 		if err != nil {
 			return nil, err
 		}
@@ -269,6 +279,9 @@ func emptyDepositRoot() ([32]byte, error) {
 
 func (s *PremineGenesisConfig) populate(g state.BeaconState) error {
 	if err := g.SetGenesisTime(s.GenesisTime); err != nil {
+		return err
+	}
+	if err := g.SetStakingContractAddress(s.stakingContractAddress); err != nil {
 		return err
 	}
 	if err := s.setGenesisValidatorsRoot(g); err != nil {

@@ -901,31 +901,93 @@ func TestCheckAndLogValidatorStatus_OK(t *testing.T) {
 	}
 }
 
-func TestService_ReceiveSlots_SetHighest(t *testing.T) {
+func TestService_ReceiveBlocks_NilBlock(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	valClient := validatormock.NewMockValidatorClient(ctrl)
+	v := validator{
+		blockFeed:       new(event.Feed),
+		validatorClient: valClient,
+	}
+	stream := mock2.NewMockBeaconNodeValidatorAltair_StreamBlocksClient(ctrl)
+	ctx, cancel := context.WithCancel(context.Background())
+	valClient.EXPECT().StreamBlocksAltair(
+		gomock.Any(),
+		&ethpb.StreamBlocksRequest{VerifiedOnly: true},
+	).Return(stream, nil)
+	stream.EXPECT().Context().Return(ctx).AnyTimes()
+	stream.EXPECT().Recv().Return(
+		&ethpb.StreamBlocksResponse{Block: &ethpb.StreamBlocksResponse_Phase0Block{
+			Phase0Block: &ethpb.SignedBeaconBlock{}}},
+		nil,
+	).Do(func() {
+		cancel()
+	})
+	connectionErrorChannel := make(chan error)
+	v.ReceiveBlocks(ctx, connectionErrorChannel)
+	require.Equal(t, primitives.Slot(0), v.highestValidSlot)
+}
+
+func TestService_ReceiveBlocks_SetHighest(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	client := validatormock.NewMockValidatorClient(ctrl)
 
 	v := validator{
 		validatorClient: client,
-		slotFeed:        new(event.Feed),
+		blockFeed:       new(event.Feed),
 	}
-	stream := mock2.NewMockBeaconNodeValidator_StreamSlotsClient(ctrl)
+	stream := mock2.NewMockBeaconNodeValidatorAltair_StreamBlocksClient(ctrl)
 	ctx, cancel := context.WithCancel(context.Background())
-	client.EXPECT().StreamSlots(
+	client.EXPECT().StreamBlocksAltair(
 		gomock.Any(),
-		&ethpb.StreamSlotsRequest{VerifiedOnly: true},
+		&ethpb.StreamBlocksRequest{VerifiedOnly: true},
 	).Return(stream, nil)
 	stream.EXPECT().Context().Return(ctx).AnyTimes()
+	slot := primitives.Slot(100)
 	stream.EXPECT().Recv().Return(
-		&ethpb.StreamSlotsResponse{Slot: 123},
+		&ethpb.StreamBlocksResponse{
+			Block: &ethpb.StreamBlocksResponse_Phase0Block{
+				Phase0Block: &ethpb.SignedBeaconBlock{Block: &ethpb.BeaconBlock{Slot: slot, Body: &ethpb.BeaconBlockBody{}}}},
+		},
 		nil,
 	).Do(func() {
 		cancel()
 	})
 	connectionErrorChannel := make(chan error)
-	v.ReceiveSlots(ctx, connectionErrorChannel)
-	require.Equal(t, primitives.Slot(123), v.highestValidSlot)
+	v.ReceiveBlocks(ctx, connectionErrorChannel)
+	require.Equal(t, slot, v.highestValidSlot)
+}
+
+func TestService_ReceiveBlocks_SetHighestDeneb(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	client := validatormock.NewMockValidatorClient(ctrl)
+
+	v := validator{
+		validatorClient: client,
+		blockFeed:       new(event.Feed),
+	}
+	stream := mock2.NewMockBeaconNodeValidatorAltair_StreamBlocksClient(ctrl)
+	ctx, cancel := context.WithCancel(context.Background())
+	client.EXPECT().StreamBlocksAltair(
+		gomock.Any(),
+		&ethpb.StreamBlocksRequest{VerifiedOnly: true},
+	).Return(stream, nil)
+	stream.EXPECT().Context().Return(ctx).AnyTimes()
+	slot := primitives.Slot(100)
+	stream.EXPECT().Recv().Return(
+		&ethpb.StreamBlocksResponse{
+			Block: &ethpb.StreamBlocksResponse_DenebBlock{
+				DenebBlock: &ethpb.SignedBeaconBlockDeneb{Block: &ethpb.BeaconBlockDeneb{Slot: slot, Body: &ethpb.BeaconBlockBodyDeneb{}}}},
+		},
+		nil,
+	).Do(func() {
+		cancel()
+	})
+	connectionErrorChannel := make(chan error)
+	v.ReceiveBlocks(ctx, connectionErrorChannel)
+	require.Equal(t, slot, v.highestValidSlot)
 }
 
 type doppelGangerRequestMatcher struct {

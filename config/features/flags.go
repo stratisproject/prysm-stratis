@@ -23,6 +23,11 @@ var (
 		Name:  "holesky",
 		Usage: "Run Prysm configured for the Holesky beacon chain test network",
 	}
+	// Stratisnet flag for easier tooling, no-op
+	Stratisnet = &cli.BoolFlag{
+		Name:  "stratis",
+		Usage: "Run Prysm configured for the Staris beacon chain network",
+	}
 	// Mainnet flag for easier tooling, no-op
 	Mainnet = &cli.BoolFlag{
 		Value: true,
@@ -178,6 +183,7 @@ var ValidatorFlags = append(deprecatedFlags, []cli.Flag{
 	HoleskyTestnet,
 	PraterTestnet,
 	SepoliaTestnet,
+	Stratisnet,
 	Mainnet,
 	dynamicKeyReloadDebounceInterval,
 	attestTimely,
@@ -200,6 +206,7 @@ var BeaconChainFlags = append(deprecatedBeaconFlags, append(deprecatedFlags, []c
 	HoleskyTestnet,
 	PraterTestnet,
 	SepoliaTestnet,
+	Stratisnet,
 	Mainnet,
 	disablePeerScorer,
 	disableBroadcastSlashingFlag,
@@ -233,4 +240,5 @@ var NetworkFlags = []cli.Flag{
 	PraterTestnet,
 	SepoliaTestnet,
 	HoleskyTestnet,
+	Stratisnet,
 }
