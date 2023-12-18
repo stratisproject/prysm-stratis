@@ -275,10 +275,10 @@ func (s *Server) produceBlockV3(ctx context.Context, w http.ResponseWriter, r *h
 	}
 }
 
-func getConsensusBlockValue(ctx context.Context, blockRewardsFetcher rewards.BlockRewardsFetcher, i interface{} /* block as argument */) (string, *httputil.DefaultJsonError) {
+func getConsensusBlockValue(ctx context.Context, blockRewardsFetcher rewards.BlockRewardsFetcher, i interface{} /* block as argument */) (string, *httputil.DefaultErrorJson) {
 	bb, err := blocks.NewBeaconBlock(i)
 	if err != nil {
-		return "", &httputil.DefaultJsonError{
+		return "", &httputil.DefaultErrorJson{
 			Message: err.Error(),
 			Code:    http.StatusInternalServerError,
 		}

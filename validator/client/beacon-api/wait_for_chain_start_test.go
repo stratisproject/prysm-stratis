@@ -151,7 +151,7 @@ func TestWaitForChainStart_JsonResponseError404(t *testing.T) {
 		"/eth/v1/beacon/genesis",
 		&genesisResponseJson,
 	).Return(
-		&httputil.DefaultJsonError{
+		&httputil.DefaultErrorJson{
 			Code:    http.StatusNotFound,
 			Message: "404 error",
 		},

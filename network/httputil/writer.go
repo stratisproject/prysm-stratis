@@ -16,17 +16,17 @@ type HasStatusCode interface {
 	StatusCode() int
 }
 
-// DefaultJsonError is a JSON representation of a simple error value, containing only a message and an error code.
-type DefaultJsonError struct {
+// DefaultErrorJson is a JSON representation of a simple error value, containing only a message and an error code.
+type DefaultErrorJson struct {
 	Message string `json:"message"`
 	Code    int    `json:"code"`
 }
 
-func (e *DefaultJsonError) StatusCode() int {
+func (e *DefaultErrorJson) StatusCode() int {
 	return e.Code
 }
 
-func (e *DefaultJsonError) Error() string {
+func (e *DefaultErrorJson) Error() string {
 	return fmt.Sprintf("HTTP request unsuccessful (%d: %s)", e.Code, e.Message)
 }
 

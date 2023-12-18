@@ -17,12 +17,12 @@ func TestProposeBeaconBlock_Error(t *testing.T) {
 	testSuites := []struct {
 		name                 string
 		expectedErrorMessage string
-		expectedHttpError    *httputil.DefaultJsonError
+		expectedHttpError    *httputil.DefaultErrorJson
 	}{
 		{
 			name:                 "error 202",
 			expectedErrorMessage: "block was successfully broadcasted but failed validation",
-			expectedHttpError: &httputil.DefaultJsonError{
+			expectedHttpError: &httputil.DefaultErrorJson{
 				Code:    http.StatusAccepted,
 				Message: "202 error",
 			},
