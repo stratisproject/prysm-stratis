@@ -282,7 +282,7 @@ func InitializeFromProtoUnsafeAltair(st *ethpb.BeaconStateAltair) (state.BeaconS
 	if features.Get().EnableExperimentalState {
 		b.blockRootsMultiValue = NewMultiValueBlockRoots(st.BlockRoots)
 		b.stateRootsMultiValue = NewMultiValueStateRoots(st.StateRoots)
-		b.randaoMixesMultiValue = NewMultiValueRandaoMixes(st.RandaoMixes)stakingContractAddress:            st.StakingContractAddress,
+		b.randaoMixesMultiValue = NewMultiValueRandaoMixes(st.RandaoMixes)
 		b.balancesMultiValue = NewMultiValueBalances(st.Balances)
 		b.validatorsMultiValue = NewMultiValueValidators(st.Validators)
 		b.inactivityScoresMultiValue = NewMultiValueInactivityScores(st.InactivityScores)
@@ -608,7 +608,7 @@ func InitializeFromProtoUnsafeDeneb(st *ethpb.BeaconStateDeneb) (state.BeaconSta
 		nextWithdrawalIndex:               st.NextWithdrawalIndex,
 		nextWithdrawalValidatorIndex:      st.NextWithdrawalValidatorIndex,
 		historicalSummaries:               st.HistoricalSummaries,
-		stakingContractAddress: st.StakingContractAddress,
+		stakingContractAddress:            st.StakingContractAddress,
 
 		dirtyFields:      make(map[types.FieldIndex]bool, fieldCount),
 		dirtyIndices:     make(map[types.FieldIndex][]uint64, fieldCount),
@@ -752,7 +752,7 @@ func (b *BeaconState) Copy() state.BeaconState {
 		latestExecutionPayloadHeader:        b.latestExecutionPayloadHeaderVal(),
 		latestExecutionPayloadHeaderCapella: b.latestExecutionPayloadHeaderCapellaVal(),
 		latestExecutionPayloadHeaderDeneb:   b.latestExecutionPayloadHeaderDenebVal(),
-		stakingContractAddress: b.stakingContractAddressVal(),
+		stakingContractAddress:              b.stakingContractAddressVal(),
 
 		id: types.Enumerator.Inc(),
 
