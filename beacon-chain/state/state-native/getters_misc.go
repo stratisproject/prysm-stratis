@@ -105,3 +105,20 @@ func (b *BeaconState) HistoricalSummaries() ([]*ethpb.HistoricalSummary, error) 
 func (b *BeaconState) historicalSummariesVal() []*ethpb.HistoricalSummary {
 	return ethpb.CopyHistoricalSummaries(b.historicalSummaries)
 }
+
+func (b *BeaconState) StakingContractAddress() ([]byte, error) {
+	if b.version < version.Deneb {
+		return nil, errNotSupported("StakingContractAddress", b.version)
+	}
+
+	b.lock.RLock()
+	defer b.lock.RUnlock()
+
+	return b.stakingContractAddressVal(), nil
+}
+
+func (b *BeaconState) stakingContractAddressVal() []byte {
+	tmp := make([]byte, len(b.stakingContractAddress))
+	copy(tmp, b.stakingContractAddress)
+	return tmp
+}

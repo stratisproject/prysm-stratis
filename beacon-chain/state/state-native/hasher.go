@@ -245,6 +245,13 @@ func ComputeFieldRootsWithHasher(ctx context.Context, state *BeaconState) ([][]b
 			return nil, err
 		}
 		fieldRoots[types.LatestExecutionPayloadHeaderDeneb.RealPosition()] = executionPayloadRoot[:]
+
+		// Staking contract payload root.
+		stakingContractAddressPayload, err := ssz.ByteSliceRoot(state.stakingContractAddress, 40)
+		if err != nil {
+			return nil, err
+		}
+		fieldRoots[types.StakingContractAddress.RealPosition()] = stakingContractAddressPayload[:]
 	}
 
 	if state.version >= version.Capella {

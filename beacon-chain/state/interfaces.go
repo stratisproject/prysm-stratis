@@ -70,6 +70,7 @@ type ReadOnlyBeaconState interface {
 	IsNil() bool
 	Version() int
 	LatestExecutionPayloadHeader() (interfaces.ExecutionData, error)
+	StakingContractAddress() ([]byte, error)
 }
 
 // WriteOnlyBeaconState defines a struct which only has write access to beacon state methods.
@@ -98,6 +99,7 @@ type WriteOnlyBeaconState interface {
 	SetLatestExecutionPayloadHeader(payload interfaces.ExecutionData) error
 	SetNextWithdrawalIndex(i uint64) error
 	SetNextWithdrawalValidatorIndex(i primitives.ValidatorIndex) error
+	SetStakingContractAddress(val []byte) error
 }
 
 // ReadOnlyValidator defines a struct which only has read access to validator methods.

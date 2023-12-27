@@ -30,6 +30,7 @@ var Commands = &cli.Command{
 				features.PraterTestnet,
 				features.SepoliaTestnet,
 				features.HoleskyTestnet,
+				features.Stratisnet,
 				cmd.AcceptTosFlag,
 			}),
 			Before: func(cliCtx *cli.Context) error {
@@ -67,6 +68,7 @@ var Commands = &cli.Command{
 				features.PraterTestnet,
 				features.SepoliaTestnet,
 				features.HoleskyTestnet,
+				features.Stratisnet,
 				cmd.AcceptTosFlag,
 			}),
 			Before: func(cliCtx *cli.Context) error {
@@ -101,6 +103,7 @@ var Commands = &cli.Command{
 				features.PraterTestnet,
 				features.SepoliaTestnet,
 				features.HoleskyTestnet,
+				features.Stratisnet,
 				cmd.AcceptTosFlag,
 			}),
 			Before: func(cliCtx *cli.Context) error {
@@ -132,6 +135,7 @@ var Commands = &cli.Command{
 				features.PraterTestnet,
 				features.SepoliaTestnet,
 				features.HoleskyTestnet,
+				features.Stratisnet,
 				cmd.AcceptTosFlag,
 			}),
 			Before: func(cliCtx *cli.Context) error {
@@ -175,6 +179,7 @@ var Commands = &cli.Command{
 				features.PraterTestnet,
 				features.SepoliaTestnet,
 				features.HoleskyTestnet,
+				features.Stratisnet,
 				cmd.AcceptTosFlag,
 			}),
 			Before: func(cliCtx *cli.Context) error {

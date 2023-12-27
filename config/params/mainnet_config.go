@@ -184,7 +184,7 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	BeaconStateAltairFieldCount:    24,
 	BeaconStateBellatrixFieldCount: 25,
 	BeaconStateCapellaFieldCount:   28,
-	BeaconStateDenebFieldCount:     28,
+	BeaconStateDenebFieldCount:     29,
 
 	// Slasher related values.
 	WeakSubjectivityPeriod:          54000,

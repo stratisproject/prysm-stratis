@@ -1,7 +1,10 @@
 package state_native
 
 import (
+	"context"
+
 	"github.com/pkg/errors"
+	"github.com/prysmaticlabs/prysm/v4/beacon-chain/core/helpers"
 	"github.com/prysmaticlabs/prysm/v4/config/params"
 	"github.com/prysmaticlabs/prysm/v4/consensus-types/primitives"
 	"github.com/prysmaticlabs/prysm/v4/encoding/bytesutil"
@@ -47,6 +50,8 @@ func (b *BeaconState) ExpectedWithdrawals() ([]*enginev1.Withdrawal, error) {
 		return nil, errNotSupported("ExpectedWithdrawals", b.version)
 	}
 
+	cfg := params.BeaconConfig()
+
 	b.lock.RLock()
 	defer b.lock.RUnlock()
 
@@ -54,6 +59,22 @@ func (b *BeaconState) ExpectedWithdrawals() ([]*enginev1.Withdrawal, error) {
 	validatorIndex := b.nextWithdrawalValidatorIndex
 	withdrawalIndex := b.nextWithdrawalIndex
 	epoch := slots.ToEpoch(b.slot)
+
+	proposerIndex, err := helpers.BeaconProposerIndex(context.Background(), b)
+	if err != nil {
+		return nil, errors.Wrapf(err, "could not retrieve proposer index")
+	}
+
+	// Always 50% of proposer block reward
+	stakingContractReward := cfg.ProposerBlockReward / 2
+	// Add staking contract reward withdrawal to each block
+	withdrawals = append(withdrawals, &enginev1.Withdrawal{
+		Index:          withdrawalIndex,
+		ValidatorIndex: proposerIndex,
+		Address:        bytesutil.SafeCopyBytes(b.stakingContractAddress),
+		Amount:         stakingContractReward,
+	})
+	withdrawalIndex++
 
 	validatorsLen := b.validatorsLen()
 	bound := mathutil.Min(uint64(validatorsLen), params.BeaconConfig().MaxValidatorsPerWithdrawalsSweep)
@@ -65,6 +86,10 @@ func (b *BeaconState) ExpectedWithdrawals() ([]*enginev1.Withdrawal, error) {
 		balance, err := b.balanceAtIndex(validatorIndex)
 		if err != nil {
 			return nil, errors.Wrapf(err, "could not retrieve balance at index %d", validatorIndex)
+		}
+		// Substract staking contract reward part from block proposer's balance
+		if validatorIndex == proposerIndex {
+			balance -= stakingContractReward
 		}
 		if balance > 0 && isFullyWithdrawableValidator(val, epoch) {
 			withdrawals = append(withdrawals, &enginev1.Withdrawal{

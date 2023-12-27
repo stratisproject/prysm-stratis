@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	beaconState "github.com/prysmaticlabs/prysm/v4/beacon-chain/state"
 	enginev1 "github.com/prysmaticlabs/prysm/v4/proto/engine/v1"
@@ -561,6 +562,14 @@ func BeaconStateDenebFromConsensus(st beaconState.BeaconState) (*BeaconStateDene
 	if err != nil {
 		return nil, err
 	}
+	scab, err := st.StakingContractAddress()
+	if err != nil {
+		return nil, err
+	}
+	sca := common.Address{}
+	if len(scab) >= 20 {
+		sca = common.BytesToAddress(scab)
+	}
 
 	return &BeaconStateDeneb{
 		GenesisTime:                  fmt.Sprintf("%d", st.GenesisTime()),
@@ -591,5 +600,6 @@ func BeaconStateDenebFromConsensus(st beaconState.BeaconState) (*BeaconStateDene
 		NextWithdrawalIndex:          fmt.Sprintf("%d", nwi),
 		NextWithdrawalValidatorIndex: fmt.Sprintf("%d", nwvi),
 		HistoricalSummaries:          hs,
+		StakingContractAddress:       sca.Hex(),
 	}, nil
 }

@@ -12,4 +12,5 @@ const (
 	GoerliName          = "goerli"
 	SepoliaName         = "sepolia"
 	HoleskyName         = "holesky"
+	StratisName         = "stratis"
 )
