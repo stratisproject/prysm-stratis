@@ -35,12 +35,12 @@ func StratisConfig() *BeaconChainConfig {
 
 	// Changed for faster testing
 	// TODO: remove once testing is finished
-	cfg.SecondsPerSlot = 3
-	cfg.SlotsPerEpoch = 2
-	cfg.Eth1FollowDistance = 1
-	cfg.EpochsPerEth1VotingPeriod = 1
-	cfg.MinValidatorWithdrawabilityDelay = 2
-	cfg.ShardCommitteePeriod = 2
+	//cfg.SecondsPerSlot = 3
+	//cfg.SlotsPerEpoch = 2
+	//cfg.Eth1FollowDistance = 1
+	//cfg.EpochsPerEth1VotingPeriod = 1
+	//cfg.MinValidatorWithdrawabilityDelay = 2
+	//cfg.ShardCommitteePeriod = 2
 
 	cfg.InitializeForkSchedule()
 	return cfg
