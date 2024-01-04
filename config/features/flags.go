@@ -7,26 +7,10 @@ import (
 )
 
 var (
-	// PraterTestnet flag for the multiclient Ethereum consensus testnet.
-	PraterTestnet = &cli.BoolFlag{
-		Name:    "prater",
-		Usage:   "Run Prysm configured for the Prater / Goerli test network",
-		Aliases: []string{"goerli"},
-	}
-	// SepoliaTestnet flag for the multiclient Ethereum consensus testnet.
-	SepoliaTestnet = &cli.BoolFlag{
-		Name:  "sepolia",
-		Usage: "Run Prysm configured for the Sepolia beacon chain test network",
-	}
-	// HoleskyTestnet flag for the multiclient Ethereum consensus testnet.
-	HoleskyTestnet = &cli.BoolFlag{
-		Name:  "holesky",
-		Usage: "Run Prysm configured for the Holesky beacon chain test network",
-	}
-	// Stratisnet flag for easier tooling, no-op
-	Stratisnet = &cli.BoolFlag{
-		Name:  "stratis",
-		Usage: "Run Prysm configured for the Staris beacon chain network",
+	// AuroriaTestnet flag for the multiclient Ethereum consensus testnet.
+	AuroriaTestnet = &cli.BoolFlag{
+		Name:  "auroria",
+		Usage: "Run Prysm configured for the Auroria beacon chain test network",
 	}
 	// Mainnet flag for easier tooling, no-op
 	Mainnet = &cli.BoolFlag{
@@ -180,10 +164,7 @@ var devModeFlags = []cli.Flag{
 // ValidatorFlags contains a list of all the feature flags that apply to the validator client.
 var ValidatorFlags = append(deprecatedFlags, []cli.Flag{
 	writeWalletPasswordOnWebOnboarding,
-	HoleskyTestnet,
-	PraterTestnet,
-	SepoliaTestnet,
-	Stratisnet,
+	AuroriaTestnet,
 	Mainnet,
 	dynamicKeyReloadDebounceInterval,
 	attestTimely,
@@ -203,10 +184,7 @@ var BeaconChainFlags = append(deprecatedBeaconFlags, append(deprecatedFlags, []c
 	enableExperimentalState,
 	writeSSZStateTransitionsFlag,
 	disableGRPCConnectionLogging,
-	HoleskyTestnet,
-	PraterTestnet,
-	SepoliaTestnet,
-	Stratisnet,
+	AuroriaTestnet,
 	Mainnet,
 	disablePeerScorer,
 	disableBroadcastSlashingFlag,
@@ -237,8 +215,5 @@ var E2EBeaconChainFlags = []string{
 // NetworkFlags contains a list of network flags.
 var NetworkFlags = []cli.Flag{
 	Mainnet,
-	PraterTestnet,
-	SepoliaTestnet,
-	HoleskyTestnet,
-	Stratisnet,
+	AuroriaTestnet,
 }

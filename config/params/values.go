@@ -8,9 +8,5 @@ const (
 	MainnetName         = "mainnet"
 	MainnetTestName     = "mainnet-test"
 	MinimalName         = "minimal"
-	PraterName          = "prater"
-	GoerliName          = "goerli"
-	SepoliaName         = "sepolia"
-	HoleskyName         = "holesky"
-	StratisName         = "stratis"
+	AuroriaName         = "auroria"
 )
