@@ -77,20 +77,20 @@ func MinimalSpecConfig() *BeaconChainConfig {
 	minimalConfig.DomainRandao = bytesutil.ToBytes4(bytesutil.Bytes4(2))
 	minimalConfig.DomainDeposit = bytesutil.ToBytes4(bytesutil.Bytes4(3))
 	minimalConfig.DomainVoluntaryExit = bytesutil.ToBytes4(bytesutil.Bytes4(4))
-	minimalConfig.GenesisForkVersion = []byte{0, 0, 0, 1}
+	minimalConfig.GenesisForkVersion = []byte{10, 0, 0, 1}
 
 	minimalConfig.DepositContractTreeDepth = 32
 	minimalConfig.FarFutureEpoch = math.MaxUint64
 	minimalConfig.FarFutureSlot = math.MaxUint64
 
 	// New Altair params
-	minimalConfig.AltairForkVersion = []byte{1, 0, 0, 1} // Highest byte set to 0x01 to avoid collisions with mainnet versioning
+	minimalConfig.AltairForkVersion = []byte{11, 0, 0, 1} // Highest byte set to 0x01 to avoid collisions with mainnet versioning
 	minimalConfig.AltairForkEpoch = math.MaxUint64
-	minimalConfig.BellatrixForkVersion = []byte{2, 0, 0, 1}
+	minimalConfig.BellatrixForkVersion = []byte{12, 0, 0, 1}
 	minimalConfig.BellatrixForkEpoch = math.MaxUint64
-	minimalConfig.CapellaForkVersion = []byte{3, 0, 0, 1}
+	minimalConfig.CapellaForkVersion = []byte{13, 0, 0, 1}
 	minimalConfig.CapellaForkEpoch = math.MaxUint64
-	minimalConfig.DenebForkVersion = []byte{4, 0, 0, 1}
+	minimalConfig.DenebForkVersion = []byte{14, 0, 0, 1}
 
 	minimalConfig.SyncCommitteeSize = 32
 	minimalConfig.InactivityScoreBias = 4

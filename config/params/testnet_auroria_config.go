@@ -16,13 +16,13 @@ func UseAuroriaNetworkConfig() {
 func AuroriaConfig() *BeaconChainConfig {
 	cfg := MainnetConfig().Copy()
 	cfg.ConfigName = AuroriaName
-	cfg.GenesisForkVersion = []byte{0x00, 0x00, 0x10, 0x20}
+	cfg.GenesisForkVersion = []byte{10, 0, 10, 20}
 	cfg.DepositChainID = 56201
 	cfg.DepositNetworkID = 56201
-	cfg.AltairForkVersion = []byte{0x01, 0x00, 0x10, 0x20}
-	cfg.BellatrixForkVersion = []byte{0x02, 0x00, 0x10, 0x20}
-	cfg.CapellaForkVersion = []byte{0x03, 0x00, 0x10, 0x20}
-	cfg.DenebForkVersion = []byte{0x04, 0x00, 0x10, 0x20}
+	cfg.AltairForkVersion = []byte{11, 0, 10, 20}
+	cfg.BellatrixForkVersion = []byte{12, 0, 10, 20}
+	cfg.CapellaForkVersion = []byte{13, 0, 10, 20}
+	cfg.DenebForkVersion = []byte{14, 0, 10, 20}
 
 	cfg.InitializeForkSchedule()
 	return cfg
