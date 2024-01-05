@@ -87,8 +87,8 @@ var mainnetBeaconConfig = &BeaconChainConfig{
 	IntervalsPerSlot:                3,
 
 	// Ethereum PoW parameters.
-	DepositChainID:         56200, // Chain ID of eth1 mainnet.
-	DepositNetworkID:       56200, // Network ID of eth1 mainnet.
+	DepositChainID:         105105, // Chain ID of eth1 mainnet.
+	DepositNetworkID:       105105, // Network ID of eth1 mainnet.
 	DepositContractAddress: "0x0000000000000000000000000000000000001001",
 
 	// Validator params.
