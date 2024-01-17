@@ -3,7 +3,6 @@ package interop
 import (
 	"context"
 
-	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/pkg/errors"
 	"github.com/prysmaticlabs/prysm/v4/beacon-chain/core/altair"
@@ -161,7 +160,9 @@ func (s *PremineGenesisConfig) empty() (state.BeaconState, error) {
 		}
 	case version.Deneb:
 		e, err = state_native.InitializeFromProtoDeneb(&ethpb.BeaconStateDeneb{
-			StakingContractAddress: common.Address{}.Bytes(),
+			StakingContractAddress:      make([]byte, 20),
+			LastRewardedProposerIndex:   0,
+			LastRewardedProposerUpdated: false,
 		})
 		if err != nil {
 			return nil, err

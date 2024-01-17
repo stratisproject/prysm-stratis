@@ -60,6 +60,8 @@ type BeaconState struct {
 	nextWithdrawalIndex                 uint64
 	nextWithdrawalValidatorIndex        primitives.ValidatorIndex
 	stakingContractAddress              []byte
+	lastRewardedProposerIndex           primitives.ValidatorIndex
+	lastRewardedProposerUpdated         bool
 
 	id                    uint64
 	lock                  sync.RWMutex
@@ -106,6 +108,8 @@ type beaconStateMarshalable struct {
 	NextWithdrawalIndex                 uint64                                  `json:"next_withdrawal_index" yaml:"next_withdrawal_index"`
 	NextWithdrawalValidatorIndex        primitives.ValidatorIndex               `json:"next_withdrawal_validator_index" yaml:"next_withdrawal_validator_index"`
 	StakingContractAddress              []byte                                  `json:"staking_contract_address" yaml:"staking_contract_address"`
+	LastRewardedProposerIndex           primitives.ValidatorIndex               `json:"last_rewarded_proposer_index" yaml:"last_rewarded_proposer_index"`
+	LastRewardedProposerUpdated         bool                                    `json:"last_rewarded_proposer_updated" yaml:"last_rewarded_proposer_updated"`
 }
 
 func (b *BeaconState) MarshalJSON() ([]byte, error) {
@@ -166,6 +170,8 @@ func (b *BeaconState) MarshalJSON() ([]byte, error) {
 		NextWithdrawalIndex:                 b.nextWithdrawalIndex,
 		NextWithdrawalValidatorIndex:        b.nextWithdrawalValidatorIndex,
 		StakingContractAddress:              b.stakingContractAddress,
+		LastRewardedProposerIndex:           b.lastRewardedProposerIndex,
+		LastRewardedProposerUpdated:         b.lastRewardedProposerUpdated,
 	}
 	return json.Marshal(marshalable)
 }

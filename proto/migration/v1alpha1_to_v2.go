@@ -1011,6 +1011,14 @@ func BeaconStateDenebToProto(st state.BeaconState) (*ethpbv2.BeaconStateDeneb, e
 	if err != nil {
 		return nil, err
 	}
+	sourceLastRewardedProposerIndex, err := st.LastRewardedProposerIndex()
+	if err != nil {
+		return nil, err
+	}
+	sourceLastRewardedProposerUpdated, err := st.LastRewardedProposerUpdated()
+	if err != nil {
+		return nil, err
+	}
 
 	hr, err := st.HistoricalRoots()
 	if err != nil {
@@ -1094,6 +1102,8 @@ func BeaconStateDenebToProto(st state.BeaconState) (*ethpbv2.BeaconStateDeneb, e
 		NextWithdrawalValidatorIndex: sourceNextWithdrawalValIndex,
 		HistoricalSummaries:          sourceHistoricalSummaries,
 		StakingContractAddress:       stakingContractAddress,
+		LastRewardedProposerIndex:    sourceLastRewardedProposerIndex,
+		LastRewardedProposerUpdated:  sourceLastRewardedProposerUpdated,
 	}
 
 	return result, nil

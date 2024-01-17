@@ -92,6 +92,10 @@ func (f FieldIndex) String() string {
 		return "HistoricalSummaries"
 	case StakingContractAddress:
 		return "StakingContractAddress"
+	case LastRewardedProposerIndex:
+		return "LastRewardedProposerIndex"
+	case LastRewardedProposerUpdated:
+		return "LastRewardedProposerUpdated"
 	default:
 		return ""
 	}
@@ -159,6 +163,10 @@ func (f FieldIndex) RealPosition() int {
 		return 27
 	case StakingContractAddress:
 		return 28
+	case LastRewardedProposerIndex:
+		return 29
+	case LastRewardedProposerUpdated:
+		return 30
 	default:
 		return -1
 	}
@@ -215,6 +223,8 @@ const (
 	NextWithdrawalValidatorIndex
 	HistoricalSummaries
 	StakingContractAddress
+	LastRewardedProposerIndex
+	LastRewardedProposerUpdated
 )
 
 // Enumerator keeps track of the number of states created since the node's start.

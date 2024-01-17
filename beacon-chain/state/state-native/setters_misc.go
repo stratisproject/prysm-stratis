@@ -97,6 +97,24 @@ func (b *BeaconState) SetStakingContractAddress(val []byte) error {
 	return nil
 }
 
+func (b *BeaconState) SetLastRewardedProposerIndex(i primitives.ValidatorIndex) error {
+	b.lock.Lock()
+	defer b.lock.Unlock()
+
+	b.lastRewardedProposerIndex = i
+	b.markFieldAsDirty(types.LastRewardedProposerIndex)
+	return nil
+}
+
+func (b *BeaconState) SetLastRewardedProposerUpdated(val bool) error {
+	b.lock.Lock()
+	defer b.lock.Unlock()
+
+	b.lastRewardedProposerUpdated = val
+	b.markFieldAsDirty(types.LastRewardedProposerUpdated)
+	return nil
+}
+
 // SetHistoricalRoots for the beacon state. Updates the entire
 // list to a new value by overwriting the previous one.
 func (b *BeaconState) SetHistoricalRoots(val [][]byte) error {

@@ -222,6 +222,8 @@ message BeaconStateDeneb {
   repeated HistoricalSummary historical_summaries = 11003 [(ethereum.eth.ext.ssz_max) = "16777216"]; // [New in Capella]
 
   bytes staking_contract_address = 12001 [(ethereum.eth.ext.ssz_size) = "20"];
+  uint64 last_rewarded_proposer_index = 12002 [(ethereum.eth.ext.cast_type) = "github.com/prysmaticlabs/prysm/v4/consensus-types/primitives.ValidatorIndex"];
+  bool last_rewarded_proposer_updated = 12003;
 }
 
 message HistoricalSummary {

@@ -3,6 +3,7 @@ package state_native
 import (
 	"testing"
 
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/prysmaticlabs/prysm/v4/config/params"
 	"github.com/prysmaticlabs/prysm/v4/consensus-types/primitives"
 	enginev1 "github.com/prysmaticlabs/prysm/v4/proto/engine/v1"
@@ -362,6 +363,36 @@ func TestExpectedWithdrawals_Deneb(t *testing.T) {
 		expected, err := s.ExpectedWithdrawals()
 		require.NoError(t, err)
 		require.Equal(t, 0, len(expected))
+	})
+	t.Run("one withdrawal to staking contract", func(t *testing.T) {
+		s := BeaconState{
+			version:                     version.Deneb,
+			validators:                  make([]*ethpb.Validator, 100),
+			balances:                    make([]uint64, 100),
+			stakingContractAddress:      common.HexToAddress("0x0000000000000000000000000000000000001001").Bytes(),
+			lastRewardedProposerIndex:   20,
+			lastRewardedProposerUpdated: true,
+		}
+		for i := range s.validators {
+			s.balances[i] = params.BeaconConfig().MaxEffectiveBalance
+			val := &ethpb.Validator{
+				WithdrawalCredentials: make([]byte, 32),
+				EffectiveBalance:      params.BeaconConfig().MaxEffectiveBalance,
+				WithdrawableEpoch:     primitives.Epoch(1),
+			}
+			val.WithdrawalCredentials[0] = params.BeaconConfig().ETH1AddressWithdrawalPrefixByte
+			s.validators[i] = val
+		}
+		expected, err := s.ExpectedWithdrawals()
+		require.NoError(t, err)
+		require.Equal(t, 1, len(expected))
+		withdrawal := &enginev1.Withdrawal{
+			Index:          0,
+			ValidatorIndex: 20,
+			Address:        s.stakingContractAddress,
+			Amount:         params.BeaconConfig().ProposerBlockReward / 2,
+		}
+		require.DeepEqual(t, withdrawal, expected[0])
 	})
 	t.Run("one fully withdrawable", func(t *testing.T) {
 		s := BeaconState{

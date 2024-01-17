@@ -81,6 +81,7 @@ func emptyGenesisStateDeneb() (state.BeaconState, error) {
 		Eth1DepositIndex: 0,
 
 		LatestExecutionPayloadHeader: &enginev1.ExecutionPayloadHeaderDeneb{},
+		StakingContractAddress:       make([]byte, 20),
 	}
 	return state_native.InitializeFromProtoDeneb(st)
 }
@@ -133,6 +134,10 @@ func buildGenesisBeaconStateDeneb(genesisTime uint64, preState state.BeaconState
 	if err != nil {
 		return nil, err
 	}
+	stakingContractAddress, err := preState.StakingContractAddress()
+	if err != nil {
+		return nil, err
+	}
 	st := &ethpb.BeaconStateDeneb{
 		// Misc fields.
 		Slot:                  0,
@@ -170,10 +175,11 @@ func buildGenesisBeaconStateDeneb(genesisTime uint64, preState state.BeaconState
 			Root:  params.BeaconConfig().ZeroHash[:],
 		},
 
-		HistoricalRoots: [][]byte{},
-		BlockRoots:      blockRoots,
-		StateRoots:      stateRoots,
-		Slashings:       slashings,
+		HistoricalRoots:        [][]byte{},
+		BlockRoots:             blockRoots,
+		StateRoots:             stateRoots,
+		Slashings:              slashings,
+		StakingContractAddress: stakingContractAddress,
 
 		// Eth1 data.
 		Eth1Data:         eth1Data,

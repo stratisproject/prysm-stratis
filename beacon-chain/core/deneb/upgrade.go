@@ -61,6 +61,14 @@ func UpgradeToDeneb(state state.BeaconState) (state.BeaconState, error) {
 	if err != nil {
 		return nil, err
 	}
+	lrpi, err := state.LastRewardedProposerIndex()
+	if err != nil {
+		return nil, err
+	}
+	lrpu, err := state.LastRewardedProposerUpdated()
+	if err != nil {
+		return nil, err
+	}
 
 	s := &ethpb.BeaconStateDeneb{
 		GenesisTime:           state.GenesisTime(),
@@ -114,6 +122,8 @@ func UpgradeToDeneb(state state.BeaconState) (state.BeaconState, error) {
 		NextWithdrawalValidatorIndex: vi,
 		HistoricalSummaries:          summaries,
 		StakingContractAddress:       stakingContractAddress,
+		LastRewardedProposerIndex:    lrpi,
+		LastRewardedProposerUpdated:  lrpu,
 	}
 
 	return state_native.InitializeFromProtoUnsafeDeneb(s)

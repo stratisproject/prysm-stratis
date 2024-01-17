@@ -92,6 +92,8 @@ var denebFields = append(
 	types.NextWithdrawalValidatorIndex,
 	types.HistoricalSummaries,
 	types.StakingContractAddress,
+	types.LastRewardedProposerIndex,
+	types.LastRewardedProposerUpdated,
 )
 
 const (
@@ -609,6 +611,8 @@ func InitializeFromProtoUnsafeDeneb(st *ethpb.BeaconStateDeneb) (state.BeaconSta
 		nextWithdrawalValidatorIndex:      st.NextWithdrawalValidatorIndex,
 		historicalSummaries:               st.HistoricalSummaries,
 		stakingContractAddress:            st.StakingContractAddress,
+		lastRewardedProposerIndex:         st.LastRewardedProposerIndex,
+		lastRewardedProposerUpdated:       st.LastRewardedProposerUpdated,
 
 		dirtyFields:      make(map[types.FieldIndex]bool, fieldCount),
 		dirtyIndices:     make(map[types.FieldIndex][]uint64, fieldCount),
@@ -670,6 +674,9 @@ func InitializeFromProtoUnsafeDeneb(st *ethpb.BeaconStateDeneb) (state.BeaconSta
 	b.sharedFieldReferences[types.CurrentEpochParticipationBits] = stateutil.NewRef(1)
 	b.sharedFieldReferences[types.LatestExecutionPayloadHeaderDeneb] = stateutil.NewRef(1) // New in Deneb.
 	b.sharedFieldReferences[types.HistoricalSummaries] = stateutil.NewRef(1)               // New in Capella.
+	b.sharedFieldReferences[types.StakingContractAddress] = stateutil.NewRef(1)
+	b.sharedFieldReferences[types.LastRewardedProposerIndex] = stateutil.NewRef(1)
+	b.sharedFieldReferences[types.LastRewardedProposerUpdated] = stateutil.NewRef(1)
 	if !features.Get().EnableExperimentalState {
 		b.sharedFieldReferences[types.BlockRoots] = stateutil.NewRef(1)
 		b.sharedFieldReferences[types.StateRoots] = stateutil.NewRef(1)
@@ -713,6 +720,8 @@ func (b *BeaconState) Copy() state.BeaconState {
 		eth1DepositIndex:             b.eth1DepositIndex,
 		nextWithdrawalIndex:          b.nextWithdrawalIndex,
 		nextWithdrawalValidatorIndex: b.nextWithdrawalValidatorIndex,
+		lastRewardedProposerIndex:    b.lastRewardedProposerIndex,
+		lastRewardedProposerUpdated:  b.lastRewardedProposerUpdated,
 
 		// Large arrays, infrequently changed, constant size.
 		blockRoots:                b.blockRoots,
@@ -1057,6 +1066,10 @@ func (b *BeaconState) rootSelector(ctx context.Context, field types.FieldIndex) 
 		return stateutil.HistoricalSummariesRoot(b.historicalSummaries)
 	case types.StakingContractAddress:
 		return ssz.ByteSliceRoot(b.stakingContractAddress, 40)
+	case types.LastRewardedProposerIndex:
+		return ssz.Uint64Root(uint64(b.lastRewardedProposerIndex)), nil
+	case types.LastRewardedProposerUpdated:
+		return ssz.BoolRoot(b.lastRewardedProposerUpdated), nil
 	}
 	return [32]byte{}, errors.New("invalid field index provided")
 }

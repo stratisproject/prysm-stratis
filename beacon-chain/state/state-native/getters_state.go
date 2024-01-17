@@ -172,6 +172,8 @@ func (b *BeaconState) ToProtoUnsafe() interface{} {
 			NextWithdrawalValidatorIndex: b.nextWithdrawalValidatorIndex,
 			HistoricalSummaries:          b.historicalSummaries,
 			StakingContractAddress:       b.stakingContractAddress,
+			LastRewardedProposerIndex:    b.lastRewardedProposerIndex,
+			LastRewardedProposerUpdated:  b.lastRewardedProposerUpdated,
 		}
 	default:
 		return nil
@@ -339,6 +341,8 @@ func (b *BeaconState) ToProto() interface{} {
 			NextWithdrawalValidatorIndex: b.nextWithdrawalValidatorIndex,
 			HistoricalSummaries:          b.historicalSummariesVal(),
 			StakingContractAddress:       b.stakingContractAddressVal(),
+			LastRewardedProposerIndex:    b.lastRewardedProposerIndex,
+			LastRewardedProposerUpdated:  b.lastRewardedProposerUpdated,
 		}
 	default:
 		return nil

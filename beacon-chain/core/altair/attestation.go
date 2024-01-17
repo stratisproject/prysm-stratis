@@ -40,6 +40,15 @@ func ProcessAttestationsNoVerifySignature(
 			return nil, errors.Wrapf(err, "could not verify attestation at index %d in block", idx)
 		}
 	}
+	if len(body.Attestations()) > 0 {
+		if err := RewardProposer(ctx, beaconState); err != nil {
+			return nil, err
+		}
+	} else {
+		if err := beaconState.SetLastRewardedProposerUpdated(false); err != nil {
+			return nil, err
+		}
+	}
 	return beaconState, nil
 }
 
@@ -106,34 +115,27 @@ func SetParticipationAndRewardProposer(
 	targetEpoch primitives.Epoch,
 	indices []uint64,
 	participatedFlags map[uint8]bool, totalBalance uint64) (state.BeaconState, error) {
-	var proposerRewardNumerator uint64
 	currentEpoch := time.CurrentEpoch(beaconState)
 	var stateErr error
 	if targetEpoch == currentEpoch {
 		stateErr = beaconState.ModifyCurrentParticipationBits(func(val []byte) ([]byte, error) {
-			propRewardNum, epochParticipation, err := EpochParticipation(beaconState, indices, val, participatedFlags, totalBalance)
+			_, epochParticipation, err := EpochParticipation(beaconState, indices, val, participatedFlags, totalBalance)
 			if err != nil {
 				return nil, err
 			}
-			proposerRewardNumerator = propRewardNum
 			return epochParticipation, nil
 		})
 	} else {
 		stateErr = beaconState.ModifyPreviousParticipationBits(func(val []byte) ([]byte, error) {
-			propRewardNum, epochParticipation, err := EpochParticipation(beaconState, indices, val, participatedFlags, totalBalance)
+			_, epochParticipation, err := EpochParticipation(beaconState, indices, val, participatedFlags, totalBalance)
 			if err != nil {
 				return nil, err
 			}
-			proposerRewardNumerator = propRewardNum
 			return epochParticipation, nil
 		})
 	}
 	if stateErr != nil {
 		return nil, stateErr
-	}
-
-	if err := RewardProposer(ctx, beaconState, proposerRewardNumerator); err != nil {
-		return nil, err
 	}
 
 	return beaconState, nil
@@ -224,11 +226,19 @@ func EpochParticipation(beaconState state.BeaconState, indices []uint64, epochPa
 //	proposer_reward_denominator = (WEIGHT_DENOMINATOR - PROPOSER_WEIGHT) * WEIGHT_DENOMINATOR // PROPOSER_WEIGHT
 //	proposer_reward = Gwei(proposer_reward_numerator // proposer_reward_denominator)
 //	increase_balance(state, get_beacon_proposer_index(state), proposer_reward)
-func RewardProposer(ctx context.Context, beaconState state.BeaconState, proposerRewardNumerator uint64) error {
+func RewardProposer(ctx context.Context, beaconState state.BeaconState) error {
 	cfg := params.BeaconConfig()
 	proposerReward := cfg.ProposerBlockReward
 	i, err := helpers.BeaconProposerIndex(ctx, beaconState)
 	if err != nil {
+		return err
+	}
+
+	if err := beaconState.SetLastRewardedProposerIndex(i); err != nil {
+		return err
+	}
+
+	if err := beaconState.SetLastRewardedProposerUpdated(true); err != nil {
 		return err
 	}
 

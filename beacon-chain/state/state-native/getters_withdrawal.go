@@ -1,10 +1,7 @@
 package state_native
 
 import (
-	"context"
-
 	"github.com/pkg/errors"
-	"github.com/prysmaticlabs/prysm/v4/beacon-chain/core/helpers"
 	"github.com/prysmaticlabs/prysm/v4/config/params"
 	"github.com/prysmaticlabs/prysm/v4/consensus-types/primitives"
 	"github.com/prysmaticlabs/prysm/v4/encoding/bytesutil"
@@ -60,21 +57,21 @@ func (b *BeaconState) ExpectedWithdrawals() ([]*enginev1.Withdrawal, error) {
 	withdrawalIndex := b.nextWithdrawalIndex
 	epoch := slots.ToEpoch(b.slot)
 
-	proposerIndex, err := helpers.BeaconProposerIndex(context.Background(), b)
-	if err != nil {
-		return nil, errors.Wrapf(err, "could not retrieve proposer index")
-	}
+	lastRewardedProposerIndex := b.lastRewardedProposerIndex
+	lastRewardedProposerUpdated := b.lastRewardedProposerUpdated
 
 	// Always 50% of proposer block reward
 	stakingContractReward := cfg.ProposerBlockReward / 2
-	// Add staking contract reward withdrawal to each block
-	withdrawals = append(withdrawals, &enginev1.Withdrawal{
-		Index:          withdrawalIndex,
-		ValidatorIndex: proposerIndex,
-		Address:        bytesutil.SafeCopyBytes(b.stakingContractAddress),
-		Amount:         stakingContractReward,
-	})
-	withdrawalIndex++
+	if lastRewardedProposerUpdated {
+		// Add staking contract reward withdrawal for each rewarded proposer
+		withdrawals = append(withdrawals, &enginev1.Withdrawal{
+			Index:          withdrawalIndex,
+			ValidatorIndex: lastRewardedProposerIndex,
+			Address:        bytesutil.SafeCopyBytes(b.stakingContractAddress),
+			Amount:         stakingContractReward,
+		})
+		withdrawalIndex++
+	}
 
 	validatorsLen := b.validatorsLen()
 	bound := mathutil.Min(uint64(validatorsLen), params.BeaconConfig().MaxValidatorsPerWithdrawalsSweep)
@@ -87,8 +84,9 @@ func (b *BeaconState) ExpectedWithdrawals() ([]*enginev1.Withdrawal, error) {
 		if err != nil {
 			return nil, errors.Wrapf(err, "could not retrieve balance at index %d", validatorIndex)
 		}
-		// Substract staking contract reward part from block proposer's balance
-		if validatorIndex == proposerIndex {
+		// Substract staking contract reward part from block proposer's balance,
+		// because this amount was already withdrawn in the first withdrawal in the list
+		if lastRewardedProposerUpdated && validatorIndex == lastRewardedProposerIndex {
 			balance -= stakingContractReward
 		}
 		if balance > 0 && isFullyWithdrawableValidator(val, epoch) {

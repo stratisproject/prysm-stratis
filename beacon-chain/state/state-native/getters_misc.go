@@ -120,5 +120,28 @@ func (b *BeaconState) StakingContractAddress() ([]byte, error) {
 func (b *BeaconState) stakingContractAddressVal() []byte {
 	tmp := make([]byte, len(b.stakingContractAddress))
 	copy(tmp, b.stakingContractAddress)
+	copy(tmp, b.stakingContractAddress)
 	return tmp
+}
+
+func (b *BeaconState) LastRewardedProposerIndex() (primitives.ValidatorIndex, error) {
+	if b.version < version.Deneb {
+		return 0, errNotSupported("LastRewardedProposerIndex", b.version)
+	}
+
+	b.lock.RLock()
+	defer b.lock.RUnlock()
+
+	return b.lastRewardedProposerIndex, nil
+}
+
+func (b *BeaconState) LastRewardedProposerUpdated() (bool, error) {
+	if b.version < version.Deneb {
+		return false, errNotSupported("LastRewardedProposerUpdated", b.version)
+	}
+
+	b.lock.RLock()
+	defer b.lock.RUnlock()
+
+	return b.lastRewardedProposerUpdated, nil
 }

@@ -570,6 +570,14 @@ func BeaconStateDenebFromConsensus(st beaconState.BeaconState) (*BeaconStateDene
 	if len(scab) >= 20 {
 		sca = common.BytesToAddress(scab)
 	}
+	lrpi, err := st.LastRewardedProposerIndex()
+	if err != nil {
+		return nil, err
+	}
+	lrpu, err := st.LastRewardedProposerUpdated()
+	if err != nil {
+		return nil, err
+	}
 
 	return &BeaconStateDeneb{
 		GenesisTime:                  fmt.Sprintf("%d", st.GenesisTime()),
@@ -601,5 +609,7 @@ func BeaconStateDenebFromConsensus(st beaconState.BeaconState) (*BeaconStateDene
 		NextWithdrawalValidatorIndex: fmt.Sprintf("%d", nwvi),
 		HistoricalSummaries:          hs,
 		StakingContractAddress:       sca.Hex(),
+		LastRewardedProposerIndex:    fmt.Sprintf("%d", lrpi),
+		LastRewardedProposerUpdated:  lrpu,
 	}, nil
 }

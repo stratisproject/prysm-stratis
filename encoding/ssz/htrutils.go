@@ -21,6 +21,11 @@ func Uint64Root(val uint64) [32]byte {
 	return root
 }
 
+func BoolRoot(val bool) [32]byte {
+	root := bytesutil.ToBytes32([]byte{bytesutil.FromBool(val)})
+	return root
+}
+
 // ForkRoot computes the HashTreeRoot Merkleization of
 // a Fork struct value according to the Ethereum
 // Simple Serialize specification.
