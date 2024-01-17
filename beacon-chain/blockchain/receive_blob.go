@@ -7,7 +7,7 @@ import (
 )
 
 // SendNewBlobEvent sends a message to the BlobNotifier channel that the blob
-// for the block root `root` is ready in the database
+// for the block `root` is ready in the database
 func (s *Service) sendNewBlobEvent(root [32]byte, index uint64) {
 	s.blobNotifiers.notifyIndex(root, index)
 }
