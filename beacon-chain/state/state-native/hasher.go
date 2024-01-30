@@ -256,7 +256,7 @@ func ComputeFieldRootsWithHasher(ctx context.Context, state *BeaconState) ([][]b
 		// Last rewarded proposer index
 		lastRewardedProposerIndexRoot := make([]byte, 32)
 		binary.LittleEndian.PutUint64(lastRewardedProposerIndexRoot, uint64(state.lastRewardedProposerIndex))
-		fieldRoots[types.LastRewardedProposerIndex.RealPosition()] = lastRewardedProposerIndexRoot[:]
+		fieldRoots[types.LastRewardedProposerIndex.RealPosition()] = lastRewardedProposerIndexRoot
 
 		lastRewardedProposerUpdatedRoot := ssz.BoolRoot(state.lastRewardedProposerUpdated)
 		fieldRoots[types.LastRewardedProposerUpdated.RealPosition()] = lastRewardedProposerUpdatedRoot[:]

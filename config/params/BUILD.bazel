@@ -14,11 +14,8 @@ go_library(
         "mainnet_config.go",
         "minimal_config.go",
         "network_config.go",
-        "stratisnet_config.go",
         "testnet_e2e_config.go",
-        "testnet_holesky_config.go",
-        "testnet_prater_config.go",
-        "testnet_sepolia_config.go",
+        "testnet_auroria_config.go",
         "testutils.go",
         "testutils_develop.go",  # keep
         "values.go",
