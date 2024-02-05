@@ -5,8 +5,9 @@ go_library(
     srcs = [
         "genesis.go",
         "genesis_mainnet.go",
+        "genesis_auroria.go",
     ],
-    embedsrcs = ["mainnet.ssz.snappy"],
+    embedsrcs = ["mainnet.ssz.snappy","auroria.ssz.snappy"],
     importpath = "github.com/prysmaticlabs/prysm/v4/beacon-chain/state/genesis",
     visibility = ["//beacon-chain/db:__subpackages__"],
     deps = [
