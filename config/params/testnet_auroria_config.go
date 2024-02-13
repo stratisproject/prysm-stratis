@@ -23,6 +23,7 @@ func AuroriaConfig() *BeaconChainConfig {
 	cfg.BellatrixForkVersion = []byte{12, 0, 10, 20}
 	cfg.CapellaForkVersion = []byte{13, 0, 10, 20}
 	cfg.DenebForkVersion = []byte{14, 0, 10, 20}
+	cfg.EjectionBalance = 17500 * 1e9
 
 	cfg.InitializeForkSchedule()
 	return cfg
