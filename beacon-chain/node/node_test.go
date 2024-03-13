@@ -198,7 +198,7 @@ func Test_hasNetworkFlag(t *testing.T) {
 			want:         true,
 		},
 		{
-			name:         "Mainnet",
+			name:         "Stratis Mainnet",
 			networkName:  features.Mainnet.Name,
 			networkValue: "mainnet",
 			want:         true,
