@@ -5,19 +5,20 @@ import (
 	"fmt"
 
 	lru "github.com/hashicorp/golang-lru"
-	lruwrpr "github.com/prysmaticlabs/prysm/v4/cache/lru"
+	lruwrpr "github.com/prysmaticlabs/prysm/v5/cache/lru"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/prysmaticlabs/prysm/v4/beacon-chain/core/helpers"
-	"github.com/prysmaticlabs/prysm/v4/beacon-chain/core/signing"
-	"github.com/prysmaticlabs/prysm/v4/beacon-chain/core/transition"
-	"github.com/prysmaticlabs/prysm/v4/beacon-chain/state"
-	"github.com/prysmaticlabs/prysm/v4/config/params"
-	"github.com/prysmaticlabs/prysm/v4/consensus-types/primitives"
-	"github.com/prysmaticlabs/prysm/v4/crypto/bls"
-	"github.com/prysmaticlabs/prysm/v4/network/forks"
-	ethpb "github.com/prysmaticlabs/prysm/v4/proto/prysm/v1alpha1"
-	"github.com/prysmaticlabs/prysm/v4/time/slots"
+	"github.com/prysmaticlabs/prysm/v5/beacon-chain/core/helpers"
+	"github.com/prysmaticlabs/prysm/v5/beacon-chain/core/signing"
+	"github.com/prysmaticlabs/prysm/v5/beacon-chain/core/transition"
+	forkchoicetypes "github.com/prysmaticlabs/prysm/v5/beacon-chain/forkchoice/types"
+	"github.com/prysmaticlabs/prysm/v5/beacon-chain/state"
+	"github.com/prysmaticlabs/prysm/v5/config/params"
+	"github.com/prysmaticlabs/prysm/v5/consensus-types/primitives"
+	"github.com/prysmaticlabs/prysm/v5/crypto/bls"
+	"github.com/prysmaticlabs/prysm/v5/network/forks"
+	ethpb "github.com/prysmaticlabs/prysm/v5/proto/prysm/v1alpha1"
+	"github.com/prysmaticlabs/prysm/v5/time/slots"
 )
 
 const (
@@ -137,7 +138,7 @@ func (c *sigCache) SignatureVerified(sig SignatureData) (bool, error) {
 // across multiple values.
 type ProposerCache interface {
 	ComputeProposer(ctx context.Context, root [32]byte, slot primitives.Slot, pst state.BeaconState) (primitives.ValidatorIndex, error)
-	Proposer(root [32]byte, slot primitives.Slot) (primitives.ValidatorIndex, bool)
+	Proposer(c *forkchoicetypes.Checkpoint, slot primitives.Slot) (primitives.ValidatorIndex, bool)
 }
 
 func newPropCache() *propCache {
@@ -163,7 +164,10 @@ func (*propCache) ComputeProposer(ctx context.Context, parent [32]byte, slot pri
 
 // Proposer returns the validator index if it is found in the cache, along with a boolean indicating
 // whether the value was present, similar to accessing an lru or go map.
-func (*propCache) Proposer(_ [32]byte, _ primitives.Slot) (primitives.ValidatorIndex, bool) {
-	// TODO: replace with potuz' proposer id cache
-	return 0, false
+func (*propCache) Proposer(c *forkchoicetypes.Checkpoint, slot primitives.Slot) (primitives.ValidatorIndex, bool) {
+	id, err := helpers.ProposerIndexAtSlotFromCheckpoint(c, slot)
+	if err != nil {
+		return 0, false
+	}
+	return id, true
 }

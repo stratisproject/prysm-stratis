@@ -3,6 +3,7 @@ package features
 import (
 	"time"
 
+	backfill "github.com/prysmaticlabs/prysm/v5/cmd/beacon-chain/sync/backfill/flags"
 	"github.com/urfave/cli/v2"
 )
 
@@ -16,27 +17,23 @@ var (
 	Mainnet = &cli.BoolFlag{
 		Value: true,
 		Name:  "mainnet",
-		Usage: "Run on Stratis Beacon Chain Main Net. This is the default and can be omitted.",
+		Usage: "Run on Stratis main network. This is the default and can be omitted.",
 	}
 	devModeFlag = &cli.BoolFlag{
 		Name:  "dev",
-		Usage: "Enable experimental features still in development. These features may not be stable.",
+		Usage: "Enables experimental features still in development. These features may not be stable.",
 	}
 	enableExperimentalState = &cli.BoolFlag{
 		Name:  "enable-experimental-state",
-		Usage: "Turn on the latest and greatest (but potentially unstable) changes to the beacon state",
+		Usage: "Turns on the latest and greatest (but potentially unstable) changes to the beacon state.",
 	}
 	writeSSZStateTransitionsFlag = &cli.BoolFlag{
 		Name:  "interop-write-ssz-state-transitions",
-		Usage: "Write ssz states to disk after attempted state transition",
+		Usage: "Writes SSZ states to disk after attempted state transitio.",
 	}
 	disableGRPCConnectionLogging = &cli.BoolFlag{
 		Name:  "disable-grpc-connection-logging",
-		Usage: "Disables displaying logs for newly connected grpc clients",
-	}
-	disableReorgLateBlocks = &cli.BoolFlag{
-		Name:  "disable-reorg-late-blocks",
-		Usage: "Disables reorgs of late blocks",
+		Usage: "Disables displaying logs for newly connected grpc clients.",
 	}
 	disablePeerScorer = &cli.BoolFlag{
 		Name:  "disable-peer-scorer",
@@ -44,31 +41,31 @@ var (
 	}
 	writeWalletPasswordOnWebOnboarding = &cli.BoolFlag{
 		Name: "write-wallet-password-on-web-onboarding",
-		Usage: "(Danger): Writes the wallet password to the wallet directory on completing Prysm web onboarding. " +
-			"We recommend against this flag unless you are an advanced user.",
+		Usage: `(Danger): Writes the wallet password to the wallet directory on completing Prysm web onboarding.
+	We recommend against this flag unless you are an advanced user.`,
 	}
 	aggregateFirstInterval = &cli.DurationFlag{
 		Name:   "aggregate-first-interval",
-		Usage:  "(Advanced): Specifies the first interval in which attestations are aggregated in the slot (typically unnaggregated attestations are aggregated in this interval)",
+		Usage:  "(Advanced): Specifies the first interval in which attestations are aggregated in the slot (typically unnaggregated attestations are aggregated in this interval).",
 		Value:  7000 * time.Millisecond,
 		Hidden: true,
 	}
 	aggregateSecondInterval = &cli.DurationFlag{
 		Name:   "aggregate-second-interval",
-		Usage:  "(Advanced): Specifies the second interval in which attestations are aggregated in the slot",
+		Usage:  "(Advanced): Specifies the second interval in which attestations are aggregated in the slot.",
 		Value:  9500 * time.Millisecond,
 		Hidden: true,
 	}
 	aggregateThirdInterval = &cli.DurationFlag{
 		Name:   "aggregate-third-interval",
-		Usage:  "(Advanced): Specifies the third interval in which attestations are aggregated in the slot",
+		Usage:  "(Advanced): Specifies the third interval in which attestations are aggregated in the slot.",
 		Value:  11800 * time.Millisecond,
 		Hidden: true,
 	}
 	dynamicKeyReloadDebounceInterval = &cli.DurationFlag{
 		Name: "dynamic-key-reload-debounce-interval",
-		Usage: "(Advanced): Specifies the time duration the validator waits to reload new keys if they have " +
-			"changed on disk. Default 1s, can be any type of duration such as 1.5s, 1000ms, 1m.",
+		Usage: `(Advanced): Specifies the time duration the validator waits to reload new keys if they have changed on disk.
+	Can be any type of duration such as 1.5s, 1000ms, 1m.`,
 		Value: time.Second,
 	}
 	disableBroadcastSlashingFlag = &cli.BoolFlag{
@@ -77,25 +74,25 @@ var (
 	}
 	attestTimely = &cli.BoolFlag{
 		Name:  "attest-timely",
-		Usage: "Fixes validator can attest timely after current block processes. See #8185 for more details",
+		Usage: "Fixes validator can attest timely after current block processes. See #8185 for more details.",
 	}
 	enableSlasherFlag = &cli.BoolFlag{
 		Name:  "slasher",
-		Usage: "Enables a slasher in the beacon node for detecting slashable offenses",
+		Usage: "Enables a slasher in the beacon node for detecting slashable offenses.",
 	}
 	enableSlashingProtectionPruning = &cli.BoolFlag{
 		Name:  "enable-slashing-protection-history-pruning",
-		Usage: "Enables the pruning of the validator client's slashing protection database",
+		Usage: "Enables the pruning of the validator client's slashing protection database.",
 	}
 	enableDoppelGangerProtection = &cli.BoolFlag{
 		Name: "enable-doppelganger",
-		Usage: "Enables the validator to perform a doppelganger check. (Warning): This is not " +
-			"a foolproof method to find duplicate instances in the network. Your validator will still be" +
-			" vulnerable if it is being run in unsafe configurations.",
+		Usage: `Enables the validator to perform a doppelganger check.
+		This is not "a foolproof method to find duplicate instances in the network.
+		Your validator will still be vulnerable if it is being run in unsafe configurations.`,
 	}
 	disableStakinContractCheck = &cli.BoolFlag{
 		Name:  "disable-staking-contract-check",
-		Usage: "Disables checking of staking contract deposits when proposing blocks, useful for devnets",
+		Usage: "Disables checking of staking contract deposits when proposing blocks, useful for devnets.",
 	}
 	enableHistoricalSpaceRepresentation = &cli.BoolFlag{
 		Name: "enable-historical-state-representation",
@@ -105,60 +102,58 @@ var (
 	}
 	enableStartupOptimistic = &cli.BoolFlag{
 		Name:   "startup-optimistic",
-		Usage:  "Treats every block as optimistically synced at launch. Use with caution",
+		Usage:  "Treats every block as optimistically synced at launch. Use with caution.",
 		Value:  false,
 		Hidden: true,
 	}
 	enableFullSSZDataLogging = &cli.BoolFlag{
 		Name:  "enable-full-ssz-data-logging",
-		Usage: "Enables displaying logs for full ssz data on rejected gossip messages",
+		Usage: "Enables displaying logs for full ssz data on rejected gossip messages.",
 	}
 	SaveFullExecutionPayloads = &cli.BoolFlag{
 		Name:  "save-full-execution-payloads",
-		Usage: "Saves beacon blocks with full execution payloads instead of execution payload headers in the database",
+		Usage: "Saves beacon blocks with full execution payloads instead of execution payload headers in the database.",
 	}
 	EnableBeaconRESTApi = &cli.BoolFlag{
 		Name:  "enable-beacon-rest-api",
-		Usage: "Experimental enable of the beacon REST API when querying a beacon node",
+		Usage: "(Experimental): Enables of the beacon REST API when querying a beacon node.",
 	}
-	enableVerboseSigVerification = &cli.BoolFlag{
-		Name:  "enable-verbose-sig-verification",
-		Usage: "Enables identifying invalid signatures if batch verification fails when processing block",
-	}
-	disableOptionalEngineMethods = &cli.BoolFlag{
-		Name:  "disable-optional-engine-methods",
-		Usage: "Disables the optional engine methods",
+	disableVerboseSigVerification = &cli.BoolFlag{
+		Name:  "disable-verbose-sig-verification",
+		Usage: "Disables identifying invalid signatures if batch verification fails when processing block.",
 	}
 	prepareAllPayloads = &cli.BoolFlag{
 		Name:  "prepare-all-payloads",
-		Usage: "Informs the engine to prepare all local payloads. Useful for relayers and builders",
+		Usage: "Informs the engine to prepare all local payloads. Useful for relayers and builders.",
 	}
-	EnableEIP4881 = &cli.BoolFlag{
-		Name:  "enable-eip-4881",
-		Usage: "Enables the deposit tree specified in EIP4881",
+	DisableEIP4881 = &cli.BoolFlag{
+		Name:  "disable-eip-4881",
+		Usage: "Disables the deposit tree specified in EIP-4881.",
+	}
+	EnableLightClient = &cli.BoolFlag{
+		Name:  "enable-lightclient",
+		Usage: "Enables the light client support in the beacon node",
 	}
 	disableResourceManager = &cli.BoolFlag{
 		Name:  "disable-resource-manager",
-		Usage: "Disables running the libp2p resource manager",
+		Usage: "Disables running the libp2p resource manager.",
 	}
-
 	// DisableRegistrationCache a flag for disabling the validator registration cache and use db instead.
 	DisableRegistrationCache = &cli.BoolFlag{
 		Name:  "disable-registration-cache",
-		Usage: "A temporary flag for disabling the validator registration cache instead of using the db. note: registrations do not clear on restart while using the db",
+		Usage: "Temporary flag for disabling the validator registration cache instead of using the DB. Note: registrations do not clear on restart while using the DB.",
 	}
-
-	disableAggregateParallel = &cli.BoolFlag{
-		Name:  "disable-aggregate-parallel",
-		Usage: "Disables parallel aggregation of attestations",
+	// BlobSaveFsync enforces durable filesystem writes for use cases where blob availability is critical.
+	BlobSaveFsync = &cli.BoolFlag{
+		Name:  "blob-save-fsync",
+		Usage: "Forces new blob files to be fysnc'd before continuing, ensuring durable blob writes.",
 	}
 )
 
 // devModeFlags holds list of flags that are set when development mode is on.
 var devModeFlags = []cli.Flag{
-	enableVerboseSigVerification,
-	EnableEIP4881,
 	enableExperimentalState,
+	backfill.EnableExperimentalBackfill,
 }
 
 // ValidatorFlags contains a list of all the feature flags that apply to the validator client.
@@ -191,20 +186,19 @@ var BeaconChainFlags = append(deprecatedBeaconFlags, append(deprecatedFlags, []c
 	enableSlasherFlag,
 	enableHistoricalSpaceRepresentation,
 	disableStakinContractCheck,
-	disableReorgLateBlocks,
 	SaveFullExecutionPayloads,
 	enableStartupOptimistic,
 	enableFullSSZDataLogging,
-	enableVerboseSigVerification,
-	disableOptionalEngineMethods,
+	disableVerboseSigVerification,
 	prepareAllPayloads,
 	aggregateFirstInterval,
 	aggregateSecondInterval,
 	aggregateThirdInterval,
-	EnableEIP4881,
+	DisableEIP4881,
 	disableResourceManager,
 	DisableRegistrationCache,
-	disableAggregateParallel,
+	EnableLightClient,
+	BlobSaveFsync,
 }...)...)
 
 // E2EBeaconChainFlags contains a list of the beacon chain feature flags to be tested in E2E.

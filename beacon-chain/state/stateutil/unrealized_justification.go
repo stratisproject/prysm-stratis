@@ -2,10 +2,10 @@ package stateutil
 
 import (
 	"github.com/pkg/errors"
-	"github.com/prysmaticlabs/prysm/v4/config/params"
-	"github.com/prysmaticlabs/prysm/v4/consensus-types/primitives"
-	"github.com/prysmaticlabs/prysm/v4/math"
-	ethpb "github.com/prysmaticlabs/prysm/v4/proto/prysm/v1alpha1"
+	"github.com/prysmaticlabs/prysm/v5/config/params"
+	"github.com/prysmaticlabs/prysm/v5/consensus-types/primitives"
+	"github.com/prysmaticlabs/prysm/v5/math"
+	ethpb "github.com/prysmaticlabs/prysm/v5/proto/prysm/v1alpha1"
 )
 
 // UnrealizedCheckpointBalances returns the total current active balance, the
@@ -24,23 +24,27 @@ func UnrealizedCheckpointBalances(cp, pp []byte, validators []*ethpb.Validator, 
 
 	var err error
 	for i, v := range validators {
-		active := v.ActivationEpoch <= currentEpoch && currentEpoch < v.ExitEpoch
-		if active && !v.Slashed {
+		activeCurrent := v.ActivationEpoch <= currentEpoch && currentEpoch < v.ExitEpoch
+		if activeCurrent {
 			activeBalance, err = math.Add64(activeBalance, v.EffectiveBalance)
 			if err != nil {
 				return 0, 0, 0, err
 			}
-			if ((cp[i] >> targetIdx) & 1) == 1 {
-				currentTarget, err = math.Add64(currentTarget, v.EffectiveBalance)
-				if err != nil {
-					return 0, 0, 0, err
-				}
+		}
+		if v.Slashed {
+			continue
+		}
+		if activeCurrent && ((cp[i]>>targetIdx)&1) == 1 {
+			currentTarget, err = math.Add64(currentTarget, v.EffectiveBalance)
+			if err != nil {
+				return 0, 0, 0, err
 			}
-			if ((pp[i] >> targetIdx) & 1) == 1 {
-				prevTarget, err = math.Add64(prevTarget, v.EffectiveBalance)
-				if err != nil {
-					return 0, 0, 0, err
-				}
+		}
+		activePrevious := v.ActivationEpoch+1 <= currentEpoch && currentEpoch <= v.ExitEpoch
+		if activePrevious && ((pp[i]>>targetIdx)&1) == 1 {
+			prevTarget, err = math.Add64(prevTarget, v.EffectiveBalance)
+			if err != nil {
+				return 0, 0, 0, err
 			}
 		}
 	}

@@ -9,19 +9,19 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/prysmaticlabs/go-bitfield"
-	"github.com/prysmaticlabs/prysm/v4/beacon-chain/cache"
-	"github.com/prysmaticlabs/prysm/v4/beacon-chain/core/time"
-	forkchoicetypes "github.com/prysmaticlabs/prysm/v4/beacon-chain/forkchoice/types"
-	"github.com/prysmaticlabs/prysm/v4/beacon-chain/state"
-	fieldparams "github.com/prysmaticlabs/prysm/v4/config/fieldparams"
-	"github.com/prysmaticlabs/prysm/v4/config/params"
-	"github.com/prysmaticlabs/prysm/v4/consensus-types/primitives"
-	"github.com/prysmaticlabs/prysm/v4/container/slice"
-	"github.com/prysmaticlabs/prysm/v4/crypto/hash"
-	"github.com/prysmaticlabs/prysm/v4/encoding/bytesutil"
-	"github.com/prysmaticlabs/prysm/v4/math"
-	ethpb "github.com/prysmaticlabs/prysm/v4/proto/prysm/v1alpha1"
-	"github.com/prysmaticlabs/prysm/v4/time/slots"
+	"github.com/prysmaticlabs/prysm/v5/beacon-chain/cache"
+	"github.com/prysmaticlabs/prysm/v5/beacon-chain/core/time"
+	forkchoicetypes "github.com/prysmaticlabs/prysm/v5/beacon-chain/forkchoice/types"
+	"github.com/prysmaticlabs/prysm/v5/beacon-chain/state"
+	fieldparams "github.com/prysmaticlabs/prysm/v5/config/fieldparams"
+	"github.com/prysmaticlabs/prysm/v5/config/params"
+	"github.com/prysmaticlabs/prysm/v5/consensus-types/primitives"
+	"github.com/prysmaticlabs/prysm/v5/container/slice"
+	"github.com/prysmaticlabs/prysm/v5/crypto/hash"
+	"github.com/prysmaticlabs/prysm/v5/encoding/bytesutil"
+	"github.com/prysmaticlabs/prysm/v5/math"
+	ethpb "github.com/prysmaticlabs/prysm/v5/proto/prysm/v1alpha1"
+	"github.com/prysmaticlabs/prysm/v5/time/slots"
 )
 
 var (
@@ -379,7 +379,7 @@ func UpdateCachedCheckpointToStateRoot(state state.ReadOnlyBeaconState, cp *fork
 	if cp.Epoch <= params.BeaconConfig().GenesisEpoch+params.BeaconConfig().MinSeedLookahead {
 		return nil
 	}
-	slot, err := slots.EpochEnd(cp.Epoch - 1)
+	slot, err := slots.EpochEnd(cp.Epoch)
 	if err != nil {
 		return err
 	}
@@ -388,49 +388,6 @@ func UpdateCachedCheckpointToStateRoot(state state.ReadOnlyBeaconState, cp *fork
 		return err
 	}
 	proposerIndicesCache.SetCheckpoint(*cp, [32]byte(root))
-	return nil
-}
-
-// UpdateUnsafeProposerIndicesInCache updates proposer indices entry of the
-// cache one epoch in advance.
-// Input state is used to retrieve active validator indices.
-// Input root is to use as key in the cache.
-// Input epoch is the epoch to retrieve proposer indices for.
-func UpdateUnsafeProposerIndicesInCache(ctx context.Context, state state.ReadOnlyBeaconState, epoch primitives.Epoch) error {
-	// The cache uses the state root at the end of (current epoch - 2) as key.
-	// (e.g. for epoch 2, the key is root at slot 31)
-	if epoch <= params.BeaconConfig().GenesisEpoch+2*params.BeaconConfig().MinSeedLookahead {
-		return nil
-	}
-	slot, err := slots.EpochEnd(epoch - 2)
-	if err != nil {
-		return err
-	}
-	root, err := state.StateRootAtIndex(uint64(slot % params.BeaconConfig().SlotsPerHistoricalRoot))
-	if err != nil {
-		return err
-	}
-	// Skip cache update if the key already exists
-	_, ok := proposerIndicesCache.UnsafeProposerIndices(epoch, [32]byte(root))
-	if ok {
-		return nil
-	}
-	indices, err := ActiveValidatorIndices(ctx, state, epoch)
-	if err != nil {
-		return err
-	}
-	proposerIndices, err := precomputeProposerIndices(state, indices, epoch)
-	if err != nil {
-		return err
-	}
-	if len(proposerIndices) != int(params.BeaconConfig().SlotsPerEpoch) {
-		return errors.New("invalid proposer length returned from state")
-	}
-	// This is here to deal with tests only
-	var indicesArray [fieldparams.SlotsPerEpoch]primitives.ValidatorIndex
-	copy(indicesArray[:], proposerIndices)
-	proposerIndicesCache.Prune(epoch - 2)
-	proposerIndicesCache.SetUnsafe(epoch, [32]byte(root), indicesArray)
 	return nil
 }
 

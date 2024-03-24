@@ -3,9 +3,9 @@ package sync
 import (
 	"context"
 
-	"github.com/prysmaticlabs/prysm/v4/beacon-chain/blockchain"
-	"github.com/prysmaticlabs/prysm/v4/beacon-chain/core/transition/interop"
-	"github.com/prysmaticlabs/prysm/v4/consensus-types/blocks"
+	"github.com/prysmaticlabs/prysm/v5/beacon-chain/blockchain"
+	"github.com/prysmaticlabs/prysm/v5/beacon-chain/core/transition/interop"
+	"github.com/prysmaticlabs/prysm/v5/consensus-types/blocks"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -27,7 +27,7 @@ func (s *Service) beaconBlockSubscriber(ctx context.Context, msg proto.Message) 
 		return err
 	}
 
-	if err := s.cfg.chain.ReceiveBlock(ctx, signed, root); err != nil {
+	if err := s.cfg.chain.ReceiveBlock(ctx, signed, root, nil); err != nil {
 		if blockchain.IsInvalidBlock(err) {
 			r := blockchain.InvalidBlockRoot(err)
 			if r != [32]byte{} {

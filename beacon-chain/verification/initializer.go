@@ -4,12 +4,12 @@ import (
 	"context"
 	"sync"
 
-	"github.com/prysmaticlabs/prysm/v4/beacon-chain/blockchain/kzg"
-	forkchoicetypes "github.com/prysmaticlabs/prysm/v4/beacon-chain/forkchoice/types"
-	"github.com/prysmaticlabs/prysm/v4/beacon-chain/startup"
-	"github.com/prysmaticlabs/prysm/v4/beacon-chain/state"
-	"github.com/prysmaticlabs/prysm/v4/consensus-types/blocks"
-	"github.com/prysmaticlabs/prysm/v4/consensus-types/primitives"
+	"github.com/prysmaticlabs/prysm/v5/beacon-chain/blockchain/kzg"
+	forkchoicetypes "github.com/prysmaticlabs/prysm/v5/beacon-chain/forkchoice/types"
+	"github.com/prysmaticlabs/prysm/v5/beacon-chain/startup"
+	"github.com/prysmaticlabs/prysm/v5/beacon-chain/state"
+	"github.com/prysmaticlabs/prysm/v5/consensus-types/blocks"
+	"github.com/prysmaticlabs/prysm/v5/consensus-types/primitives"
 )
 
 // Forkchoicer represents the forkchoice methods that the verifiers need.
@@ -20,6 +20,7 @@ type Forkchoicer interface {
 	HasNode([32]byte) bool
 	IsCanonical(root [32]byte) bool
 	Slot([32]byte) (primitives.Slot, error)
+	TargetRootForEpoch([32]byte, primitives.Epoch) ([32]byte, error)
 }
 
 // StateByRooter describes a stategen-ish type that can produce arbitrary states by their root
@@ -39,18 +40,18 @@ type sharedResources struct {
 
 // Initializer is used to create different Verifiers.
 // Verifiers require access to stateful data structures, like caches,
-// and it is Initializer's job to provides access to those.
+// and it is Initializer's job to provide access to those.
 type Initializer struct {
 	shared *sharedResources
 }
 
 // NewBlobVerifier creates a BlobVerifier for a single blob, with the given set of requirements.
-func (ini *Initializer) NewBlobVerifier(b blocks.ROBlob, reqs ...Requirement) *BlobVerifier {
-	return &BlobVerifier{
+func (ini *Initializer) NewBlobVerifier(b blocks.ROBlob, reqs []Requirement) *ROBlobVerifier {
+	return &ROBlobVerifier{
 		sharedResources:      ini.shared,
 		blob:                 b,
 		results:              newResults(reqs...),
-		verifyBlobCommitment: kzg.VerifyROBlobCommitment,
+		verifyBlobCommitment: kzg.Verify,
 	}
 }
 

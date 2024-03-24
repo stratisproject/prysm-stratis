@@ -15,34 +15,35 @@ import (
 	"github.com/libp2p/go-libp2p/core/peer"
 	gcache "github.com/patrickmn/go-cache"
 	"github.com/pkg/errors"
-	"github.com/prysmaticlabs/prysm/v4/async"
-	"github.com/prysmaticlabs/prysm/v4/async/abool"
-	"github.com/prysmaticlabs/prysm/v4/async/event"
-	"github.com/prysmaticlabs/prysm/v4/beacon-chain/blockchain"
-	blockfeed "github.com/prysmaticlabs/prysm/v4/beacon-chain/core/feed/block"
-	"github.com/prysmaticlabs/prysm/v4/beacon-chain/core/feed/operation"
-	statefeed "github.com/prysmaticlabs/prysm/v4/beacon-chain/core/feed/state"
-	"github.com/prysmaticlabs/prysm/v4/beacon-chain/db"
-	"github.com/prysmaticlabs/prysm/v4/beacon-chain/db/filesystem"
-	"github.com/prysmaticlabs/prysm/v4/beacon-chain/execution"
-	"github.com/prysmaticlabs/prysm/v4/beacon-chain/operations/attestations"
-	"github.com/prysmaticlabs/prysm/v4/beacon-chain/operations/blstoexec"
-	"github.com/prysmaticlabs/prysm/v4/beacon-chain/operations/slashings"
-	"github.com/prysmaticlabs/prysm/v4/beacon-chain/operations/synccommittee"
-	"github.com/prysmaticlabs/prysm/v4/beacon-chain/operations/voluntaryexits"
-	"github.com/prysmaticlabs/prysm/v4/beacon-chain/p2p"
-	"github.com/prysmaticlabs/prysm/v4/beacon-chain/startup"
-	"github.com/prysmaticlabs/prysm/v4/beacon-chain/state/stategen"
-	"github.com/prysmaticlabs/prysm/v4/beacon-chain/verification"
-	lruwrpr "github.com/prysmaticlabs/prysm/v4/cache/lru"
-	"github.com/prysmaticlabs/prysm/v4/config/params"
-	"github.com/prysmaticlabs/prysm/v4/consensus-types/blocks"
-	"github.com/prysmaticlabs/prysm/v4/consensus-types/interfaces"
-	leakybucket "github.com/prysmaticlabs/prysm/v4/container/leaky-bucket"
-	ethpb "github.com/prysmaticlabs/prysm/v4/proto/prysm/v1alpha1"
-	"github.com/prysmaticlabs/prysm/v4/runtime"
-	prysmTime "github.com/prysmaticlabs/prysm/v4/time"
-	"github.com/prysmaticlabs/prysm/v4/time/slots"
+	"github.com/prysmaticlabs/prysm/v5/async"
+	"github.com/prysmaticlabs/prysm/v5/async/abool"
+	"github.com/prysmaticlabs/prysm/v5/async/event"
+	"github.com/prysmaticlabs/prysm/v5/beacon-chain/blockchain"
+	blockfeed "github.com/prysmaticlabs/prysm/v5/beacon-chain/core/feed/block"
+	"github.com/prysmaticlabs/prysm/v5/beacon-chain/core/feed/operation"
+	statefeed "github.com/prysmaticlabs/prysm/v5/beacon-chain/core/feed/state"
+	"github.com/prysmaticlabs/prysm/v5/beacon-chain/db"
+	"github.com/prysmaticlabs/prysm/v5/beacon-chain/db/filesystem"
+	"github.com/prysmaticlabs/prysm/v5/beacon-chain/execution"
+	"github.com/prysmaticlabs/prysm/v5/beacon-chain/operations/attestations"
+	"github.com/prysmaticlabs/prysm/v5/beacon-chain/operations/blstoexec"
+	"github.com/prysmaticlabs/prysm/v5/beacon-chain/operations/slashings"
+	"github.com/prysmaticlabs/prysm/v5/beacon-chain/operations/synccommittee"
+	"github.com/prysmaticlabs/prysm/v5/beacon-chain/operations/voluntaryexits"
+	"github.com/prysmaticlabs/prysm/v5/beacon-chain/p2p"
+	"github.com/prysmaticlabs/prysm/v5/beacon-chain/startup"
+	"github.com/prysmaticlabs/prysm/v5/beacon-chain/state/stategen"
+	"github.com/prysmaticlabs/prysm/v5/beacon-chain/sync/backfill/coverage"
+	"github.com/prysmaticlabs/prysm/v5/beacon-chain/verification"
+	lruwrpr "github.com/prysmaticlabs/prysm/v5/cache/lru"
+	"github.com/prysmaticlabs/prysm/v5/config/params"
+	"github.com/prysmaticlabs/prysm/v5/consensus-types/blocks"
+	"github.com/prysmaticlabs/prysm/v5/consensus-types/interfaces"
+	leakybucket "github.com/prysmaticlabs/prysm/v5/container/leaky-bucket"
+	ethpb "github.com/prysmaticlabs/prysm/v5/proto/prysm/v1alpha1"
+	"github.com/prysmaticlabs/prysm/v5/runtime"
+	prysmTime "github.com/prysmaticlabs/prysm/v5/time"
+	"github.com/prysmaticlabs/prysm/v5/time/slots"
 	"github.com/trailofbits/go-mutexasserts"
 )
 
@@ -154,7 +155,9 @@ type Service struct {
 	clockWaiter                      startup.ClockWaiter
 	initialSyncComplete              chan struct{}
 	verifierWaiter                   *verification.InitializerWaiter
-	newBlobVerifier                  NewBlobVerifier
+	newBlobVerifier                  verification.NewBlobVerifier
+	availableBlocker                 coverage.AvailableBlocker
+	ctxMap                           ContextByteVersions
 }
 
 // NewService initializes new regular sync service.
@@ -205,11 +208,9 @@ func NewService(ctx context.Context, opts ...Option) *Service {
 	return r
 }
 
-type NewBlobVerifier func(b blocks.ROBlob, reqs ...verification.Requirement) BlobVerifier
-
-func newBlobVerifierFromInitializer(ini *verification.Initializer) NewBlobVerifier {
-	return func(b blocks.ROBlob, reqs ...verification.Requirement) BlobVerifier {
-		return ini.NewBlobVerifier(b, reqs...)
+func newBlobVerifierFromInitializer(ini *verification.Initializer) verification.NewBlobVerifier {
+	return func(b blocks.ROBlob, reqs []verification.Requirement) verification.BlobVerifier {
+		return ini.NewBlobVerifier(b, reqs)
 	}
 }
 
@@ -295,6 +296,15 @@ func (s *Service) waitForChainStart() {
 	s.cfg.clock = clock
 	startTime := clock.GenesisTime()
 	log.WithField("starttime", startTime).Debug("Received state initialized event")
+
+	ctxMap, err := ContextByteVersionsForValRoot(clock.GenesisValidatorsRoot())
+	if err != nil {
+		log.WithError(err).WithField("genesis_validator_root", clock.GenesisValidatorsRoot()).
+			Error("sync service failed to initialize context version map")
+		return
+	}
+	s.ctxMap = ctxMap
+
 	// Register respective rpc handlers at state initialized event.
 	s.registerRPCHandlers()
 	// Wait for chainstart in separate routine.

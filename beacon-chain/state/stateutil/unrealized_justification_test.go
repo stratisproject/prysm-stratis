@@ -3,9 +3,9 @@ package stateutil
 import (
 	"testing"
 
-	"github.com/prysmaticlabs/prysm/v4/config/params"
-	ethpb "github.com/prysmaticlabs/prysm/v4/proto/prysm/v1alpha1"
-	"github.com/prysmaticlabs/prysm/v4/testing/require"
+	"github.com/prysmaticlabs/prysm/v5/config/params"
+	ethpb "github.com/prysmaticlabs/prysm/v5/proto/prysm/v1alpha1"
+	"github.com/prysmaticlabs/prysm/v5/testing/require"
 )
 
 func TestState_UnrealizedCheckpointBalances(t *testing.T) {
@@ -78,7 +78,6 @@ func TestState_UnrealizedCheckpointBalances(t *testing.T) {
 		validators[1].Slashed = true
 		active, previous, current, err := UnrealizedCheckpointBalances(cp, pp, validators, 1)
 		require.NoError(tt, err)
-		expectedActive -= params.BeaconConfig().MaxEffectiveBalance
 		require.Equal(tt, expectedActive, active)
 		require.Equal(tt, params.BeaconConfig().MaxEffectiveBalance-params.BeaconConfig().MinDepositAmount, current)
 		require.Equal(tt, 2*params.BeaconConfig().MaxEffectiveBalance, previous)

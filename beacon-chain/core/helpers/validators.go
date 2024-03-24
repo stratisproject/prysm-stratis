@@ -7,15 +7,16 @@ import (
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
-	"github.com/prysmaticlabs/prysm/v4/beacon-chain/cache"
-	"github.com/prysmaticlabs/prysm/v4/beacon-chain/core/time"
-	"github.com/prysmaticlabs/prysm/v4/beacon-chain/state"
-	"github.com/prysmaticlabs/prysm/v4/config/params"
-	"github.com/prysmaticlabs/prysm/v4/consensus-types/primitives"
-	"github.com/prysmaticlabs/prysm/v4/crypto/hash"
-	"github.com/prysmaticlabs/prysm/v4/encoding/bytesutil"
-	ethpb "github.com/prysmaticlabs/prysm/v4/proto/prysm/v1alpha1"
-	"github.com/prysmaticlabs/prysm/v4/time/slots"
+	"github.com/prysmaticlabs/prysm/v5/beacon-chain/cache"
+	"github.com/prysmaticlabs/prysm/v5/beacon-chain/core/time"
+	forkchoicetypes "github.com/prysmaticlabs/prysm/v5/beacon-chain/forkchoice/types"
+	"github.com/prysmaticlabs/prysm/v5/beacon-chain/state"
+	"github.com/prysmaticlabs/prysm/v5/config/params"
+	"github.com/prysmaticlabs/prysm/v5/consensus-types/primitives"
+	"github.com/prysmaticlabs/prysm/v5/crypto/hash"
+	"github.com/prysmaticlabs/prysm/v5/encoding/bytesutil"
+	ethpb "github.com/prysmaticlabs/prysm/v5/proto/prysm/v1alpha1"
+	"github.com/prysmaticlabs/prysm/v5/time/slots"
 	log "github.com/sirupsen/logrus"
 	"go.opencensus.io/trace"
 )
@@ -271,47 +272,25 @@ func BeaconProposerIndex(ctx context.Context, state state.ReadOnlyBeaconState) (
 func cachedProposerIndexAtSlot(slot primitives.Slot, root [32]byte) (primitives.ValidatorIndex, error) {
 	proposerIndices, has := proposerIndicesCache.ProposerIndices(slots.ToEpoch(slot), root)
 	if !has {
-		cache.ProposerIndicesCacheMiss.Inc()
 		return 0, errProposerIndexMiss
 	}
 	if len(proposerIndices) != int(params.BeaconConfig().SlotsPerEpoch) {
-		cache.ProposerIndicesCacheMiss.Inc()
 		return 0, errProposerIndexMiss
 	}
 	return proposerIndices[slot%params.BeaconConfig().SlotsPerEpoch], nil
 }
 
-// cachedUnsafeProposerIndexAtSlot returns the proposer index at the given slot
-// from the unsafe cache computed in the previous epoch
-func cachedUnsafeProposerIndexAtSlot(slot primitives.Slot, root [32]byte) (primitives.ValidatorIndex, error) {
-	proposerIndices, has := proposerIndicesCache.UnsafeProposerIndices(slots.ToEpoch(slot), root)
+// ProposerIndexAtSlotFromCheckpoint returns the proposer index at the given
+// slot from the cache at the given checkpoint
+func ProposerIndexAtSlotFromCheckpoint(c *forkchoicetypes.Checkpoint, slot primitives.Slot) (primitives.ValidatorIndex, error) {
+	proposerIndices, has := proposerIndicesCache.IndicesFromCheckpoint(*c)
 	if !has {
-		cache.ProposerIndicesCacheMiss.Inc()
 		return 0, errProposerIndexMiss
 	}
 	if len(proposerIndices) != int(params.BeaconConfig().SlotsPerEpoch) {
-		cache.ProposerIndicesCacheMiss.Inc()
 		return 0, errProposerIndexMiss
 	}
 	return proposerIndices[slot%params.BeaconConfig().SlotsPerEpoch], nil
-}
-
-// UnsafeBeaconProposerIndexAtSlot returns the proposer index at the given slot
-// if it has been cached one epoch in advance
-func UnsafeBeaconProposerIndexAtSlot(state state.ReadOnlyBeaconState, slot primitives.Slot) (primitives.ValidatorIndex, error) {
-	e := slots.ToEpoch(slot)
-	if e < 2 {
-		return 0, errProposerIndexMiss
-	}
-	s, err := slots.EpochEnd(e - 2)
-	if err != nil {
-		return 0, err
-	}
-	r, err := StateRootAtSlot(state, s)
-	if err != nil {
-		return 0, err
-	}
-	return cachedUnsafeProposerIndexAtSlot(slot, [32]byte(r))
 }
 
 // BeaconProposerIndexAtSlot returns proposer index at the given slot from the
@@ -335,7 +314,7 @@ func BeaconProposerIndexAtSlot(ctx context.Context, state state.ReadOnlyBeaconSt
 				return pid, nil
 			}
 			if err := UpdateProposerIndicesInCache(ctx, state, e); err != nil {
-				return 0, errors.Wrap(err, "could not update committee cache")
+				return 0, errors.Wrap(err, "could not update proposer index cache")
 			}
 			pid, err = cachedProposerIndexAtSlot(slot, [32]byte(r))
 			if err == nil {

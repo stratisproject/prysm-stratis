@@ -13,6 +13,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/ethereum/go-ethereum/beacon/engine"
@@ -22,21 +23,20 @@ import (
 	gethRPC "github.com/ethereum/go-ethereum/rpc"
 	"github.com/ethereum/go-ethereum/trie"
 	gMux "github.com/gorilla/mux"
-	builderAPI "github.com/prysmaticlabs/prysm/v4/api/client/builder"
-	"github.com/prysmaticlabs/prysm/v4/beacon-chain/core/signing"
-	"github.com/prysmaticlabs/prysm/v4/beacon-chain/rpc/eth/shared"
-	"github.com/prysmaticlabs/prysm/v4/config/params"
-	"github.com/prysmaticlabs/prysm/v4/consensus-types/blocks"
-	"github.com/prysmaticlabs/prysm/v4/consensus-types/interfaces"
-	types "github.com/prysmaticlabs/prysm/v4/consensus-types/primitives"
+	builderAPI "github.com/prysmaticlabs/prysm/v5/api/client/builder"
+	"github.com/prysmaticlabs/prysm/v5/api/server/structs"
+	"github.com/prysmaticlabs/prysm/v5/beacon-chain/core/signing"
+	"github.com/prysmaticlabs/prysm/v5/config/params"
+	"github.com/prysmaticlabs/prysm/v5/consensus-types/blocks"
+	"github.com/prysmaticlabs/prysm/v5/consensus-types/interfaces"
+	types "github.com/prysmaticlabs/prysm/v5/consensus-types/primitives"
 
-	"github.com/prysmaticlabs/prysm/v4/crypto/bls"
-	"github.com/prysmaticlabs/prysm/v4/encoding/bytesutil"
-	"github.com/prysmaticlabs/prysm/v4/math"
-	"github.com/prysmaticlabs/prysm/v4/network"
-	"github.com/prysmaticlabs/prysm/v4/network/authorization"
-	v1 "github.com/prysmaticlabs/prysm/v4/proto/engine/v1"
-	eth "github.com/prysmaticlabs/prysm/v4/proto/prysm/v1alpha1"
+	"github.com/prysmaticlabs/prysm/v5/crypto/bls"
+	"github.com/prysmaticlabs/prysm/v5/encoding/bytesutil"
+	"github.com/prysmaticlabs/prysm/v5/network"
+	"github.com/prysmaticlabs/prysm/v5/network/authorization"
+	v1 "github.com/prysmaticlabs/prysm/v5/proto/engine/v1"
+	eth "github.com/prysmaticlabs/prysm/v5/proto/prysm/v1alpha1"
 	"github.com/sirupsen/logrus"
 )
 
@@ -115,6 +115,7 @@ type Builder struct {
 	blobBundle     *v1.BlobsBundle
 	mux            *gMux.Router
 	validatorMap   map[string]*eth.ValidatorRegistrationV1
+	valLock        sync.RWMutex
 	srv            *http.Server
 }
 
@@ -160,7 +161,9 @@ func New(opts ...Option) (*Builder, error) {
 	p.address = addr
 	p.srv = srv
 	p.execClient = execClient
+	p.valLock.Lock()
 	p.validatorMap = map[string]*eth.ValidatorRegistrationV1{}
+	p.valLock.Unlock()
 	p.mux = router
 	return p, nil
 }
@@ -247,7 +250,9 @@ func (p *Builder) handleEngineCalls(req, resp []byte) {
 			p.cfg.logger.Errorf("Could not unmarshal fcu: %v", err)
 			return
 		}
-		p.currId = result.Result.PayloadId
+		if result.Result.PayloadId != nil && *result.Result.PayloadId != [8]byte{} {
+			p.currId = result.Result.PayloadId
+		}
 		if rpcObj.Method == ForkchoiceUpdatedMethodV3 {
 			attr := &v1.PayloadAttributesV3{}
 			obj, err := json.Marshal(rpcObj.Params[1])
@@ -261,7 +266,17 @@ func (p *Builder) handleEngineCalls(req, resp []byte) {
 			}
 			p.prevBeaconRoot = attr.ParentBeaconBlockRoot
 		}
-		p.cfg.logger.Infof("Received payload id of %#x", result.Result.PayloadId)
+		payloadID := [8]byte{}
+		status := ""
+		lastValHash := []byte{}
+		if result.Result.PayloadId != nil {
+			payloadID = *result.Result.PayloadId
+		}
+		if result.Result.Status != nil {
+			status = result.Result.Status.Status.String()
+			lastValHash = result.Result.Status.LatestValidHash
+		}
+		p.cfg.logger.Infof("Received payload id of %#x and status of %s along with a valid hash of %#x", payloadID, status, lastValHash)
 	}
 }
 
@@ -270,7 +285,7 @@ func (p *Builder) isBuilderCall(req *http.Request) bool {
 }
 
 func (p *Builder) registerValidators(w http.ResponseWriter, req *http.Request) {
-	var registrations []shared.SignedValidatorRegistration
+	var registrations []structs.SignedValidatorRegistration
 	if err := json.NewDecoder(req.Body).Decode(&registrations); err != nil {
 		http.Error(w, "invalid request", http.StatusBadRequest)
 		return
@@ -281,7 +296,9 @@ func (p *Builder) registerValidators(w http.ResponseWriter, req *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+		p.valLock.Lock()
 		p.validatorMap[r.Message.Pubkey] = msg
+		p.valLock.Unlock()
 	}
 	// TODO: Verify Signatures from validators
 	w.WriteHeader(http.StatusOK)
@@ -411,7 +428,7 @@ func (p *Builder) handleHeaderRequestCapella(w http.ResponseWriter) {
 	weiVal := big.NewInt(0).SetBytes(bytesutil.ReverseByteOrder(b.Value))
 	// we set the payload value as twice its actual one so that it always chooses builder payloads vs local payloads
 	weiVal = weiVal.Mul(weiVal, big.NewInt(2))
-	wObj, err := blocks.WrappedExecutionPayloadCapella(b.Payload, math.WeiToGwei(weiVal))
+	wObj, err := blocks.WrappedExecutionPayloadCapella(b.Payload, weiVal)
 	if err != nil {
 		p.cfg.logger.WithError(err).Error("Could not wrap execution payload")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -492,7 +509,7 @@ func (p *Builder) handleHeaderRequestDeneb(w http.ResponseWriter) {
 	weiVal := big.NewInt(0).SetBytes(bytesutil.ReverseByteOrder(b.Value))
 	// we set the payload value as twice its actual one so that it always chooses builder payloads vs local payloads
 	weiVal = weiVal.Mul(weiVal, big.NewInt(2))
-	wObj, err := blocks.WrappedExecutionPayloadDeneb(b.Payload, math.WeiToGwei(weiVal))
+	wObj, err := blocks.WrappedExecutionPayloadDeneb(b.Payload, weiVal)
 	if err != nil {
 		p.cfg.logger.WithError(err).Error("Could not wrap execution payload")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -664,6 +681,7 @@ func (p *Builder) retrievePendingBlock() (*v1.ExecutionPayload, error) {
 	if err = json.Unmarshal(marshalledOutput, bellatrixPayload); err != nil {
 		return nil, err
 	}
+	p.currId = nil
 	return bellatrixPayload, nil
 }
 
@@ -688,6 +706,7 @@ func (p *Builder) retrievePendingBlockCapella() (*v1.ExecutionPayloadCapellaWith
 	if err = json.Unmarshal(marshalledOutput, capellaPayload); err != nil {
 		return nil, err
 	}
+	p.currId = nil
 	return capellaPayload, nil
 }
 
@@ -716,6 +735,7 @@ func (p *Builder) retrievePendingBlockDeneb() (*v1.ExecutionPayloadDenebWithValu
 	if err = json.Unmarshal(marshalledOutput, denebPayload); err != nil {
 		return nil, err
 	}
+	p.currId = nil
 	return denebPayload, nil
 }
 

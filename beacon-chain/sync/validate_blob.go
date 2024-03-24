@@ -8,15 +8,15 @@ import (
 	pubsub "github.com/libp2p/go-libp2p-pubsub"
 	"github.com/libp2p/go-libp2p/core/peer"
 	"github.com/pkg/errors"
-	"github.com/prysmaticlabs/prysm/v4/beacon-chain/verification"
-	"github.com/prysmaticlabs/prysm/v4/config/params"
-	"github.com/prysmaticlabs/prysm/v4/consensus-types/blocks"
-	"github.com/prysmaticlabs/prysm/v4/consensus-types/primitives"
-	"github.com/prysmaticlabs/prysm/v4/crypto/rand"
-	"github.com/prysmaticlabs/prysm/v4/encoding/bytesutil"
-	eth "github.com/prysmaticlabs/prysm/v4/proto/prysm/v1alpha1"
-	prysmTime "github.com/prysmaticlabs/prysm/v4/time"
-	"github.com/prysmaticlabs/prysm/v4/time/slots"
+	"github.com/prysmaticlabs/prysm/v5/beacon-chain/verification"
+	"github.com/prysmaticlabs/prysm/v5/config/params"
+	"github.com/prysmaticlabs/prysm/v5/consensus-types/blocks"
+	"github.com/prysmaticlabs/prysm/v5/consensus-types/primitives"
+	"github.com/prysmaticlabs/prysm/v5/crypto/rand"
+	"github.com/prysmaticlabs/prysm/v5/encoding/bytesutil"
+	eth "github.com/prysmaticlabs/prysm/v5/proto/prysm/v1alpha1"
+	prysmTime "github.com/prysmaticlabs/prysm/v5/time"
+	"github.com/prysmaticlabs/prysm/v5/time/slots"
 	"github.com/sirupsen/logrus"
 )
 
@@ -47,7 +47,7 @@ func (s *Service) validateBlob(ctx context.Context, pid peer.ID, msg *pubsub.Mes
 	if err != nil {
 		return pubsub.ValidationReject, errors.Wrap(err, "roblob conversion failure")
 	}
-	vf := s.newBlobVerifier(blob, verification.GossipSidecarRequirements...)
+	vf := s.newBlobVerifier(blob, verification.GossipSidecarRequirements)
 
 	if err := vf.BlobIndexInBounds(); err != nil {
 		return pubsub.ValidationReject, err
@@ -60,7 +60,7 @@ func (s *Service) validateBlob(ctx context.Context, pid peer.ID, msg *pubsub.Mes
 		return pubsub.ValidationReject, fmt.Errorf("wrong topic name: %s", *msg.Topic)
 	}
 
-	if err := vf.SlotNotTooEarly(); err != nil {
+	if err := vf.NotFromFutureSlot(); err != nil {
 		return pubsub.ValidationIgnore, err
 	}
 

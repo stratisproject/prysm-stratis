@@ -3,7 +3,7 @@ package params
 import (
 	"testing"
 
-	"github.com/prysmaticlabs/prysm/v4/consensus-types/primitives"
+	"github.com/prysmaticlabs/prysm/v5/consensus-types/primitives"
 )
 
 func TestMaxRequestBlock(t *testing.T) {
@@ -12,10 +12,10 @@ func TestMaxRequestBlock(t *testing.T) {
 		expectedMaxBlock uint64
 		description      string
 	}{
-		{
-			epoch:            primitives.Epoch(mainnetDenebForkEpoch - 1), // Assuming the fork epoch is not 0
-			expectedMaxBlock: mainnetBeaconConfig.MaxRequestBlocks,
-		},
+		// {
+		// 	epoch:            primitives.Epoch(mainnetDenebForkEpoch - 1), // Assuming the fork epoch is not 0
+		// 	expectedMaxBlock: mainnetBeaconConfig.MaxRequestBlocks,
+		// },
 		{
 			epoch:            primitives.Epoch(mainnetDenebForkEpoch),
 			expectedMaxBlock: mainnetBeaconConfig.MaxRequestBlocksDeneb,

@@ -4,8 +4,8 @@ import (
 	"math"
 	"time"
 
-	fieldparams "github.com/prysmaticlabs/prysm/v4/config/fieldparams"
-	"github.com/prysmaticlabs/prysm/v4/encoding/bytesutil"
+	fieldparams "github.com/prysmaticlabs/prysm/v5/config/fieldparams"
+	"github.com/prysmaticlabs/prysm/v5/encoding/bytesutil"
 )
 
 // MainnetConfig returns the configuration to be used in the main network.
@@ -19,7 +19,7 @@ func MainnetConfig() *BeaconChainConfig {
 const (
 	// Genesis Fork Epoch for the mainnet config.
 	genesisForkEpoch      = 0
-	mainnetDenebForkEpoch = math.MaxUint64
+	mainnetDenebForkEpoch = 0
 )
 
 var mainnetNetworkConfig = &NetworkConfig{

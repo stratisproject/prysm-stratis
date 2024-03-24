@@ -13,13 +13,13 @@ import (
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/prysmaticlabs/go-bitfield"
-	"github.com/prysmaticlabs/prysm/v4/beacon-chain/rpc/eth/shared"
-	fieldparams "github.com/prysmaticlabs/prysm/v4/config/fieldparams"
-	"github.com/prysmaticlabs/prysm/v4/math"
-	v1 "github.com/prysmaticlabs/prysm/v4/proto/engine/v1"
-	eth "github.com/prysmaticlabs/prysm/v4/proto/prysm/v1alpha1"
-	"github.com/prysmaticlabs/prysm/v4/testing/assert"
-	"github.com/prysmaticlabs/prysm/v4/testing/require"
+	"github.com/prysmaticlabs/prysm/v5/api/server/structs"
+	fieldparams "github.com/prysmaticlabs/prysm/v5/config/fieldparams"
+	"github.com/prysmaticlabs/prysm/v5/math"
+	v1 "github.com/prysmaticlabs/prysm/v5/proto/engine/v1"
+	eth "github.com/prysmaticlabs/prysm/v5/proto/prysm/v1alpha1"
+	"github.com/prysmaticlabs/prysm/v5/testing/assert"
+	"github.com/prysmaticlabs/prysm/v5/testing/require"
 )
 
 func ezDecode(t *testing.T, s string) []byte {
@@ -38,7 +38,7 @@ func TestSignedValidatorRegistration_MarshalJSON(t *testing.T) {
 		},
 		Signature: make([]byte, 96),
 	}
-	a := shared.SignedValidatorRegistrationFromConsensus(svr)
+	a := structs.SignedValidatorRegistrationFromConsensus(svr)
 	je, err := json.Marshal(a)
 	require.NoError(t, err)
 	// decode with a struct w/ plain strings so we can check the string encoding of the hex fields
@@ -55,7 +55,7 @@ func TestSignedValidatorRegistration_MarshalJSON(t *testing.T) {
 	require.Equal(t, "0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000", un.Message.Pubkey)
 
 	t.Run("roundtrip", func(t *testing.T) {
-		b := &shared.SignedValidatorRegistration{}
+		b := &structs.SignedValidatorRegistration{}
 		if err := json.Unmarshal(je, b); err != nil {
 			require.NoError(t, err)
 		}
@@ -202,6 +202,39 @@ var testExampleHeaderResponseUnknownVersion = `{
         "transactions_root": "0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2",
         "withdrawals_root": "0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2"
       },
+      "value": "652312848583266388373324160190187140051835877600158453279131187530910662656",
+      "pubkey": "0x93247f2209abcacf57b75a51dafae777f9dd38bc7053d1af526f220a7489a6d3a2753e5f3e8b1cfe39b56f43611df74a"
+    },
+    "signature": "0x1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505cc411d61252fb6cb3fa0017b679f8bb2305b26a285fa2737f175668d0dff91cc1b66ac1fb663c9bc59509846d6ec05345bd908eda73e670af888da41af171505"
+  }
+}`
+
+var testExampleHeaderResponseDenebTooManyBlobs = `{
+  "version": "deneb",
+  "data": {
+    "message": {
+      "header": {
+        "parent_hash": "0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2",
+        "fee_recipient": "0xabcf8e0d4e9587369b2301d0790347320302cc09",
+        "state_root": "0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2",
+        "receipts_root": "0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2",
+        "logs_bloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+        "prev_randao": "0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2",
+        "block_number": "1",
+        "gas_limit": "1",
+        "gas_used": "1",
+        "timestamp": "1",
+        "extra_data": "0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2",
+        "base_fee_per_gas": "452312848583266388373324160190187140051835877600158453279131187530910662656",
+		"block_hash": "0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2",
+        "transactions_root": "0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2",
+        "withdrawals_root": "0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2",
+		"blob_gas_used": "1",	
+		"excess_blob_gas": "2"	
+      },
+      "blob_kzg_commitments": [
+          "","","","","","",""
+	  ],
       "value": "652312848583266388373324160190187140051835877600158453279131187530910662656",
       "pubkey": "0x93247f2209abcacf57b75a51dafae777f9dd38bc7053d1af526f220a7489a6d3a2753e5f3e8b1cfe39b56f43611df74a"
     },
@@ -1685,7 +1718,7 @@ func TestUint256UnmarshalTooBig(t *testing.T) {
 func TestMarshalBlindedBeaconBlockBodyBellatrix(t *testing.T) {
 	expected, err := os.ReadFile("testdata/blinded-block.json")
 	require.NoError(t, err)
-	b, err := shared.BlindedBeaconBlockBellatrixFromConsensus(&eth.BlindedBeaconBlockBellatrix{
+	b, err := structs.BlindedBeaconBlockBellatrixFromConsensus(&eth.BlindedBeaconBlockBellatrix{
 		Slot:          1,
 		ProposerIndex: 1,
 		ParentRoot:    ezDecode(t, "0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2"),
@@ -1715,7 +1748,7 @@ func TestMarshalBlindedBeaconBlockBodyBellatrix(t *testing.T) {
 func TestMarshalBlindedBeaconBlockBodyCapella(t *testing.T) {
 	expected, err := os.ReadFile("testdata/blinded-block-capella.json")
 	require.NoError(t, err)
-	b, err := shared.BlindedBeaconBlockCapellaFromConsensus(&eth.BlindedBeaconBlockCapella{
+	b, err := structs.BlindedBeaconBlockCapellaFromConsensus(&eth.BlindedBeaconBlockCapella{
 		Slot:          1,
 		ProposerIndex: 1,
 		ParentRoot:    ezDecode(t, "0xcf8e0d4e9587369b2301d0790347320302cc0943d5a1884560367e8208d920f2"),

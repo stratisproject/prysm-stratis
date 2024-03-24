@@ -8,15 +8,15 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/prysmaticlabs/prysm/v4/beacon-chain/blockchain"
-	"github.com/prysmaticlabs/prysm/v4/beacon-chain/execution"
-	"github.com/prysmaticlabs/prysm/v4/beacon-chain/state"
-	"github.com/prysmaticlabs/prysm/v4/config/params"
-	"github.com/prysmaticlabs/prysm/v4/consensus-types/interfaces"
-	"github.com/prysmaticlabs/prysm/v4/consensus-types/primitives"
-	"github.com/prysmaticlabs/prysm/v4/encoding/bytesutil"
-	ethpb "github.com/prysmaticlabs/prysm/v4/proto/prysm/v1alpha1"
-	"github.com/prysmaticlabs/prysm/v4/testing/require"
+	"github.com/prysmaticlabs/prysm/v5/beacon-chain/blockchain"
+	"github.com/prysmaticlabs/prysm/v5/beacon-chain/execution"
+	"github.com/prysmaticlabs/prysm/v5/beacon-chain/state"
+	"github.com/prysmaticlabs/prysm/v5/config/params"
+	"github.com/prysmaticlabs/prysm/v5/consensus-types/interfaces"
+	"github.com/prysmaticlabs/prysm/v5/consensus-types/primitives"
+	"github.com/prysmaticlabs/prysm/v5/encoding/bytesutil"
+	ethpb "github.com/prysmaticlabs/prysm/v5/proto/prysm/v1alpha1"
+	"github.com/prysmaticlabs/prysm/v5/testing/require"
 )
 
 type Builder struct {
@@ -90,7 +90,7 @@ func (bb *Builder) InvalidBlock(t testing.TB, b interfaces.ReadOnlySignedBeaconB
 	r := bb.block(t, b)
 	ctx, cancel := context.WithTimeout(context.TODO(), time.Duration(params.BeaconConfig().SecondsPerSlot)*time.Second)
 	defer cancel()
-	require.Equal(t, true, bb.service.ReceiveBlock(ctx, b, r) != nil)
+	require.Equal(t, true, bb.service.ReceiveBlock(ctx, b, r, nil) != nil)
 }
 
 // ValidBlock receives the valid block and notifies forkchoice.
@@ -98,7 +98,7 @@ func (bb *Builder) ValidBlock(t testing.TB, b interfaces.ReadOnlySignedBeaconBlo
 	r := bb.block(t, b)
 	ctx, cancel := context.WithTimeout(context.TODO(), time.Duration(params.BeaconConfig().SecondsPerSlot)*time.Second)
 	defer cancel()
-	require.NoError(t, bb.service.ReceiveBlock(ctx, b, r))
+	require.NoError(t, bb.service.ReceiveBlock(ctx, b, r, nil))
 }
 
 // PoWBlock receives the block and notifies a mocked execution engine.
