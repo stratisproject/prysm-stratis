@@ -20,11 +20,11 @@ import (
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/holiman/uint256"
 	"github.com/pkg/errors"
-	fieldparams "github.com/prysmaticlabs/prysm/v5/config/fieldparams"
-	"github.com/prysmaticlabs/prysm/v5/config/params"
-	"github.com/prysmaticlabs/prysm/v5/crypto/rand"
-	e2e "github.com/prysmaticlabs/prysm/v5/testing/endtoend/params"
 	"github.com/sirupsen/logrus"
+	fieldparams "github.com/stratisproject/prysm-stratis/config/fieldparams"
+	"github.com/stratisproject/prysm-stratis/config/params"
+	"github.com/stratisproject/prysm-stratis/crypto/rand"
+	e2e "github.com/stratisproject/prysm-stratis/testing/endtoend/params"
 	"golang.org/x/sync/errgroup"
 )
 

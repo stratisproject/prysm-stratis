@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"testing"
 
-	slashertypes "github.com/prysmaticlabs/prysm/v5/beacon-chain/slasher/types"
-	"github.com/prysmaticlabs/prysm/v5/config/params"
-	"github.com/prysmaticlabs/prysm/v5/consensus-types/primitives"
-	"github.com/prysmaticlabs/prysm/v5/testing/require"
-	"github.com/prysmaticlabs/prysm/v5/time/slots"
 	logTest "github.com/sirupsen/logrus/hooks/test"
+	slashertypes "github.com/stratisproject/prysm-stratis/beacon-chain/slasher/types"
+	"github.com/stratisproject/prysm-stratis/config/params"
+	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
+	"github.com/stratisproject/prysm-stratis/testing/require"
+	"github.com/stratisproject/prysm-stratis/time/slots"
 	bolt "go.etcd.io/bbolt"
 )
 

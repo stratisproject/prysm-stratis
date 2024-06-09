@@ -5,16 +5,16 @@ import (
 	"math"
 	"testing"
 
-	mock "github.com/prysmaticlabs/prysm/v5/beacon-chain/blockchain/testing"
-	dbTest "github.com/prysmaticlabs/prysm/v5/beacon-chain/db/testing"
-	doublylinkedtree "github.com/prysmaticlabs/prysm/v5/beacon-chain/forkchoice/doubly-linked-tree"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/state/stategen"
-	mockstategen "github.com/prysmaticlabs/prysm/v5/beacon-chain/state/stategen/mock"
-	"github.com/prysmaticlabs/prysm/v5/consensus-types/primitives"
-	pbrpc "github.com/prysmaticlabs/prysm/v5/proto/prysm/v1alpha1"
-	"github.com/prysmaticlabs/prysm/v5/testing/assert"
-	"github.com/prysmaticlabs/prysm/v5/testing/require"
-	"github.com/prysmaticlabs/prysm/v5/testing/util"
+	mock "github.com/stratisproject/prysm-stratis/beacon-chain/blockchain/testing"
+	dbTest "github.com/stratisproject/prysm-stratis/beacon-chain/db/testing"
+	doublylinkedtree "github.com/stratisproject/prysm-stratis/beacon-chain/forkchoice/doubly-linked-tree"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/state/stategen"
+	mockstategen "github.com/stratisproject/prysm-stratis/beacon-chain/state/stategen/mock"
+	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
+	pbrpc "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
+	"github.com/stratisproject/prysm-stratis/testing/assert"
+	"github.com/stratisproject/prysm-stratis/testing/require"
+	"github.com/stratisproject/prysm-stratis/testing/util"
 )
 
 func addDefaultReplayerBuilder(s *Server, h stategen.HistoryAccessor) {

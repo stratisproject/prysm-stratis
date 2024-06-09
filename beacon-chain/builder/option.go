@@ -1,11 +1,11 @@
 package builder
 
 import (
-	"github.com/prysmaticlabs/prysm/v5/api/client/builder"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/blockchain"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/cache"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/db"
-	"github.com/prysmaticlabs/prysm/v5/cmd/beacon-chain/flags"
+	"github.com/stratisproject/prysm-stratis/api/client/builder"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/blockchain"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/cache"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/db"
+	"github.com/stratisproject/prysm-stratis/cmd/beacon-chain/flags"
 	"github.com/urfave/cli/v2"
 )
 

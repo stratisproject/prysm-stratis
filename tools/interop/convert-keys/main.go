@@ -9,9 +9,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/prysmaticlabs/prysm/v5/config/params"
-	"github.com/prysmaticlabs/prysm/v5/tools/unencrypted-keys-gen/keygen"
 	log "github.com/sirupsen/logrus"
+	"github.com/stratisproject/prysm-stratis/config/params"
+	"github.com/stratisproject/prysm-stratis/tools/unencrypted-keys-gen/keygen"
 	"gopkg.in/yaml.v2"
 )
 

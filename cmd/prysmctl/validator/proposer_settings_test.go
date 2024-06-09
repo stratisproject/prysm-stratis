@@ -11,10 +11,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/prysmaticlabs/prysm/v5/testing/assert"
-	"github.com/prysmaticlabs/prysm/v5/testing/require"
-	"github.com/prysmaticlabs/prysm/v5/validator/rpc"
 	logtest "github.com/sirupsen/logrus/hooks/test"
+	"github.com/stratisproject/prysm-stratis/testing/assert"
+	"github.com/stratisproject/prysm-stratis/testing/require"
+	"github.com/stratisproject/prysm-stratis/validator/rpc"
 	"github.com/urfave/cli/v2"
 )
 

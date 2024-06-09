@@ -5,10 +5,10 @@ import (
 	"path/filepath"
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/prysmaticlabs/prysm/v5/cmd"
-	"github.com/prysmaticlabs/prysm/v5/crypto/rand"
-	"github.com/prysmaticlabs/prysm/v5/io/file"
 	"github.com/sirupsen/logrus"
+	"github.com/stratisproject/prysm-stratis/cmd"
+	"github.com/stratisproject/prysm-stratis/crypto/rand"
+	"github.com/stratisproject/prysm-stratis/io/file"
 	"github.com/urfave/cli/v2"
 )
 

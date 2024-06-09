@@ -5,7 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/prysmaticlabs/prysm/v5/testing/require"
+	"github.com/stratisproject/prysm-stratis/testing/require"
 )
 
 func TestNormalizeQueryValuesHandler(t *testing.T) {

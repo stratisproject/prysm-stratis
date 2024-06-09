@@ -5,7 +5,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/prysmaticlabs/prysm/v5/testing/require"
+	"github.com/stratisproject/prysm-stratis/testing/require"
 )
 
 type safeMap struct {

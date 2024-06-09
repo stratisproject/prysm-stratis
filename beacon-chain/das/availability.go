@@ -5,15 +5,15 @@ import (
 	"fmt"
 
 	errors "github.com/pkg/errors"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/db/filesystem"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/verification"
-	"github.com/prysmaticlabs/prysm/v5/config/params"
-	"github.com/prysmaticlabs/prysm/v5/consensus-types/blocks"
-	"github.com/prysmaticlabs/prysm/v5/consensus-types/primitives"
-	"github.com/prysmaticlabs/prysm/v5/runtime/logging"
-	"github.com/prysmaticlabs/prysm/v5/runtime/version"
-	"github.com/prysmaticlabs/prysm/v5/time/slots"
 	log "github.com/sirupsen/logrus"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/db/filesystem"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/verification"
+	"github.com/stratisproject/prysm-stratis/config/params"
+	"github.com/stratisproject/prysm-stratis/consensus-types/blocks"
+	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
+	"github.com/stratisproject/prysm-stratis/runtime/logging"
+	"github.com/stratisproject/prysm-stratis/runtime/version"
+	"github.com/stratisproject/prysm-stratis/time/slots"
 )
 
 var (

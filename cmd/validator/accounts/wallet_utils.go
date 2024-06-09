@@ -4,11 +4,11 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	"github.com/prysmaticlabs/prysm/v5/validator/accounts"
-	"github.com/prysmaticlabs/prysm/v5/validator/accounts/iface"
-	"github.com/prysmaticlabs/prysm/v5/validator/accounts/wallet"
-	"github.com/prysmaticlabs/prysm/v5/validator/keymanager"
-	remote_web3signer "github.com/prysmaticlabs/prysm/v5/validator/keymanager/remote-web3signer"
+	"github.com/stratisproject/prysm-stratis/validator/accounts"
+	"github.com/stratisproject/prysm-stratis/validator/accounts/iface"
+	"github.com/stratisproject/prysm-stratis/validator/accounts/wallet"
+	"github.com/stratisproject/prysm-stratis/validator/keymanager"
+	remote_web3signer "github.com/stratisproject/prysm-stratis/validator/keymanager/remote-web3signer"
 	"github.com/urfave/cli/v2"
 )
 

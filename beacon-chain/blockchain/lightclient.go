@@ -5,14 +5,14 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/state"
-	"github.com/prysmaticlabs/prysm/v5/config/params"
-	"github.com/prysmaticlabs/prysm/v5/consensus-types/interfaces"
-	"github.com/prysmaticlabs/prysm/v5/encoding/bytesutil"
-	ethpbv1 "github.com/prysmaticlabs/prysm/v5/proto/eth/v1"
-	ethpbv2 "github.com/prysmaticlabs/prysm/v5/proto/eth/v2"
-	"github.com/prysmaticlabs/prysm/v5/proto/migration"
-	"github.com/prysmaticlabs/prysm/v5/time/slots"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/state"
+	"github.com/stratisproject/prysm-stratis/config/params"
+	"github.com/stratisproject/prysm-stratis/consensus-types/interfaces"
+	"github.com/stratisproject/prysm-stratis/encoding/bytesutil"
+	ethpbv1 "github.com/stratisproject/prysm-stratis/proto/eth/v1"
+	ethpbv2 "github.com/stratisproject/prysm-stratis/proto/eth/v2"
+	"github.com/stratisproject/prysm-stratis/proto/migration"
+	"github.com/stratisproject/prysm-stratis/time/slots"
 )
 
 const (

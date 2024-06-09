@@ -5,9 +5,9 @@ import (
 	"os"
 	"path"
 
-	"github.com/prysmaticlabs/prysm/v5/config/features"
-	"github.com/prysmaticlabs/prysm/v5/consensus-types/interfaces"
-	"github.com/prysmaticlabs/prysm/v5/io/file"
+	"github.com/stratisproject/prysm-stratis/config/features"
+	"github.com/stratisproject/prysm-stratis/consensus-types/interfaces"
+	"github.com/stratisproject/prysm-stratis/io/file"
 )
 
 // WriteBlockToDisk as a block ssz. Writes to temp directory. Debug!

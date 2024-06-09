@@ -7,12 +7,12 @@ import (
 	"strconv"
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/prysmaticlabs/prysm/v5/api/server/structs"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/core/helpers"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/rpc/eth/shared"
-	"github.com/prysmaticlabs/prysm/v5/config/params"
-	"github.com/prysmaticlabs/prysm/v5/network/httputil"
-	"github.com/prysmaticlabs/prysm/v5/time/slots"
+	"github.com/stratisproject/prysm-stratis/api/server/structs"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/core/helpers"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/rpc/eth/shared"
+	"github.com/stratisproject/prysm-stratis/config/params"
+	"github.com/stratisproject/prysm-stratis/network/httputil"
+	"github.com/stratisproject/prysm-stratis/time/slots"
 	"go.opencensus.io/trace"
 )
 

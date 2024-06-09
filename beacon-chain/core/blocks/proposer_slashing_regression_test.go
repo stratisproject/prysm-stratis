@@ -4,10 +4,10 @@ import (
 	"os"
 	"testing"
 
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/core/blocks"
-	state_native "github.com/prysmaticlabs/prysm/v5/beacon-chain/state/state-native"
-	ethpb "github.com/prysmaticlabs/prysm/v5/proto/prysm/v1alpha1"
-	"github.com/prysmaticlabs/prysm/v5/testing/require"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/core/blocks"
+	state_native "github.com/stratisproject/prysm-stratis/beacon-chain/state/state-native"
+	ethpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
+	"github.com/stratisproject/prysm-stratis/testing/require"
 )
 
 // Beaconfuzz discovered an issue where a proposer slashing could be produced which would pass

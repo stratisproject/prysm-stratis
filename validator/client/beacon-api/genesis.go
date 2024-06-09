@@ -8,9 +8,9 @@ import (
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/pkg/errors"
-	"github.com/prysmaticlabs/prysm/v5/api/server/structs"
-	"github.com/prysmaticlabs/prysm/v5/network/httputil"
-	ethpb "github.com/prysmaticlabs/prysm/v5/proto/prysm/v1alpha1"
+	"github.com/stratisproject/prysm-stratis/api/server/structs"
+	"github.com/stratisproject/prysm-stratis/network/httputil"
+	ethpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
 )
 
 type GenesisProvider interface {

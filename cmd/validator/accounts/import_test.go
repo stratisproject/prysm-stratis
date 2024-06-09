@@ -11,14 +11,14 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/prysmaticlabs/prysm/v5/crypto/bls"
-	"github.com/prysmaticlabs/prysm/v5/testing/assert"
-	"github.com/prysmaticlabs/prysm/v5/testing/require"
-	"github.com/prysmaticlabs/prysm/v5/validator/accounts"
-	"github.com/prysmaticlabs/prysm/v5/validator/accounts/iface"
-	"github.com/prysmaticlabs/prysm/v5/validator/accounts/wallet"
-	"github.com/prysmaticlabs/prysm/v5/validator/keymanager"
-	"github.com/prysmaticlabs/prysm/v5/validator/keymanager/local"
+	"github.com/stratisproject/prysm-stratis/crypto/bls"
+	"github.com/stratisproject/prysm-stratis/testing/assert"
+	"github.com/stratisproject/prysm-stratis/testing/require"
+	"github.com/stratisproject/prysm-stratis/validator/accounts"
+	"github.com/stratisproject/prysm-stratis/validator/accounts/iface"
+	"github.com/stratisproject/prysm-stratis/validator/accounts/wallet"
+	"github.com/stratisproject/prysm-stratis/validator/keymanager"
+	"github.com/stratisproject/prysm-stratis/validator/keymanager/local"
 	keystorev4 "github.com/wealdtech/go-eth2-wallet-encryptor-keystorev4"
 )
 

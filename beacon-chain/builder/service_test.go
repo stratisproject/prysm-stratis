@@ -5,13 +5,13 @@ import (
 	"testing"
 	"time"
 
-	buildertesting "github.com/prysmaticlabs/prysm/v5/api/client/builder/testing"
-	blockchainTesting "github.com/prysmaticlabs/prysm/v5/beacon-chain/blockchain/testing"
-	dbtesting "github.com/prysmaticlabs/prysm/v5/beacon-chain/db/testing"
-	"github.com/prysmaticlabs/prysm/v5/encoding/bytesutil"
-	eth "github.com/prysmaticlabs/prysm/v5/proto/prysm/v1alpha1"
-	"github.com/prysmaticlabs/prysm/v5/testing/assert"
-	"github.com/prysmaticlabs/prysm/v5/testing/require"
+	buildertesting "github.com/stratisproject/prysm-stratis/api/client/builder/testing"
+	blockchainTesting "github.com/stratisproject/prysm-stratis/beacon-chain/blockchain/testing"
+	dbtesting "github.com/stratisproject/prysm-stratis/beacon-chain/db/testing"
+	"github.com/stratisproject/prysm-stratis/encoding/bytesutil"
+	eth "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
+	"github.com/stratisproject/prysm-stratis/testing/assert"
+	"github.com/stratisproject/prysm-stratis/testing/require"
 )
 
 func Test_NewServiceWithBuilder(t *testing.T) {

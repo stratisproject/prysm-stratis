@@ -3,8 +3,8 @@ package mock
 import (
 	"context"
 
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/state"
-	ethpb "github.com/prysmaticlabs/prysm/v5/proto/prysm/v1alpha1"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/state"
+	ethpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
 )
 
 // PoolMock is a fake implementation of PoolManager.

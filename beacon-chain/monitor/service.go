@@ -6,17 +6,17 @@ import (
 	"sort"
 	"sync"
 
-	"github.com/prysmaticlabs/prysm/v5/async/event"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/blockchain"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/core/feed"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/core/feed/operation"
-	statefeed "github.com/prysmaticlabs/prysm/v5/beacon-chain/core/feed/state"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/core/helpers"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/state"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/state/stategen"
-	"github.com/prysmaticlabs/prysm/v5/consensus-types/primitives"
-	"github.com/prysmaticlabs/prysm/v5/time/slots"
 	"github.com/sirupsen/logrus"
+	"github.com/stratisproject/prysm-stratis/async/event"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/blockchain"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/core/feed"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/core/feed/operation"
+	statefeed "github.com/stratisproject/prysm-stratis/beacon-chain/core/feed/state"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/core/helpers"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/state"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/state/stategen"
+	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
+	"github.com/stratisproject/prysm-stratis/time/slots"
 )
 
 // Error when the context is closed while waiting for sync.

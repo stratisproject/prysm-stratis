@@ -1,22 +1,22 @@
 package blockchain
 
 import (
-	"github.com/prysmaticlabs/prysm/v5/async/event"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/cache"
-	statefeed "github.com/prysmaticlabs/prysm/v5/beacon-chain/core/feed/state"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/db"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/db/filesystem"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/execution"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/forkchoice"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/operations/attestations"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/operations/blstoexec"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/operations/slashings"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/operations/voluntaryexits"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/p2p"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/startup"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/state"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/state/stategen"
-	ethpb "github.com/prysmaticlabs/prysm/v5/proto/prysm/v1alpha1"
+	"github.com/stratisproject/prysm-stratis/async/event"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/cache"
+	statefeed "github.com/stratisproject/prysm-stratis/beacon-chain/core/feed/state"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/db"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/db/filesystem"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/execution"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/forkchoice"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/operations/attestations"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/operations/blstoexec"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/operations/slashings"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/operations/voluntaryexits"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/p2p"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/startup"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/state"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/state/stategen"
+	ethpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
 )
 
 type Option func(s *Service) error

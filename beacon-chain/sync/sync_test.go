@@ -4,8 +4,8 @@ import (
 	"io"
 	"testing"
 
-	"github.com/prysmaticlabs/prysm/v5/cmd/beacon-chain/flags"
 	"github.com/sirupsen/logrus"
+	"github.com/stratisproject/prysm-stratis/cmd/beacon-chain/flags"
 )
 
 func TestMain(m *testing.M) {

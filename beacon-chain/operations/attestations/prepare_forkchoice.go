@@ -7,12 +7,12 @@ import (
 	"time"
 
 	"github.com/prysmaticlabs/go-bitfield"
-	"github.com/prysmaticlabs/prysm/v5/config/features"
-	"github.com/prysmaticlabs/prysm/v5/config/params"
-	"github.com/prysmaticlabs/prysm/v5/crypto/hash"
-	ethpb "github.com/prysmaticlabs/prysm/v5/proto/prysm/v1alpha1"
-	attaggregation "github.com/prysmaticlabs/prysm/v5/proto/prysm/v1alpha1/attestation/aggregation/attestations"
-	"github.com/prysmaticlabs/prysm/v5/time/slots"
+	"github.com/stratisproject/prysm-stratis/config/features"
+	"github.com/stratisproject/prysm-stratis/config/params"
+	"github.com/stratisproject/prysm-stratis/crypto/hash"
+	ethpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
+	attaggregation "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1/attestation/aggregation/attestations"
+	"github.com/stratisproject/prysm-stratis/time/slots"
 	"go.opencensus.io/trace"
 )
 

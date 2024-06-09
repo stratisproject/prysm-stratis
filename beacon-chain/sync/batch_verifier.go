@@ -6,8 +6,8 @@ import (
 
 	pubsub "github.com/libp2p/go-libp2p-pubsub"
 	"github.com/pkg/errors"
-	"github.com/prysmaticlabs/prysm/v5/crypto/bls"
-	"github.com/prysmaticlabs/prysm/v5/monitoring/tracing"
+	"github.com/stratisproject/prysm-stratis/crypto/bls"
+	"github.com/stratisproject/prysm-stratis/monitoring/tracing"
 	"go.opencensus.io/trace"
 )
 

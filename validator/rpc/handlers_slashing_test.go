@@ -8,12 +8,12 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/prysmaticlabs/prysm/v5/testing/require"
-	"github.com/prysmaticlabs/prysm/v5/validator/accounts"
-	"github.com/prysmaticlabs/prysm/v5/validator/db/kv"
-	"github.com/prysmaticlabs/prysm/v5/validator/keymanager"
-	"github.com/prysmaticlabs/prysm/v5/validator/slashing-protection-history/format"
-	mocks "github.com/prysmaticlabs/prysm/v5/validator/testing"
+	"github.com/stratisproject/prysm-stratis/testing/require"
+	"github.com/stratisproject/prysm-stratis/validator/accounts"
+	"github.com/stratisproject/prysm-stratis/validator/db/kv"
+	"github.com/stratisproject/prysm-stratis/validator/keymanager"
+	"github.com/stratisproject/prysm-stratis/validator/slashing-protection-history/format"
+	mocks "github.com/stratisproject/prysm-stratis/validator/testing"
 )
 
 func TestImportSlashingProtection_Preconditions(t *testing.T) {

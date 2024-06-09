@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/libp2p/go-libp2p/core/peer"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/p2p/peers/peerdata"
-	"github.com/prysmaticlabs/prysm/v5/config/features"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/p2p/peers/peerdata"
+	"github.com/stratisproject/prysm-stratis/config/features"
 )
 
 var _ Scorer = (*Service)(nil)

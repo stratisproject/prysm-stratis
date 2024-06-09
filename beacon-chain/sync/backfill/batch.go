@@ -7,12 +7,12 @@ import (
 
 	"github.com/libp2p/go-libp2p/core/peer"
 	"github.com/pkg/errors"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/das"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/sync"
-	"github.com/prysmaticlabs/prysm/v5/consensus-types/blocks"
-	"github.com/prysmaticlabs/prysm/v5/consensus-types/primitives"
-	eth "github.com/prysmaticlabs/prysm/v5/proto/prysm/v1alpha1"
 	log "github.com/sirupsen/logrus"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/das"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/sync"
+	"github.com/stratisproject/prysm-stratis/consensus-types/blocks"
+	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
+	eth "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
 )
 
 // ErrChainBroken indicates a backfill batch can't be imported to the db because it is not known to be the ancestor

@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/prysmaticlabs/prysm/v5/consensus-types/primitives"
+	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
 )
 
 func TestSSZUint64_Limit(t *testing.T) {

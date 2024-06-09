@@ -2,10 +2,10 @@ package genesis
 
 import (
 	"github.com/pkg/errors"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/node"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/sync/genesis"
-	"github.com/prysmaticlabs/prysm/v5/cmd/beacon-chain/sync/checkpoint"
 	log "github.com/sirupsen/logrus"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/node"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/sync/genesis"
+	"github.com/stratisproject/prysm-stratis/cmd/beacon-chain/sync/checkpoint"
 	"github.com/urfave/cli/v2"
 )
 

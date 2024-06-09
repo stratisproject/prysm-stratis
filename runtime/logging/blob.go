@@ -3,8 +3,8 @@ package logging
 import (
 	"fmt"
 
-	"github.com/prysmaticlabs/prysm/v5/consensus-types/blocks"
 	"github.com/sirupsen/logrus"
+	"github.com/stratisproject/prysm-stratis/consensus-types/blocks"
 )
 
 // BlobFields extracts a standard set of fields from a BlobSidecar into a logrus.Fields struct

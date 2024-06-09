@@ -17,8 +17,8 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/prysmaticlabs/prysm/v5/network"
 	"github.com/sirupsen/logrus"
+	"github.com/stratisproject/prysm-stratis/network"
 )
 
 var (

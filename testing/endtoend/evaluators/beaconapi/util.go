@@ -8,9 +8,9 @@ import (
 	"net/http"
 
 	"github.com/pkg/errors"
-	"github.com/prysmaticlabs/prysm/v5/api"
-	"github.com/prysmaticlabs/prysm/v5/testing/endtoend/params"
 	log "github.com/sirupsen/logrus"
+	"github.com/stratisproject/prysm-stratis/api"
+	"github.com/stratisproject/prysm-stratis/testing/endtoend/params"
 )
 
 var (

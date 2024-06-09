@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"unsafe"
 
-	"github.com/prysmaticlabs/prysm/v5/consensus-types/primitives"
+	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
 	"google.golang.org/protobuf/proto"
 )
 

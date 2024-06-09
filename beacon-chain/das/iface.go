@@ -3,8 +3,8 @@ package das
 import (
 	"context"
 
-	"github.com/prysmaticlabs/prysm/v5/consensus-types/blocks"
-	"github.com/prysmaticlabs/prysm/v5/consensus-types/primitives"
+	"github.com/stratisproject/prysm-stratis/consensus-types/blocks"
+	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
 )
 
 // AvailabilityStore describes a component that can verify and save sidecars for a given block, and confirm previously

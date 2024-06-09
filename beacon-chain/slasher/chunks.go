@@ -7,11 +7,11 @@ import (
 	"math"
 
 	"github.com/pkg/errors"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/db"
-	slashertypes "github.com/prysmaticlabs/prysm/v5/beacon-chain/slasher/types"
-	"github.com/prysmaticlabs/prysm/v5/consensus-types/primitives"
-	ethpb "github.com/prysmaticlabs/prysm/v5/proto/prysm/v1alpha1"
 	"github.com/sirupsen/logrus"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/db"
+	slashertypes "github.com/stratisproject/prysm-stratis/beacon-chain/slasher/types"
+	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
+	ethpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
 )
 
 // Chunker defines a struct which represents a slice containing a chunk for K different validator's

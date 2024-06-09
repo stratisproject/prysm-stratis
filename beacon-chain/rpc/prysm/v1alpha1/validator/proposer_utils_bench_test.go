@@ -5,10 +5,10 @@ import (
 	"testing"
 
 	"github.com/prysmaticlabs/go-bitfield"
-	"github.com/prysmaticlabs/prysm/v5/config/params"
-	ethpb "github.com/prysmaticlabs/prysm/v5/proto/prysm/v1alpha1"
-	aggtesting "github.com/prysmaticlabs/prysm/v5/proto/prysm/v1alpha1/attestation/aggregation/testing"
-	"github.com/prysmaticlabs/prysm/v5/testing/require"
+	"github.com/stratisproject/prysm-stratis/config/params"
+	ethpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
+	aggtesting "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1/attestation/aggregation/testing"
+	"github.com/stratisproject/prysm-stratis/testing/require"
 )
 
 func BenchmarkProposerAtts_sortByProfitability(b *testing.B) {

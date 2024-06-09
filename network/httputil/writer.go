@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/prysmaticlabs/prysm/v5/api"
 	log "github.com/sirupsen/logrus"
+	"github.com/stratisproject/prysm-stratis/api"
 )
 
 type HasStatusCode interface {

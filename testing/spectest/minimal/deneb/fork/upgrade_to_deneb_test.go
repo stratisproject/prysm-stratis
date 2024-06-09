@@ -3,7 +3,7 @@ package fork
 import (
 	"testing"
 
-	"github.com/prysmaticlabs/prysm/v5/testing/spectest/shared/deneb/fork"
+	"github.com/stratisproject/prysm-stratis/testing/spectest/shared/deneb/fork"
 )
 
 func TestMinimal_UpgradeToDeneb(t *testing.T) {

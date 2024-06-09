@@ -7,13 +7,13 @@ import (
 	"time"
 
 	"github.com/libp2p/go-libp2p/core/peer"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/p2p/peers/scorers"
-	"github.com/prysmaticlabs/prysm/v5/cmd/beacon-chain/flags"
-	"github.com/prysmaticlabs/prysm/v5/config/params"
-	mathutil "github.com/prysmaticlabs/prysm/v5/math"
-	prysmTime "github.com/prysmaticlabs/prysm/v5/time"
-	"github.com/prysmaticlabs/prysm/v5/time/slots"
 	"github.com/sirupsen/logrus"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/p2p/peers/scorers"
+	"github.com/stratisproject/prysm-stratis/cmd/beacon-chain/flags"
+	"github.com/stratisproject/prysm-stratis/config/params"
+	mathutil "github.com/stratisproject/prysm-stratis/math"
+	prysmTime "github.com/stratisproject/prysm-stratis/time"
+	"github.com/stratisproject/prysm-stratis/time/slots"
 	"go.opencensus.io/trace"
 )
 

@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"math/big"
 
-	"github.com/prysmaticlabs/prysm/v5/math"
+	"github.com/stratisproject/prysm-stratis/math"
 )
 
 // ToBytes returns integer x to bytes in little-endian format at the specified length.

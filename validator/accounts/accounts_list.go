@@ -6,10 +6,10 @@ import (
 	"math"
 
 	"github.com/pkg/errors"
-	ethpb "github.com/prysmaticlabs/prysm/v5/proto/prysm/v1alpha1"
-	"github.com/prysmaticlabs/prysm/v5/validator/accounts/wallet"
-	"github.com/prysmaticlabs/prysm/v5/validator/client/iface"
-	"github.com/prysmaticlabs/prysm/v5/validator/keymanager"
+	ethpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
+	"github.com/stratisproject/prysm-stratis/validator/accounts/wallet"
+	"github.com/stratisproject/prysm-stratis/validator/client/iface"
+	"github.com/stratisproject/prysm-stratis/validator/keymanager"
 )
 
 // List pretty-prints accounts in the wallet.

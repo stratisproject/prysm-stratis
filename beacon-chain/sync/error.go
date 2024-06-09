@@ -8,11 +8,11 @@ import (
 	libp2pcore "github.com/libp2p/go-libp2p/core"
 	"github.com/libp2p/go-libp2p/core/network"
 	multiplex "github.com/libp2p/go-mplex"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/p2p"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/p2p/encoder"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/p2p/types"
-	"github.com/prysmaticlabs/prysm/v5/config/params"
 	"github.com/sirupsen/logrus"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/p2p"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/p2p/encoder"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/p2p/types"
+	"github.com/stratisproject/prysm-stratis/config/params"
 )
 
 var ErrNoValidDigest = errors.New("no valid digest matched")

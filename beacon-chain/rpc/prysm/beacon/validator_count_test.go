@@ -12,20 +12,20 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/prysmaticlabs/prysm/v5/api/server/structs"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/state"
+	"github.com/stratisproject/prysm-stratis/api/server/structs"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/state"
 
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/rpc/lookup"
-	"github.com/prysmaticlabs/prysm/v5/network/httputil"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/rpc/lookup"
+	"github.com/stratisproject/prysm-stratis/network/httputil"
 
 	"github.com/gorilla/mux"
-	chainMock "github.com/prysmaticlabs/prysm/v5/beacon-chain/blockchain/testing"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/rpc/testutil"
-	"github.com/prysmaticlabs/prysm/v5/config/params"
-	"github.com/prysmaticlabs/prysm/v5/consensus-types/primitives"
-	eth "github.com/prysmaticlabs/prysm/v5/proto/prysm/v1alpha1"
-	"github.com/prysmaticlabs/prysm/v5/testing/require"
-	"github.com/prysmaticlabs/prysm/v5/testing/util"
+	chainMock "github.com/stratisproject/prysm-stratis/beacon-chain/blockchain/testing"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/rpc/testutil"
+	"github.com/stratisproject/prysm-stratis/config/params"
+	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
+	eth "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
+	"github.com/stratisproject/prysm-stratis/testing/require"
+	"github.com/stratisproject/prysm-stratis/testing/util"
 )
 
 func TestGetValidatorCountInvalidRequest(t *testing.T) {

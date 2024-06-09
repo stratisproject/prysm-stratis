@@ -4,10 +4,10 @@ import (
 	"flag"
 	"testing"
 
-	"github.com/prysmaticlabs/prysm/v5/cmd"
-	"github.com/prysmaticlabs/prysm/v5/testing/assert"
-	"github.com/prysmaticlabs/prysm/v5/testing/require"
-	dbtest "github.com/prysmaticlabs/prysm/v5/validator/db/testing"
+	"github.com/stratisproject/prysm-stratis/cmd"
+	"github.com/stratisproject/prysm-stratis/testing/assert"
+	"github.com/stratisproject/prysm-stratis/testing/require"
+	dbtest "github.com/stratisproject/prysm-stratis/validator/db/testing"
 	"github.com/urfave/cli/v2"
 )
 

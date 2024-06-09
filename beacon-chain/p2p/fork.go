@@ -8,12 +8,12 @@ import (
 	"github.com/ethereum/go-ethereum/p2p/enode"
 	"github.com/ethereum/go-ethereum/p2p/enr"
 	"github.com/pkg/errors"
-	"github.com/prysmaticlabs/prysm/v5/config/params"
-	"github.com/prysmaticlabs/prysm/v5/network/forks"
-	pb "github.com/prysmaticlabs/prysm/v5/proto/prysm/v1alpha1"
-	prysmTime "github.com/prysmaticlabs/prysm/v5/time"
-	"github.com/prysmaticlabs/prysm/v5/time/slots"
 	"github.com/sirupsen/logrus"
+	"github.com/stratisproject/prysm-stratis/config/params"
+	"github.com/stratisproject/prysm-stratis/network/forks"
+	pb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
+	prysmTime "github.com/stratisproject/prysm-stratis/time"
+	"github.com/stratisproject/prysm-stratis/time/slots"
 )
 
 // ENR key used for Ethereum consensus-related fork data.

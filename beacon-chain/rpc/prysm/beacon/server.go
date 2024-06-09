@@ -1,11 +1,11 @@
 package beacon
 
 import (
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/blockchain"
-	beacondb "github.com/prysmaticlabs/prysm/v5/beacon-chain/db"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/rpc/lookup"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/state/stategen"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/sync"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/blockchain"
+	beacondb "github.com/stratisproject/prysm-stratis/beacon-chain/db"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/rpc/lookup"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/state/stategen"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/sync"
 )
 
 type Server struct {

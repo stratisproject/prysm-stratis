@@ -4,11 +4,11 @@ import (
 	"math/big"
 
 	"github.com/pkg/errors"
-	consensus_types "github.com/prysmaticlabs/prysm/v5/consensus-types"
-	"github.com/prysmaticlabs/prysm/v5/encoding/bytesutil"
-	enginev1 "github.com/prysmaticlabs/prysm/v5/proto/engine/v1"
-	eth "github.com/prysmaticlabs/prysm/v5/proto/prysm/v1alpha1"
-	"github.com/prysmaticlabs/prysm/v5/runtime/version"
+	consensus_types "github.com/stratisproject/prysm-stratis/consensus-types"
+	"github.com/stratisproject/prysm-stratis/encoding/bytesutil"
+	enginev1 "github.com/stratisproject/prysm-stratis/proto/engine/v1"
+	eth "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
+	"github.com/stratisproject/prysm-stratis/runtime/version"
 	"google.golang.org/protobuf/proto"
 )
 

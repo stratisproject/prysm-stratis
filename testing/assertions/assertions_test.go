@@ -6,13 +6,13 @@ import (
 	"strings"
 	"testing"
 
-	eth "github.com/prysmaticlabs/prysm/v5/proto/prysm/v1alpha1"
-	testpb "github.com/prysmaticlabs/prysm/v5/proto/testing"
-	"github.com/prysmaticlabs/prysm/v5/testing/assert"
-	"github.com/prysmaticlabs/prysm/v5/testing/assertions"
-	"github.com/prysmaticlabs/prysm/v5/testing/require"
 	"github.com/sirupsen/logrus"
 	"github.com/sirupsen/logrus/hooks/test"
+	eth "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
+	testpb "github.com/stratisproject/prysm-stratis/proto/testing"
+	"github.com/stratisproject/prysm-stratis/testing/assert"
+	"github.com/stratisproject/prysm-stratis/testing/assertions"
+	"github.com/stratisproject/prysm-stratis/testing/require"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 

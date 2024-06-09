@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/prysmaticlabs/prysm/v5/config/params"
-	ev "github.com/prysmaticlabs/prysm/v5/testing/endtoend/evaluators"
-	e2eParams "github.com/prysmaticlabs/prysm/v5/testing/endtoend/params"
-	"github.com/prysmaticlabs/prysm/v5/testing/endtoend/types"
-	"github.com/prysmaticlabs/prysm/v5/testing/require"
+	"github.com/stratisproject/prysm-stratis/config/params"
+	ev "github.com/stratisproject/prysm-stratis/testing/endtoend/evaluators"
+	e2eParams "github.com/stratisproject/prysm-stratis/testing/endtoend/params"
+	"github.com/stratisproject/prysm-stratis/testing/endtoend/types"
+	"github.com/stratisproject/prysm-stratis/testing/require"
 )
 
 func TestEndToEnd_Slasher_MinimalConfig(t *testing.T) {

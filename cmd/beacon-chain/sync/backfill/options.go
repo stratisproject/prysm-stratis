@@ -1,9 +1,9 @@
 package backfill
 
 import (
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/node"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/sync/backfill"
-	"github.com/prysmaticlabs/prysm/v5/cmd/beacon-chain/sync/backfill/flags"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/node"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/sync/backfill"
+	"github.com/stratisproject/prysm-stratis/cmd/beacon-chain/sync/backfill/flags"
 	"github.com/urfave/cli/v2"
 )
 

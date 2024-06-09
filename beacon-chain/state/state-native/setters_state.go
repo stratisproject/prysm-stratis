@@ -2,11 +2,11 @@ package state_native
 
 import (
 	"github.com/pkg/errors"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/state/state-native/types"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/state/stateutil"
-	"github.com/prysmaticlabs/prysm/v5/config/features"
-	fieldparams "github.com/prysmaticlabs/prysm/v5/config/fieldparams"
-	consensus_types "github.com/prysmaticlabs/prysm/v5/consensus-types"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/state/state-native/types"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/state/stateutil"
+	"github.com/stratisproject/prysm-stratis/config/features"
+	fieldparams "github.com/stratisproject/prysm-stratis/config/fieldparams"
+	consensus_types "github.com/stratisproject/prysm-stratis/consensus-types"
 )
 
 // SetStateRoots for the beacon state. Updates the state roots

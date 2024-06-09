@@ -9,13 +9,13 @@ import (
 	"time"
 
 	"github.com/libp2p/go-libp2p/core/peer"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/p2p/peers/scorers"
-	"github.com/prysmaticlabs/prysm/v5/cmd/beacon-chain/flags"
-	"github.com/prysmaticlabs/prysm/v5/consensus-types/primitives"
-	leakybucket "github.com/prysmaticlabs/prysm/v5/container/leaky-bucket"
-	"github.com/prysmaticlabs/prysm/v5/testing/assert"
-	"github.com/prysmaticlabs/prysm/v5/testing/require"
-	prysmTime "github.com/prysmaticlabs/prysm/v5/time"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/p2p/peers/scorers"
+	"github.com/stratisproject/prysm-stratis/cmd/beacon-chain/flags"
+	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
+	leakybucket "github.com/stratisproject/prysm-stratis/container/leaky-bucket"
+	"github.com/stratisproject/prysm-stratis/testing/assert"
+	"github.com/stratisproject/prysm-stratis/testing/require"
+	prysmTime "github.com/stratisproject/prysm-stratis/time"
 )
 
 func TestBlocksFetcher_selectFailOverPeer(t *testing.T) {

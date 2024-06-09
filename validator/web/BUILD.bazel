@@ -9,7 +9,7 @@ go_library(
         "log.go",
         "site_data.go",
     ],
-    importpath = "github.com/prysmaticlabs/prysm/v5/validator/web",
+    importpath = "github.com/stratisproject/prysm-stratis/validator/web",
     visibility = [
         "//api/gateway:__pkg__",
         "//validator:__subpackages__",

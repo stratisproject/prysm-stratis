@@ -10,8 +10,8 @@ import (
 
 	"github.com/logrusorgru/aurora"
 	"github.com/pkg/errors"
-	"github.com/prysmaticlabs/prysm/v5/io/file"
-	"github.com/prysmaticlabs/prysm/v5/validator/keymanager"
+	"github.com/stratisproject/prysm-stratis/io/file"
+	"github.com/stratisproject/prysm-stratis/validator/keymanager"
 )
 
 var (

@@ -5,12 +5,12 @@ import (
 	"context"
 	"io"
 
-	fieldparams "github.com/prysmaticlabs/prysm/v5/config/fieldparams"
-	validatorServiceConfig "github.com/prysmaticlabs/prysm/v5/config/validator/service"
-	"github.com/prysmaticlabs/prysm/v5/consensus-types/primitives"
-	"github.com/prysmaticlabs/prysm/v5/monitoring/backup"
-	ethpb "github.com/prysmaticlabs/prysm/v5/proto/prysm/v1alpha1"
-	"github.com/prysmaticlabs/prysm/v5/validator/db/kv"
+	fieldparams "github.com/stratisproject/prysm-stratis/config/fieldparams"
+	validatorServiceConfig "github.com/stratisproject/prysm-stratis/config/validator/service"
+	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
+	"github.com/stratisproject/prysm-stratis/monitoring/backup"
+	ethpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
+	"github.com/stratisproject/prysm-stratis/validator/db/kv"
 )
 
 // Ensure the kv store implements the interface.

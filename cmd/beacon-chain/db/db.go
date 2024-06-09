@@ -1,10 +1,10 @@
 package db
 
 import (
-	beacondb "github.com/prysmaticlabs/prysm/v5/beacon-chain/db"
-	"github.com/prysmaticlabs/prysm/v5/cmd"
-	"github.com/prysmaticlabs/prysm/v5/runtime/tos"
 	"github.com/sirupsen/logrus"
+	beacondb "github.com/stratisproject/prysm-stratis/beacon-chain/db"
+	"github.com/stratisproject/prysm-stratis/cmd"
+	"github.com/stratisproject/prysm-stratis/runtime/tos"
 	"github.com/urfave/cli/v2"
 )
 

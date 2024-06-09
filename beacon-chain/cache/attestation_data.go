@@ -4,8 +4,8 @@ import (
 	"errors"
 	"sync"
 
-	forkchoicetypes "github.com/prysmaticlabs/prysm/v5/beacon-chain/forkchoice/types"
-	"github.com/prysmaticlabs/prysm/v5/consensus-types/primitives"
+	forkchoicetypes "github.com/stratisproject/prysm-stratis/beacon-chain/forkchoice/types"
+	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
 )
 
 type AttestationConsensusData struct {

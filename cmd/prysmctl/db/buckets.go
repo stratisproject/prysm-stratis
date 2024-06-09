@@ -3,7 +3,7 @@ package db
 import (
 	"fmt"
 
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/db/kv"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/db/kv"
 	"github.com/urfave/cli/v2"
 )
 

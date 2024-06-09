@@ -4,8 +4,8 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/prysmaticlabs/prysm/v5/api/client"
-	"github.com/prysmaticlabs/prysm/v5/testing/require"
+	"github.com/stratisproject/prysm-stratis/api/client"
+	"github.com/stratisproject/prysm-stratis/testing/require"
 )
 
 func TestParseNodeVersion(t *testing.T) {

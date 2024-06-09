@@ -21,7 +21,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/prysmaticlabs/prysm/v5/time/mclock"
+	"github.com/stratisproject/prysm-stratis/time/mclock"
 )
 
 // waitQuotient is divided against the max backoff time, in order to have N requests based on the full

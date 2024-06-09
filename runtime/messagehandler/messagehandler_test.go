@@ -5,9 +5,9 @@ import (
 	"testing"
 
 	pubsub "github.com/libp2p/go-libp2p-pubsub"
-	"github.com/prysmaticlabs/prysm/v5/runtime/messagehandler"
-	"github.com/prysmaticlabs/prysm/v5/testing/require"
 	logTest "github.com/sirupsen/logrus/hooks/test"
+	"github.com/stratisproject/prysm-stratis/runtime/messagehandler"
+	"github.com/stratisproject/prysm-stratis/testing/require"
 )
 
 func TestSafelyHandleMessage(t *testing.T) {

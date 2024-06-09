@@ -10,12 +10,12 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	"github.com/prysmaticlabs/prysm/v5/io/file"
-	"github.com/prysmaticlabs/prysm/v5/testing/endtoend/helpers"
-	e2e "github.com/prysmaticlabs/prysm/v5/testing/endtoend/params"
-	e2etypes "github.com/prysmaticlabs/prysm/v5/testing/endtoend/types"
-	"github.com/prysmaticlabs/prysm/v5/testing/middleware/builder"
 	"github.com/sirupsen/logrus"
+	"github.com/stratisproject/prysm-stratis/io/file"
+	"github.com/stratisproject/prysm-stratis/testing/endtoend/helpers"
+	e2e "github.com/stratisproject/prysm-stratis/testing/endtoend/params"
+	e2etypes "github.com/stratisproject/prysm-stratis/testing/endtoend/types"
+	"github.com/stratisproject/prysm-stratis/testing/middleware/builder"
 )
 
 // BuilderSet represents a set of builders for the validators running via a relay.

@@ -4,11 +4,11 @@ import (
 	"context"
 
 	"github.com/pkg/errors"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/blockchain/kzg"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/das"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/verification"
-	"github.com/prysmaticlabs/prysm/v5/consensus-types/blocks"
-	"github.com/prysmaticlabs/prysm/v5/encoding/bytesutil"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/blockchain/kzg"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/das"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/verification"
+	"github.com/stratisproject/prysm-stratis/consensus-types/blocks"
+	"github.com/stratisproject/prysm-stratis/encoding/bytesutil"
 )
 
 var (

@@ -4,11 +4,11 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	"github.com/prysmaticlabs/prysm/v5/cmd"
-	"github.com/prysmaticlabs/prysm/v5/cmd/validator/flags"
-	"github.com/prysmaticlabs/prysm/v5/validator/accounts"
-	"github.com/prysmaticlabs/prysm/v5/validator/accounts/userprompt"
-	"github.com/prysmaticlabs/prysm/v5/validator/client"
+	"github.com/stratisproject/prysm-stratis/cmd"
+	"github.com/stratisproject/prysm-stratis/cmd/validator/flags"
+	"github.com/stratisproject/prysm-stratis/validator/accounts"
+	"github.com/stratisproject/prysm-stratis/validator/accounts/userprompt"
+	"github.com/stratisproject/prysm-stratis/validator/client"
 	"github.com/urfave/cli/v2"
 )
 

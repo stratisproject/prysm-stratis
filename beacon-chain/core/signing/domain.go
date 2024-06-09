@@ -2,9 +2,9 @@ package signing
 
 import (
 	"github.com/pkg/errors"
-	"github.com/prysmaticlabs/prysm/v5/consensus-types/primitives"
-	"github.com/prysmaticlabs/prysm/v5/crypto/bls"
-	eth "github.com/prysmaticlabs/prysm/v5/proto/prysm/v1alpha1"
+	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
+	"github.com/stratisproject/prysm-stratis/crypto/bls"
+	eth "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
 )
 
 // Domain returns the domain version for BLS private key to sign and verify.

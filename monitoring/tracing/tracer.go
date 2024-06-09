@@ -6,8 +6,8 @@ import (
 	"errors"
 
 	"contrib.go.opencensus.io/exporter/jaeger"
-	"github.com/prysmaticlabs/prysm/v5/runtime/version"
 	"github.com/sirupsen/logrus"
+	"github.com/stratisproject/prysm-stratis/runtime/version"
 	"go.opencensus.io/trace"
 )
 

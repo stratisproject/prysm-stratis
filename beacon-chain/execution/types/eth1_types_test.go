@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/prysmaticlabs/prysm/v5/testing/assert"
+	"github.com/stratisproject/prysm-stratis/testing/assert"
 )
 
 func TestRoundtrip_HeaderInfo(t *testing.T) {

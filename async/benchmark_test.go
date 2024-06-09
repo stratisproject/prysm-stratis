@@ -6,9 +6,9 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/prysmaticlabs/prysm/v5/async"
-	"github.com/prysmaticlabs/prysm/v5/testing/require"
 	log "github.com/sirupsen/logrus"
+	"github.com/stratisproject/prysm-stratis/async"
+	"github.com/stratisproject/prysm-stratis/testing/require"
 )
 
 var input [][]byte

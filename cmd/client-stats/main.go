@@ -7,14 +7,14 @@ import (
 	"time"
 
 	joonix "github.com/joonix/log"
-	"github.com/prysmaticlabs/prysm/v5/cmd"
-	"github.com/prysmaticlabs/prysm/v5/cmd/client-stats/flags"
-	"github.com/prysmaticlabs/prysm/v5/io/logs"
-	"github.com/prysmaticlabs/prysm/v5/monitoring/clientstats"
-	"github.com/prysmaticlabs/prysm/v5/monitoring/journald"
-	prefixed "github.com/prysmaticlabs/prysm/v5/runtime/logging/logrus-prefixed-formatter"
-	"github.com/prysmaticlabs/prysm/v5/runtime/version"
 	"github.com/sirupsen/logrus"
+	"github.com/stratisproject/prysm-stratis/cmd"
+	"github.com/stratisproject/prysm-stratis/cmd/client-stats/flags"
+	"github.com/stratisproject/prysm-stratis/io/logs"
+	"github.com/stratisproject/prysm-stratis/monitoring/clientstats"
+	"github.com/stratisproject/prysm-stratis/monitoring/journald"
+	prefixed "github.com/stratisproject/prysm-stratis/runtime/logging/logrus-prefixed-formatter"
+	"github.com/stratisproject/prysm-stratis/runtime/version"
 	"github.com/urfave/cli/v2"
 )
 

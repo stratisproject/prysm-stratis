@@ -4,7 +4,7 @@ import (
 	"errors"
 	"os"
 
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/db/kv"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/db/kv"
 )
 
 // ErrNotFound can be used to determine if an error from a method in the database package

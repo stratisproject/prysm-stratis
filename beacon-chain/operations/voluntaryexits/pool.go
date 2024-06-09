@@ -4,14 +4,14 @@ import (
 	"math"
 	"sync"
 
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/core/blocks"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/state"
-	"github.com/prysmaticlabs/prysm/v5/config/params"
-	types "github.com/prysmaticlabs/prysm/v5/consensus-types/primitives"
-	doublylinkedlist "github.com/prysmaticlabs/prysm/v5/container/doubly-linked-list"
-	ethpb "github.com/prysmaticlabs/prysm/v5/proto/prysm/v1alpha1"
-	"github.com/prysmaticlabs/prysm/v5/time/slots"
 	"github.com/sirupsen/logrus"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/core/blocks"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/state"
+	"github.com/stratisproject/prysm-stratis/config/params"
+	types "github.com/stratisproject/prysm-stratis/consensus-types/primitives"
+	doublylinkedlist "github.com/stratisproject/prysm-stratis/container/doubly-linked-list"
+	ethpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
+	"github.com/stratisproject/prysm-stratis/time/slots"
 )
 
 // PoolManager maintains pending and seen voluntary exits.

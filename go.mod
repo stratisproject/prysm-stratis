@@ -1,4 +1,4 @@
-module github.com/prysmaticlabs/prysm/v5
+module github.com/stratisproject/prysm-stratis
 
 go 1.21
 

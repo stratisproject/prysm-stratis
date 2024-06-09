@@ -16,12 +16,12 @@ import (
 	"github.com/libp2p/go-libp2p/core/crypto"
 	"github.com/pkg/errors"
 	"github.com/prysmaticlabs/go-bitfield"
-	"github.com/prysmaticlabs/prysm/v5/consensus-types/wrapper"
-	ecdsaprysm "github.com/prysmaticlabs/prysm/v5/crypto/ecdsa"
-	"github.com/prysmaticlabs/prysm/v5/io/file"
-	pb "github.com/prysmaticlabs/prysm/v5/proto/prysm/v1alpha1"
-	"github.com/prysmaticlabs/prysm/v5/proto/prysm/v1alpha1/metadata"
 	"github.com/sirupsen/logrus"
+	"github.com/stratisproject/prysm-stratis/consensus-types/wrapper"
+	ecdsaprysm "github.com/stratisproject/prysm-stratis/crypto/ecdsa"
+	"github.com/stratisproject/prysm-stratis/io/file"
+	pb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
+	"github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1/metadata"
 	"google.golang.org/protobuf/proto"
 )
 

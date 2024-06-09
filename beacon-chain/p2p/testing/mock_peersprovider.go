@@ -10,10 +10,10 @@ import (
 	"github.com/libp2p/go-libp2p/core/network"
 	"github.com/libp2p/go-libp2p/core/peer"
 	ma "github.com/multiformats/go-multiaddr"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/p2p/peers"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/p2p/peers/scorers"
-	pb "github.com/prysmaticlabs/prysm/v5/proto/prysm/v1alpha1"
 	log "github.com/sirupsen/logrus"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/p2p/peers"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/p2p/peers/scorers"
+	pb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
 )
 
 // MockPeersProvider implements PeersProvider for testing.

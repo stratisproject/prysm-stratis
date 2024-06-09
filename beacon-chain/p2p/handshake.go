@@ -10,10 +10,10 @@ import (
 
 	"github.com/libp2p/go-libp2p/core/network"
 	"github.com/libp2p/go-libp2p/core/peer"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/p2p/peers"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/p2p/peers/peerdata"
-	prysmTime "github.com/prysmaticlabs/prysm/v5/time"
 	"github.com/sirupsen/logrus"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/p2p/peers"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/p2p/peers/peerdata"
+	prysmTime "github.com/stratisproject/prysm-stratis/time"
 )
 
 const (

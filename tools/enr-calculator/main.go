@@ -10,10 +10,10 @@ import (
 	"github.com/ethereum/go-ethereum/p2p/enode"
 	"github.com/ethereum/go-ethereum/p2p/enr"
 	"github.com/libp2p/go-libp2p/core/crypto"
-	ecdsaprysm "github.com/prysmaticlabs/prysm/v5/crypto/ecdsa"
-	"github.com/prysmaticlabs/prysm/v5/io/file"
-	_ "github.com/prysmaticlabs/prysm/v5/runtime/maxprocs"
 	log "github.com/sirupsen/logrus"
+	ecdsaprysm "github.com/stratisproject/prysm-stratis/crypto/ecdsa"
+	"github.com/stratisproject/prysm-stratis/io/file"
+	_ "github.com/stratisproject/prysm-stratis/runtime/maxprocs"
 )
 
 var (

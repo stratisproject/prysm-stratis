@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/prysmaticlabs/prysm/v5/api/server/structs"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/rpc/core"
-	"github.com/prysmaticlabs/prysm/v5/network/httputil"
-	ethpb "github.com/prysmaticlabs/prysm/v5/proto/prysm/v1alpha1"
+	"github.com/stratisproject/prysm-stratis/api/server/structs"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/rpc/core"
+	"github.com/stratisproject/prysm-stratis/network/httputil"
+	ethpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
 	"go.opencensus.io/trace"
 )
 

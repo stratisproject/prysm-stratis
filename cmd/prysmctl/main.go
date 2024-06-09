@@ -3,13 +3,13 @@ package main
 import (
 	"os"
 
-	"github.com/prysmaticlabs/prysm/v5/cmd/prysmctl/checkpointsync"
-	"github.com/prysmaticlabs/prysm/v5/cmd/prysmctl/db"
-	"github.com/prysmaticlabs/prysm/v5/cmd/prysmctl/p2p"
-	"github.com/prysmaticlabs/prysm/v5/cmd/prysmctl/testnet"
-	"github.com/prysmaticlabs/prysm/v5/cmd/prysmctl/validator"
-	"github.com/prysmaticlabs/prysm/v5/cmd/prysmctl/weaksubjectivity"
 	log "github.com/sirupsen/logrus"
+	"github.com/stratisproject/prysm-stratis/cmd/prysmctl/checkpointsync"
+	"github.com/stratisproject/prysm-stratis/cmd/prysmctl/db"
+	"github.com/stratisproject/prysm-stratis/cmd/prysmctl/p2p"
+	"github.com/stratisproject/prysm-stratis/cmd/prysmctl/testnet"
+	"github.com/stratisproject/prysm-stratis/cmd/prysmctl/validator"
+	"github.com/stratisproject/prysm-stratis/cmd/prysmctl/weaksubjectivity"
 	"github.com/urfave/cli/v2"
 )
 

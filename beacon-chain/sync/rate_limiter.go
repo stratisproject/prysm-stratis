@@ -7,11 +7,11 @@ import (
 
 	"github.com/libp2p/go-libp2p/core/network"
 	"github.com/pkg/errors"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/p2p"
-	p2ptypes "github.com/prysmaticlabs/prysm/v5/beacon-chain/p2p/types"
-	"github.com/prysmaticlabs/prysm/v5/cmd/beacon-chain/flags"
-	leakybucket "github.com/prysmaticlabs/prysm/v5/container/leaky-bucket"
 	"github.com/sirupsen/logrus"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/p2p"
+	p2ptypes "github.com/stratisproject/prysm-stratis/beacon-chain/p2p/types"
+	"github.com/stratisproject/prysm-stratis/cmd/beacon-chain/flags"
+	leakybucket "github.com/stratisproject/prysm-stratis/container/leaky-bucket"
 	"github.com/trailofbits/go-mutexasserts"
 )
 

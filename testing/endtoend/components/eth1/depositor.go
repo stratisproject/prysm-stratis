@@ -14,14 +14,14 @@ import (
 	gethtypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/pkg/errors"
-	"github.com/prysmaticlabs/prysm/v5/config/params"
-	contracts "github.com/prysmaticlabs/prysm/v5/contracts/deposit"
-	"github.com/prysmaticlabs/prysm/v5/encoding/bytesutil"
-	eth "github.com/prysmaticlabs/prysm/v5/proto/prysm/v1alpha1"
-	e2e "github.com/prysmaticlabs/prysm/v5/testing/endtoend/params"
-	"github.com/prysmaticlabs/prysm/v5/testing/endtoend/types"
-	"github.com/prysmaticlabs/prysm/v5/testing/util"
 	log "github.com/sirupsen/logrus"
+	"github.com/stratisproject/prysm-stratis/config/params"
+	contracts "github.com/stratisproject/prysm-stratis/contracts/deposit"
+	"github.com/stratisproject/prysm-stratis/encoding/bytesutil"
+	eth "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
+	e2e "github.com/stratisproject/prysm-stratis/testing/endtoend/params"
+	"github.com/stratisproject/prysm-stratis/testing/endtoend/types"
+	"github.com/stratisproject/prysm-stratis/testing/util"
 )
 
 var gweiPerEth = big.NewInt(int64(params.BeaconConfig().GweiPerEth))

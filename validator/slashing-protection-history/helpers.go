@@ -7,9 +7,9 @@ import (
 	"strings"
 
 	"github.com/k0kubun/go-ansi"
-	fieldparams "github.com/prysmaticlabs/prysm/v5/config/fieldparams"
-	"github.com/prysmaticlabs/prysm/v5/consensus-types/primitives"
 	"github.com/schollz/progressbar/v3"
+	fieldparams "github.com/stratisproject/prysm-stratis/config/fieldparams"
+	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
 )
 
 func initializeProgressBar(numItems int, msg string) *progressbar.ProgressBar {

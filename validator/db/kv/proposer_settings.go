@@ -5,9 +5,9 @@ import (
 	"fmt"
 
 	"github.com/pkg/errors"
-	fieldparams "github.com/prysmaticlabs/prysm/v5/config/fieldparams"
-	validatorServiceConfig "github.com/prysmaticlabs/prysm/v5/config/validator/service"
-	validatorpb "github.com/prysmaticlabs/prysm/v5/proto/prysm/v1alpha1/validator-client"
+	fieldparams "github.com/stratisproject/prysm-stratis/config/fieldparams"
+	validatorServiceConfig "github.com/stratisproject/prysm-stratis/config/validator/service"
+	validatorpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1/validator-client"
 	bolt "go.etcd.io/bbolt"
 	"go.opencensus.io/trace"
 	"google.golang.org/protobuf/proto"

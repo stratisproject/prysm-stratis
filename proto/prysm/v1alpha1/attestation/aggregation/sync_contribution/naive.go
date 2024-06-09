@@ -1,9 +1,9 @@
 package sync_contribution
 
 import (
-	"github.com/prysmaticlabs/prysm/v5/crypto/bls"
-	v2 "github.com/prysmaticlabs/prysm/v5/proto/prysm/v1alpha1"
-	"github.com/prysmaticlabs/prysm/v5/proto/prysm/v1alpha1/attestation/aggregation"
+	"github.com/stratisproject/prysm-stratis/crypto/bls"
+	v2 "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
+	"github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1/attestation/aggregation"
 )
 
 // naiveSyncContributionAggregation aggregates naively, without any complex algorithms or optimizations.

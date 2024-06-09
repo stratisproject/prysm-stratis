@@ -10,10 +10,10 @@ import (
 	reflect "reflect"
 	sync "sync"
 
-	github_com_prysmaticlabs_prysm_v5_consensus_types_primitives "github.com/prysmaticlabs/prysm/v5/consensus-types/primitives"
-	github_com_prysmaticlabs_prysm_v5_consensus_types_validator "github.com/prysmaticlabs/prysm/v5/consensus-types/validator"
-	_ "github.com/prysmaticlabs/prysm/v5/proto/eth/ext"
-	v1alpha1 "github.com/prysmaticlabs/prysm/v5/proto/prysm/v1alpha1"
+	github_com_prysmaticlabs_prysm_v5_consensus_types_primitives "github.com/stratisproject/prysm-stratis/consensus-types/primitives"
+	github_com_prysmaticlabs_prysm_v5_consensus_types_validator "github.com/stratisproject/prysm-stratis/consensus-types/validator"
+	_ "github.com/stratisproject/prysm-stratis/proto/eth/ext"
+	v1alpha1 "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 )
@@ -105,7 +105,7 @@ type SignRequest struct {
 	//	*SignRequest_BlockDeneb
 	//	*SignRequest_BlindedBlockDeneb
 	Object      isSignRequest_Object                                              `protobuf_oneof:"object"`
-	SigningSlot github_com_prysmaticlabs_prysm_v5_consensus_types_primitives.Slot `protobuf:"varint,6,opt,name=signing_slot,json=signingSlot,proto3" json:"signing_slot,omitempty" cast-type:"github.com/prysmaticlabs/prysm/v5/consensus-types/primitives.Slot"`
+	SigningSlot github_com_prysmaticlabs_prysm_v5_consensus_types_primitives.Slot `protobuf:"varint,6,opt,name=signing_slot,json=signingSlot,proto3" json:"signing_slot,omitempty" cast-type:"github.com/stratisproject/prysm-stratis/consensus-types/primitives.Slot"`
 }
 
 func (x *SignRequest) Reset() {
@@ -315,11 +315,11 @@ type SignRequest_Exit struct {
 }
 
 type SignRequest_Slot struct {
-	Slot github_com_prysmaticlabs_prysm_v5_consensus_types_primitives.Slot `protobuf:"varint,105,opt,name=slot,proto3,oneof" cast-type:"github.com/prysmaticlabs/prysm/v5/consensus-types/primitives.Slot"`
+	Slot github_com_prysmaticlabs_prysm_v5_consensus_types_primitives.Slot `protobuf:"varint,105,opt,name=slot,proto3,oneof" cast-type:"github.com/stratisproject/prysm-stratis/consensus-types/primitives.Slot"`
 }
 
 type SignRequest_Epoch struct {
-	Epoch github_com_prysmaticlabs_prysm_v5_consensus_types_primitives.Epoch `protobuf:"varint,106,opt,name=epoch,proto3,oneof" cast-type:"github.com/prysmaticlabs/prysm/v5/consensus-types/primitives.Epoch"`
+	Epoch github_com_prysmaticlabs_prysm_v5_consensus_types_primitives.Epoch `protobuf:"varint,106,opt,name=epoch,proto3,oneof" cast-type:"github.com/stratisproject/prysm-stratis/consensus-types/primitives.Epoch"`
 }
 
 type SignRequest_BlockAltair struct {
@@ -516,7 +516,7 @@ type BuilderConfig struct {
 	unknownFields protoimpl.UnknownFields
 
 	Enabled  bool                                                               `protobuf:"varint,1,opt,name=enabled,proto3" json:"enabled,omitempty"`
-	GasLimit github_com_prysmaticlabs_prysm_v5_consensus_types_validator.Uint64 `protobuf:"varint,2,opt,name=gas_limit,json=gasLimit,proto3" json:"gas_limit,omitempty" cast-type:"github.com/prysmaticlabs/prysm/v5/consensus-types/validator.Uint64"`
+	GasLimit github_com_prysmaticlabs_prysm_v5_consensus_types_validator.Uint64 `protobuf:"varint,2,opt,name=gas_limit,json=gasLimit,proto3" json:"gas_limit,omitempty" cast-type:"github.com/stratisproject/prysm-stratis/consensus-types/validator.Uint64"`
 	Relays   []string                                                           `protobuf:"bytes,3,rep,name=relays,proto3" json:"relays,omitempty"`
 }
 

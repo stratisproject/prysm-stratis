@@ -5,7 +5,7 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/prysmaticlabs/prysm/v5/validator/client/iface"
+	"github.com/stratisproject/prysm-stratis/validator/client/iface"
 
 	"github.com/pkg/errors"
 )

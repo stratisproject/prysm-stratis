@@ -3,7 +3,7 @@ package properpermissions
 import (
 	"testing"
 
-	"github.com/prysmaticlabs/prysm/v5/build/bazel"
+	"github.com/stratisproject/prysm-stratis/build/bazel"
 	"golang.org/x/tools/go/analysis/analysistest"
 )
 

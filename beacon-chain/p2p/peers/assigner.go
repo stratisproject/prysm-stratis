@@ -3,10 +3,10 @@ package peers
 import (
 	"github.com/libp2p/go-libp2p/core/peer"
 	"github.com/pkg/errors"
-	forkchoicetypes "github.com/prysmaticlabs/prysm/v5/beacon-chain/forkchoice/types"
-	"github.com/prysmaticlabs/prysm/v5/cmd/beacon-chain/flags"
-	"github.com/prysmaticlabs/prysm/v5/config/params"
 	"github.com/sirupsen/logrus"
+	forkchoicetypes "github.com/stratisproject/prysm-stratis/beacon-chain/forkchoice/types"
+	"github.com/stratisproject/prysm-stratis/cmd/beacon-chain/flags"
+	"github.com/stratisproject/prysm-stratis/config/params"
 )
 
 // FinalizedCheckpointer describes the minimum capability that Assigner needs from forkchoice.

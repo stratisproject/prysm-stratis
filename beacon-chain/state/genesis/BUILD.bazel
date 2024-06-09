@@ -8,7 +8,7 @@ go_library(
         "genesis_auroria.go",
     ],
     embedsrcs = ["mainnet.ssz.snappy","auroria.ssz.snappy"],
-    importpath = "github.com/prysmaticlabs/prysm/v5/beacon-chain/state/genesis",
+    importpath = "github.com/stratisproject/prysm-stratis/beacon-chain/state/genesis",
     visibility = ["//beacon-chain/db:__subpackages__"],
     deps = [
         "//beacon-chain/state:go_default_library",

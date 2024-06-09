@@ -6,8 +6,8 @@ import (
 	"math/big"
 	"testing"
 
-	"github.com/prysmaticlabs/prysm/v5/math"
-	"github.com/prysmaticlabs/prysm/v5/testing/require"
+	"github.com/stratisproject/prysm-stratis/math"
+	"github.com/stratisproject/prysm-stratis/testing/require"
 )
 
 func TestIntegerSquareRoot(t *testing.T) {

@@ -5,14 +5,14 @@ import (
 	"context"
 	"time"
 
-	fieldparams "github.com/prysmaticlabs/prysm/v5/config/fieldparams"
-	validatorserviceconfig "github.com/prysmaticlabs/prysm/v5/config/validator/service"
-	"github.com/prysmaticlabs/prysm/v5/consensus-types/primitives"
-	ethpb "github.com/prysmaticlabs/prysm/v5/proto/prysm/v1alpha1"
-	prysmTime "github.com/prysmaticlabs/prysm/v5/time"
-	"github.com/prysmaticlabs/prysm/v5/validator/client/iface"
-	"github.com/prysmaticlabs/prysm/v5/validator/keymanager"
 	log "github.com/sirupsen/logrus"
+	fieldparams "github.com/stratisproject/prysm-stratis/config/fieldparams"
+	validatorserviceconfig "github.com/stratisproject/prysm-stratis/config/validator/service"
+	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
+	ethpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
+	prysmTime "github.com/stratisproject/prysm-stratis/time"
+	"github.com/stratisproject/prysm-stratis/validator/client/iface"
+	"github.com/stratisproject/prysm-stratis/validator/keymanager"
 )
 
 var _ iface.Validator = (*FakeValidator)(nil)

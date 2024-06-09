@@ -11,8 +11,8 @@ import (
 	sync "sync"
 
 	github_com_prysmaticlabs_go_bitfield "github.com/prysmaticlabs/go-bitfield"
-	github_com_prysmaticlabs_prysm_v5_consensus_types_primitives "github.com/prysmaticlabs/prysm/v5/consensus-types/primitives"
-	_ "github.com/prysmaticlabs/prysm/v5/proto/eth/ext"
+	github_com_prysmaticlabs_prysm_v5_consensus_types_primitives "github.com/stratisproject/prysm-stratis/consensus-types/primitives"
+	_ "github.com/stratisproject/prysm-stratis/proto/eth/ext"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	_ "google.golang.org/protobuf/types/descriptorpb"
@@ -93,7 +93,7 @@ type AggregateAttestationAndProof struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	AggregatorIndex github_com_prysmaticlabs_prysm_v5_consensus_types_primitives.ValidatorIndex `protobuf:"varint,1,opt,name=aggregator_index,json=aggregatorIndex,proto3" json:"aggregator_index,omitempty" cast-type:"github.com/prysmaticlabs/prysm/v5/consensus-types/primitives.ValidatorIndex"`
+	AggregatorIndex github_com_prysmaticlabs_prysm_v5_consensus_types_primitives.ValidatorIndex `protobuf:"varint,1,opt,name=aggregator_index,json=aggregatorIndex,proto3" json:"aggregator_index,omitempty" cast-type:"github.com/stratisproject/prysm-stratis/consensus-types/primitives.ValidatorIndex"`
 	Aggregate       *Attestation                                                                `protobuf:"bytes,3,opt,name=aggregate,proto3" json:"aggregate,omitempty"`
 	SelectionProof  []byte                                                                      `protobuf:"bytes,2,opt,name=selection_proof,json=selectionProof,proto3" json:"selection_proof,omitempty" ssz-size:"96"`
 }
@@ -211,8 +211,8 @@ type AttestationData struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Slot            github_com_prysmaticlabs_prysm_v5_consensus_types_primitives.Slot           `protobuf:"varint,1,opt,name=slot,proto3" json:"slot,omitempty" cast-type:"github.com/prysmaticlabs/prysm/v5/consensus-types/primitives.Slot"`
-	Index           github_com_prysmaticlabs_prysm_v5_consensus_types_primitives.CommitteeIndex `protobuf:"varint,2,opt,name=index,proto3" json:"index,omitempty" cast-type:"github.com/prysmaticlabs/prysm/v5/consensus-types/primitives.CommitteeIndex"`
+	Slot            github_com_prysmaticlabs_prysm_v5_consensus_types_primitives.Slot           `protobuf:"varint,1,opt,name=slot,proto3" json:"slot,omitempty" cast-type:"github.com/stratisproject/prysm-stratis/consensus-types/primitives.Slot"`
+	Index           github_com_prysmaticlabs_prysm_v5_consensus_types_primitives.CommitteeIndex `protobuf:"varint,2,opt,name=index,proto3" json:"index,omitempty" cast-type:"github.com/stratisproject/prysm-stratis/consensus-types/primitives.CommitteeIndex"`
 	BeaconBlockRoot []byte                                                                      `protobuf:"bytes,3,opt,name=beacon_block_root,json=beaconBlockRoot,proto3" json:"beacon_block_root,omitempty" ssz-size:"32"`
 	Source          *Checkpoint                                                                 `protobuf:"bytes,4,opt,name=source,proto3" json:"source,omitempty"`
 	Target          *Checkpoint                                                                 `protobuf:"bytes,5,opt,name=target,proto3" json:"target,omitempty"`
@@ -290,7 +290,7 @@ type Checkpoint struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Epoch github_com_prysmaticlabs_prysm_v5_consensus_types_primitives.Epoch `protobuf:"varint,1,opt,name=epoch,proto3" json:"epoch,omitempty" cast-type:"github.com/prysmaticlabs/prysm/v5/consensus-types/primitives.Epoch"`
+	Epoch github_com_prysmaticlabs_prysm_v5_consensus_types_primitives.Epoch `protobuf:"varint,1,opt,name=epoch,proto3" json:"epoch,omitempty" cast-type:"github.com/stratisproject/prysm-stratis/consensus-types/primitives.Epoch"`
 	Root  []byte                                                             `protobuf:"bytes,2,opt,name=root,proto3" json:"root,omitempty" ssz-size:"32"`
 }
 

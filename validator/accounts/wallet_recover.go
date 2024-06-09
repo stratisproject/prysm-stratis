@@ -5,9 +5,9 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	"github.com/prysmaticlabs/prysm/v5/validator/accounts/wallet"
-	"github.com/prysmaticlabs/prysm/v5/validator/keymanager"
-	"github.com/prysmaticlabs/prysm/v5/validator/keymanager/derived"
+	"github.com/stratisproject/prysm-stratis/validator/accounts/wallet"
+	"github.com/stratisproject/prysm-stratis/validator/keymanager"
+	"github.com/stratisproject/prysm-stratis/validator/keymanager/derived"
 )
 
 const (

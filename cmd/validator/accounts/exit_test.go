@@ -10,14 +10,14 @@ import (
 	"time"
 
 	"github.com/golang/mock/gomock"
-	"github.com/prysmaticlabs/prysm/v5/build/bazel"
-	"github.com/prysmaticlabs/prysm/v5/io/file"
-	ethpb "github.com/prysmaticlabs/prysm/v5/proto/prysm/v1alpha1"
-	"github.com/prysmaticlabs/prysm/v5/testing/assert"
-	"github.com/prysmaticlabs/prysm/v5/testing/require"
-	validatormock "github.com/prysmaticlabs/prysm/v5/testing/validator-mock"
-	"github.com/prysmaticlabs/prysm/v5/validator/accounts"
-	"github.com/prysmaticlabs/prysm/v5/validator/keymanager"
+	"github.com/stratisproject/prysm-stratis/build/bazel"
+	"github.com/stratisproject/prysm-stratis/io/file"
+	ethpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
+	"github.com/stratisproject/prysm-stratis/testing/assert"
+	"github.com/stratisproject/prysm-stratis/testing/require"
+	validatormock "github.com/stratisproject/prysm-stratis/testing/validator-mock"
+	"github.com/stratisproject/prysm-stratis/validator/accounts"
+	"github.com/stratisproject/prysm-stratis/validator/keymanager"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 

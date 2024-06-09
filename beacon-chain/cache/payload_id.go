@@ -3,7 +3,7 @@ package cache
 import (
 	"sync"
 
-	"github.com/prysmaticlabs/prysm/v5/consensus-types/primitives"
+	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
 )
 
 // RootToPayloadIDMap is a map with keys the head root and values the

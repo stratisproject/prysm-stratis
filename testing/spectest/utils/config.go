@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/prysmaticlabs/prysm/v5/config/params"
+	"github.com/stratisproject/prysm-stratis/config/params"
 )
 
 // SetConfig sets the global params for spec tests depending on the option chosen.

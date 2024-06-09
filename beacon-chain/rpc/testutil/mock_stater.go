@@ -3,10 +3,10 @@ package testutil
 import (
 	"context"
 
-	"github.com/prysmaticlabs/prysm/v5/encoding/bytesutil"
+	"github.com/stratisproject/prysm-stratis/encoding/bytesutil"
 
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/state"
-	"github.com/prysmaticlabs/prysm/v5/consensus-types/primitives"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/state"
+	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
 )
 
 // MockStater is a fake implementation of lookup.Stater.

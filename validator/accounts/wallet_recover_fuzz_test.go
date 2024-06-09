@@ -5,7 +5,7 @@ package accounts_test
 import (
 	"testing"
 
-	"github.com/prysmaticlabs/prysm/v5/validator/accounts"
+	"github.com/stratisproject/prysm-stratis/validator/accounts"
 )
 
 func FuzzValidateMnemonic(f *testing.F) {

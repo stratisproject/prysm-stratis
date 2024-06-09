@@ -4,11 +4,11 @@ import (
 	"context"
 
 	"github.com/pkg/errors"
-	"github.com/prysmaticlabs/prysm/v5/validator/client/iface"
+	"github.com/stratisproject/prysm-stratis/validator/client/iface"
 
-	fieldparams "github.com/prysmaticlabs/prysm/v5/config/fieldparams"
-	validator2 "github.com/prysmaticlabs/prysm/v5/consensus-types/validator"
-	eth "github.com/prysmaticlabs/prysm/v5/proto/prysm/v1alpha1"
+	fieldparams "github.com/stratisproject/prysm-stratis/config/fieldparams"
+	validator2 "github.com/stratisproject/prysm-stratis/consensus-types/validator"
+	eth "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
 	"go.opencensus.io/trace"
 )
 

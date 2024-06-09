@@ -10,8 +10,8 @@ import (
 	"strings"
 
 	gethRPC "github.com/ethereum/go-ethereum/rpc"
-	"github.com/prysmaticlabs/prysm/v5/network/authorization"
 	log "github.com/sirupsen/logrus"
+	"github.com/stratisproject/prysm-stratis/network/authorization"
 )
 
 // Endpoint is an endpoint with authorization data.

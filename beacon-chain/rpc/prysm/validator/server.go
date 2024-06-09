@@ -1,7 +1,7 @@
 package validator
 
 import (
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/rpc/core"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/rpc/core"
 )
 
 type Server struct {

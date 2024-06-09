@@ -5,8 +5,8 @@ import (
 	"strconv"
 	"sync"
 
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/state"
-	"github.com/prysmaticlabs/prysm/v5/consensus-types/primitives"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/state"
+	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
 	"k8s.io/client-go/tools/cache"
 )
 

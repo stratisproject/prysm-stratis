@@ -3,10 +3,10 @@ package network
 import (
 	"testing"
 
-	"github.com/prysmaticlabs/prysm/v5/network/authorization"
-	"github.com/prysmaticlabs/prysm/v5/testing/assert"
-	"github.com/prysmaticlabs/prysm/v5/testing/require"
 	logTest "github.com/sirupsen/logrus/hooks/test"
+	"github.com/stratisproject/prysm-stratis/network/authorization"
+	"github.com/stratisproject/prysm-stratis/testing/assert"
+	"github.com/stratisproject/prysm-stratis/testing/require"
 )
 
 func TestToHeaderValue(t *testing.T) {

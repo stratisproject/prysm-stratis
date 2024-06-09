@@ -5,12 +5,12 @@ import (
 	"math"
 	"testing"
 
-	dbtest "github.com/prysmaticlabs/prysm/v5/beacon-chain/db/testing"
-	slashertypes "github.com/prysmaticlabs/prysm/v5/beacon-chain/slasher/types"
-	"github.com/prysmaticlabs/prysm/v5/consensus-types/primitives"
-	ethpb "github.com/prysmaticlabs/prysm/v5/proto/prysm/v1alpha1"
-	"github.com/prysmaticlabs/prysm/v5/testing/assert"
-	"github.com/prysmaticlabs/prysm/v5/testing/require"
+	dbtest "github.com/stratisproject/prysm-stratis/beacon-chain/db/testing"
+	slashertypes "github.com/stratisproject/prysm-stratis/beacon-chain/slasher/types"
+	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
+	ethpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
+	"github.com/stratisproject/prysm-stratis/testing/assert"
+	"github.com/stratisproject/prysm-stratis/testing/require"
 )
 
 var (

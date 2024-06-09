@@ -4,8 +4,8 @@ import (
 	"io"
 	"testing"
 
-	"github.com/prysmaticlabs/prysm/v5/config/params"
 	"github.com/sirupsen/logrus"
+	"github.com/stratisproject/prysm-stratis/config/params"
 )
 
 func TestMain(m *testing.M) {

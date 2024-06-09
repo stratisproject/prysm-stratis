@@ -1,7 +1,7 @@
 package beacon
 
 import (
-	"github.com/prysmaticlabs/prysm/v5/config/params"
+	"github.com/stratisproject/prysm-stratis/config/params"
 )
 
 func init() {

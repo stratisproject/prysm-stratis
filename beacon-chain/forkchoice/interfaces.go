@@ -3,11 +3,11 @@ package forkchoice
 import (
 	"context"
 
-	forkchoicetypes "github.com/prysmaticlabs/prysm/v5/beacon-chain/forkchoice/types"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/state"
-	fieldparams "github.com/prysmaticlabs/prysm/v5/config/fieldparams"
-	forkchoice2 "github.com/prysmaticlabs/prysm/v5/consensus-types/forkchoice"
-	"github.com/prysmaticlabs/prysm/v5/consensus-types/primitives"
+	forkchoicetypes "github.com/stratisproject/prysm-stratis/beacon-chain/forkchoice/types"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/state"
+	fieldparams "github.com/stratisproject/prysm-stratis/config/fieldparams"
+	forkchoice2 "github.com/stratisproject/prysm-stratis/consensus-types/forkchoice"
+	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
 )
 
 // BalancesByRooter is a handler to obtain the effective balances of the state

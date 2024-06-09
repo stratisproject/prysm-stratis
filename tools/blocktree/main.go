@@ -16,9 +16,9 @@ import (
 	"strconv"
 
 	"github.com/emicklei/dot"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/db/filters"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/db/kv"
-	"github.com/prysmaticlabs/prysm/v5/consensus-types/primitives"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/db/filters"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/db/kv"
+	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
 )
 
 var (

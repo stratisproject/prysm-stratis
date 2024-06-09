@@ -10,9 +10,9 @@ import (
 	reflect "reflect"
 	sync "sync"
 
-	github_com_prysmaticlabs_prysm_v5_consensus_types_primitives "github.com/prysmaticlabs/prysm/v5/consensus-types/primitives"
-	_ "github.com/prysmaticlabs/prysm/v5/proto/eth/ext"
-	v1 "github.com/prysmaticlabs/prysm/v5/proto/eth/v1"
+	github_com_prysmaticlabs_prysm_v5_consensus_types_primitives "github.com/stratisproject/prysm-stratis/consensus-types/primitives"
+	_ "github.com/stratisproject/prysm-stratis/proto/eth/ext"
+	v1 "github.com/stratisproject/prysm-stratis/proto/eth/v1"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 )
@@ -98,7 +98,7 @@ type LightClientUpdate struct {
 	FinalizedHeader         *v1.BeaconBlockHeader                                             `protobuf:"bytes,4,opt,name=finalized_header,json=finalizedHeader,proto3" json:"finalized_header,omitempty"`
 	FinalityBranch          [][]byte                                                          `protobuf:"bytes,5,rep,name=finality_branch,json=finalityBranch,proto3" json:"finality_branch,omitempty"`
 	SyncAggregate           *v1.SyncAggregate                                                 `protobuf:"bytes,6,opt,name=sync_aggregate,json=syncAggregate,proto3" json:"sync_aggregate,omitempty"`
-	SignatureSlot           github_com_prysmaticlabs_prysm_v5_consensus_types_primitives.Slot `protobuf:"varint,7,opt,name=signature_slot,json=signatureSlot,proto3" json:"signature_slot,omitempty" cast-type:"github.com/prysmaticlabs/prysm/v5/consensus-types/primitives.Slot"`
+	SignatureSlot           github_com_prysmaticlabs_prysm_v5_consensus_types_primitives.Slot `protobuf:"varint,7,opt,name=signature_slot,json=signatureSlot,proto3" json:"signature_slot,omitempty" cast-type:"github.com/stratisproject/prysm-stratis/consensus-types/primitives.Slot"`
 }
 
 func (x *LightClientUpdate) Reset() {
@@ -246,7 +246,7 @@ type LightClientFinalityUpdate struct {
 	FinalizedHeader *v1.BeaconBlockHeader                                             `protobuf:"bytes,2,opt,name=finalized_header,json=finalizedHeader,proto3" json:"finalized_header,omitempty"`
 	FinalityBranch  [][]byte                                                          `protobuf:"bytes,3,rep,name=finality_branch,json=finalityBranch,proto3" json:"finality_branch,omitempty"`
 	SyncAggregate   *v1.SyncAggregate                                                 `protobuf:"bytes,4,opt,name=sync_aggregate,json=syncAggregate,proto3" json:"sync_aggregate,omitempty"`
-	SignatureSlot   github_com_prysmaticlabs_prysm_v5_consensus_types_primitives.Slot `protobuf:"varint,5,opt,name=signature_slot,json=signatureSlot,proto3" json:"signature_slot,omitempty" cast-type:"github.com/prysmaticlabs/prysm/v5/consensus-types/primitives.Slot"`
+	SignatureSlot   github_com_prysmaticlabs_prysm_v5_consensus_types_primitives.Slot `protobuf:"varint,5,opt,name=signature_slot,json=signatureSlot,proto3" json:"signature_slot,omitempty" cast-type:"github.com/stratisproject/prysm-stratis/consensus-types/primitives.Slot"`
 }
 
 func (x *LightClientFinalityUpdate) Reset() {
@@ -378,7 +378,7 @@ type LightClientOptimisticUpdate struct {
 
 	AttestedHeader *v1.BeaconBlockHeader                                             `protobuf:"bytes,1,opt,name=attested_header,json=attestedHeader,proto3" json:"attested_header,omitempty"`
 	SyncAggregate  *v1.SyncAggregate                                                 `protobuf:"bytes,2,opt,name=sync_aggregate,json=syncAggregate,proto3" json:"sync_aggregate,omitempty"`
-	SignatureSlot  github_com_prysmaticlabs_prysm_v5_consensus_types_primitives.Slot `protobuf:"varint,3,opt,name=signature_slot,json=signatureSlot,proto3" json:"signature_slot,omitempty" cast-type:"github.com/prysmaticlabs/prysm/v5/consensus-types/primitives.Slot"`
+	SignatureSlot  github_com_prysmaticlabs_prysm_v5_consensus_types_primitives.Slot `protobuf:"varint,3,opt,name=signature_slot,json=signatureSlot,proto3" json:"signature_slot,omitempty" cast-type:"github.com/stratisproject/prysm-stratis/consensus-types/primitives.Slot"`
 }
 
 func (x *LightClientOptimisticUpdate) Reset() {

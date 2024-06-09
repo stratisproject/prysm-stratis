@@ -9,8 +9,8 @@ import (
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/params"
-	clparams "github.com/prysmaticlabs/prysm/v5/config/params"
-	"github.com/prysmaticlabs/prysm/v5/time/slots"
+	clparams "github.com/stratisproject/prysm-stratis/config/params"
+	"github.com/stratisproject/prysm-stratis/time/slots"
 )
 
 // defaultMinerAddress is used to send deposits and test transactions in the e2e test.

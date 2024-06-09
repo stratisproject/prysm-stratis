@@ -3,7 +3,7 @@ package main
 import (
 	"testing"
 
-	"github.com/prysmaticlabs/prysm/v5/config/features"
+	"github.com/stratisproject/prysm-stratis/config/features"
 	"github.com/urfave/cli/v2"
 )
 

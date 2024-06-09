@@ -5,10 +5,10 @@ import (
 	"sync"
 
 	"github.com/pkg/errors"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/state/state-native/types"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/state/stateutil"
-	multi_value_slice "github.com/prysmaticlabs/prysm/v5/container/multi-value-slice"
-	pmath "github.com/prysmaticlabs/prysm/v5/math"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/state/state-native/types"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/state/stateutil"
+	multi_value_slice "github.com/stratisproject/prysm-stratis/container/multi-value-slice"
+	pmath "github.com/stratisproject/prysm-stratis/math"
 )
 
 var (

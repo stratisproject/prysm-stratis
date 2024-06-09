@@ -3,8 +3,8 @@ package filesystem
 import (
 	"testing"
 
-	"github.com/prysmaticlabs/prysm/v5/config/params"
 	"github.com/spf13/afero"
+	"github.com/stratisproject/prysm-stratis/config/params"
 )
 
 // NewEphemeralBlobStorage should only be used for tests.

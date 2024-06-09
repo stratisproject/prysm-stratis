@@ -7,8 +7,8 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	"github.com/prysmaticlabs/prysm/v5/api/client"
-	"github.com/prysmaticlabs/prysm/v5/validator/rpc"
+	"github.com/stratisproject/prysm-stratis/api/client"
+	"github.com/stratisproject/prysm-stratis/validator/rpc"
 )
 
 const (

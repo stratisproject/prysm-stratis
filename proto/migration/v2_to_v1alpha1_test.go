@@ -4,12 +4,12 @@ import (
 	"testing"
 
 	"github.com/prysmaticlabs/go-bitfield"
-	enginev1 "github.com/prysmaticlabs/prysm/v5/proto/engine/v1"
-	ethpbv1 "github.com/prysmaticlabs/prysm/v5/proto/eth/v1"
-	ethpbv2 "github.com/prysmaticlabs/prysm/v5/proto/eth/v2"
-	"github.com/prysmaticlabs/prysm/v5/testing/assert"
-	"github.com/prysmaticlabs/prysm/v5/testing/require"
-	"github.com/prysmaticlabs/prysm/v5/testing/util"
+	enginev1 "github.com/stratisproject/prysm-stratis/proto/engine/v1"
+	ethpbv1 "github.com/stratisproject/prysm-stratis/proto/eth/v1"
+	ethpbv2 "github.com/stratisproject/prysm-stratis/proto/eth/v2"
+	"github.com/stratisproject/prysm-stratis/testing/assert"
+	"github.com/stratisproject/prysm-stratis/testing/require"
+	"github.com/stratisproject/prysm-stratis/testing/util"
 )
 
 func Test_AltairToV1Alpha1SignedBlock(t *testing.T) {

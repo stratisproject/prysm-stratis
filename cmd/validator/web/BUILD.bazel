@@ -6,7 +6,7 @@ go_library(
         "log.go",
         "web.go",
     ],
-    importpath = "github.com/prysmaticlabs/prysm/v5/cmd/validator/web",
+    importpath = "github.com/stratisproject/prysm-stratis/cmd/validator/web",
     visibility = ["//visibility:public"],
     deps = [
         "//cmd:go_default_library",

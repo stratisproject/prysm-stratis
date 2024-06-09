@@ -3,10 +3,10 @@ package shared
 import (
 	"net/http"
 
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/rpc/lookup"
-	"github.com/prysmaticlabs/prysm/v5/consensus-types/blocks"
-	"github.com/prysmaticlabs/prysm/v5/consensus-types/interfaces"
-	"github.com/prysmaticlabs/prysm/v5/network/httputil"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/rpc/lookup"
+	"github.com/stratisproject/prysm-stratis/consensus-types/blocks"
+	"github.com/stratisproject/prysm-stratis/consensus-types/interfaces"
+	"github.com/stratisproject/prysm-stratis/network/httputil"
 )
 
 // WriteStateFetchError writes an appropriate error based on the supplied argument.

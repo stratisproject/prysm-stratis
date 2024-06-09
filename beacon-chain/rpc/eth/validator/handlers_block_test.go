@@ -11,17 +11,17 @@ import (
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/golang/mock/gomock"
-	"github.com/prysmaticlabs/prysm/v5/api"
-	"github.com/prysmaticlabs/prysm/v5/api/server/structs"
-	blockchainTesting "github.com/prysmaticlabs/prysm/v5/beacon-chain/blockchain/testing"
-	rewardtesting "github.com/prysmaticlabs/prysm/v5/beacon-chain/rpc/eth/rewards/testing"
-	rpctesting "github.com/prysmaticlabs/prysm/v5/beacon-chain/rpc/eth/shared/testing"
-	mockSync "github.com/prysmaticlabs/prysm/v5/beacon-chain/sync/initial-sync/testing"
-	"github.com/prysmaticlabs/prysm/v5/network/httputil"
-	eth "github.com/prysmaticlabs/prysm/v5/proto/prysm/v1alpha1"
-	"github.com/prysmaticlabs/prysm/v5/testing/assert"
-	mock2 "github.com/prysmaticlabs/prysm/v5/testing/mock"
-	"github.com/prysmaticlabs/prysm/v5/testing/require"
+	"github.com/stratisproject/prysm-stratis/api"
+	"github.com/stratisproject/prysm-stratis/api/server/structs"
+	blockchainTesting "github.com/stratisproject/prysm-stratis/beacon-chain/blockchain/testing"
+	rewardtesting "github.com/stratisproject/prysm-stratis/beacon-chain/rpc/eth/rewards/testing"
+	rpctesting "github.com/stratisproject/prysm-stratis/beacon-chain/rpc/eth/shared/testing"
+	mockSync "github.com/stratisproject/prysm-stratis/beacon-chain/sync/initial-sync/testing"
+	"github.com/stratisproject/prysm-stratis/network/httputil"
+	eth "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
+	"github.com/stratisproject/prysm-stratis/testing/assert"
+	mock2 "github.com/stratisproject/prysm-stratis/testing/mock"
+	"github.com/stratisproject/prysm-stratis/testing/require"
 )
 
 func TestProduceBlockV2(t *testing.T) {

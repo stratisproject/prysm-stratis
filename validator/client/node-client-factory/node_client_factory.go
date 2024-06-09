@@ -1,11 +1,11 @@
 package validator_client_factory
 
 import (
-	"github.com/prysmaticlabs/prysm/v5/config/features"
-	beaconApi "github.com/prysmaticlabs/prysm/v5/validator/client/beacon-api"
-	grpcApi "github.com/prysmaticlabs/prysm/v5/validator/client/grpc-api"
-	"github.com/prysmaticlabs/prysm/v5/validator/client/iface"
-	validatorHelpers "github.com/prysmaticlabs/prysm/v5/validator/helpers"
+	"github.com/stratisproject/prysm-stratis/config/features"
+	beaconApi "github.com/stratisproject/prysm-stratis/validator/client/beacon-api"
+	grpcApi "github.com/stratisproject/prysm-stratis/validator/client/grpc-api"
+	"github.com/stratisproject/prysm-stratis/validator/client/iface"
+	validatorHelpers "github.com/stratisproject/prysm-stratis/validator/helpers"
 )
 
 func NewNodeClient(validatorConn validatorHelpers.NodeConnection, jsonRestHandler beaconApi.JsonRestHandler) iface.NodeClient {

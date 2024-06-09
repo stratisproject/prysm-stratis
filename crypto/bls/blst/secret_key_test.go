@@ -8,11 +8,11 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/prysmaticlabs/prysm/v5/crypto/bls/blst"
-	"github.com/prysmaticlabs/prysm/v5/crypto/bls/common"
-	"github.com/prysmaticlabs/prysm/v5/encoding/bytesutil"
-	"github.com/prysmaticlabs/prysm/v5/testing/assert"
-	"github.com/prysmaticlabs/prysm/v5/testing/require"
+	"github.com/stratisproject/prysm-stratis/crypto/bls/blst"
+	"github.com/stratisproject/prysm-stratis/crypto/bls/common"
+	"github.com/stratisproject/prysm-stratis/encoding/bytesutil"
+	"github.com/stratisproject/prysm-stratis/testing/assert"
+	"github.com/stratisproject/prysm-stratis/testing/require"
 )
 
 func TestMarshalUnmarshal(t *testing.T) {

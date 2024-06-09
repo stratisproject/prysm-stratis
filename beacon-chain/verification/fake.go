@@ -3,7 +3,7 @@ package verification
 import (
 	"testing"
 
-	"github.com/prysmaticlabs/prysm/v5/consensus-types/blocks"
+	"github.com/stratisproject/prysm-stratis/consensus-types/blocks"
 )
 
 // BlobSidecarNoop is a FAKE verification function that simply launders a ROBlob->VerifiedROBlob.

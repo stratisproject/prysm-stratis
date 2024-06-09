@@ -10,8 +10,8 @@ import (
 	"strings"
 
 	"github.com/d4l3k/messagediff"
-	"github.com/prysmaticlabs/prysm/v5/encoding/ssz/equality"
 	"github.com/sirupsen/logrus/hooks/test"
+	"github.com/stratisproject/prysm-stratis/encoding/ssz/equality"
 	"google.golang.org/protobuf/proto"
 )
 

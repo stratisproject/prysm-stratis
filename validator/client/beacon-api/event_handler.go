@@ -7,7 +7,7 @@ import (
 	"sync"
 
 	"github.com/pkg/errors"
-	"github.com/prysmaticlabs/prysm/v5/api"
+	"github.com/stratisproject/prysm-stratis/api"
 )
 
 // Currently set to the first power of 2 bigger than the size of the `head` event

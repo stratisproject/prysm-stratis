@@ -6,17 +6,17 @@ import (
 	"testing"
 	"time"
 
-	"github.com/prysmaticlabs/prysm/v5/async/event"
-	mock "github.com/prysmaticlabs/prysm/v5/beacon-chain/blockchain/testing"
-	dbtest "github.com/prysmaticlabs/prysm/v5/beacon-chain/db/testing"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/startup"
-	mockSync "github.com/prysmaticlabs/prysm/v5/beacon-chain/sync/initial-sync/testing"
-	"github.com/prysmaticlabs/prysm/v5/consensus-types/primitives"
-	"github.com/prysmaticlabs/prysm/v5/testing/require"
-	"github.com/prysmaticlabs/prysm/v5/testing/util"
-	"github.com/prysmaticlabs/prysm/v5/time/slots"
 	"github.com/sirupsen/logrus"
 	logTest "github.com/sirupsen/logrus/hooks/test"
+	"github.com/stratisproject/prysm-stratis/async/event"
+	mock "github.com/stratisproject/prysm-stratis/beacon-chain/blockchain/testing"
+	dbtest "github.com/stratisproject/prysm-stratis/beacon-chain/db/testing"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/startup"
+	mockSync "github.com/stratisproject/prysm-stratis/beacon-chain/sync/initial-sync/testing"
+	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
+	"github.com/stratisproject/prysm-stratis/testing/require"
+	"github.com/stratisproject/prysm-stratis/testing/util"
+	"github.com/stratisproject/prysm-stratis/time/slots"
 )
 
 func TestMain(m *testing.M) {

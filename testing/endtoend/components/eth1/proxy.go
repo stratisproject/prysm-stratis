@@ -10,12 +10,12 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	"github.com/prysmaticlabs/prysm/v5/io/file"
-	"github.com/prysmaticlabs/prysm/v5/testing/endtoend/helpers"
-	e2e "github.com/prysmaticlabs/prysm/v5/testing/endtoend/params"
-	e2etypes "github.com/prysmaticlabs/prysm/v5/testing/endtoend/types"
-	proxy "github.com/prysmaticlabs/prysm/v5/testing/middleware/engine-api-proxy"
 	log "github.com/sirupsen/logrus"
+	"github.com/stratisproject/prysm-stratis/io/file"
+	"github.com/stratisproject/prysm-stratis/testing/endtoend/helpers"
+	e2e "github.com/stratisproject/prysm-stratis/testing/endtoend/params"
+	e2etypes "github.com/stratisproject/prysm-stratis/testing/endtoend/types"
+	proxy "github.com/stratisproject/prysm-stratis/testing/middleware/engine-api-proxy"
 )
 
 // ProxySet represents a set of proxies for the engine-api.

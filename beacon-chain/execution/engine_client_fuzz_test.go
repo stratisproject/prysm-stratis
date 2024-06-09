@@ -15,9 +15,9 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/pkg/errors"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/execution"
-	pb "github.com/prysmaticlabs/prysm/v5/proto/engine/v1"
-	"github.com/prysmaticlabs/prysm/v5/testing/assert"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/execution"
+	pb "github.com/stratisproject/prysm-stratis/proto/engine/v1"
+	"github.com/stratisproject/prysm-stratis/testing/assert"
 )
 
 func FuzzForkChoiceResponse(f *testing.F) {

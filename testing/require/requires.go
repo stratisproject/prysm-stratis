@@ -1,8 +1,8 @@
 package require
 
 import (
-	"github.com/prysmaticlabs/prysm/v5/testing/assertions"
 	"github.com/sirupsen/logrus/hooks/test"
+	"github.com/stratisproject/prysm-stratis/testing/assertions"
 )
 
 // Equal compares values using comparison operator.

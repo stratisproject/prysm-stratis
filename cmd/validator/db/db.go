@@ -1,10 +1,10 @@
 package db
 
 import (
-	"github.com/prysmaticlabs/prysm/v5/cmd"
-	"github.com/prysmaticlabs/prysm/v5/runtime/tos"
-	validatordb "github.com/prysmaticlabs/prysm/v5/validator/db"
 	"github.com/sirupsen/logrus"
+	"github.com/stratisproject/prysm-stratis/cmd"
+	"github.com/stratisproject/prysm-stratis/runtime/tos"
+	validatordb "github.com/stratisproject/prysm-stratis/validator/db"
 	"github.com/urfave/cli/v2"
 )
 

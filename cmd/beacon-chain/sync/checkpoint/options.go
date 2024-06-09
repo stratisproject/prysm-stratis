@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/pkg/errors"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/node"
-	"github.com/prysmaticlabs/prysm/v5/beacon-chain/sync/checkpoint"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/node"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/sync/checkpoint"
 	"github.com/urfave/cli/v2"
 )
 
