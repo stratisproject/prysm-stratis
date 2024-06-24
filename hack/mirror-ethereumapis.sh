@@ -25,7 +25,7 @@ export CURL_ARGS="-LJO#"
 curl -o /dev/null -sH "$AUTH" "$GH_REPO" || { echo "Error: Invalid repo, token or network issue!";  exit 1; }
 
 # Clone ethereumapis and prysm
-git clone https://github.com/prysmaticlabs/prysm /tmp/prysm/
+git clone https://github.com/stratisproject/prysm-stratis /tmp/prysm/
 git clone https://github.com/prysmaticlabs/ethereumapis /tmp/ethereumapis/
 
 # Checkout the release tag in prysm and copy over protos
