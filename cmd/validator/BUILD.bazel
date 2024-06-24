@@ -60,7 +60,7 @@ prysm_image_upload(
     name = "push_images",
     binary = ":validator",
     entrypoint = ["/validator"],
-    repository = "gcr.io/prysmaticlabs/prysm/validator",
+    repository = "docker.io/stratisevm/prysm-validator",
     symlinks = {
         # Backwards compatiability for images that depended on the old filepath.
         "/app/cmd/validator/validator": "/validator",
