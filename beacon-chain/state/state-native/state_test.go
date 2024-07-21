@@ -20,34 +20,6 @@ import (
 	"github.com/stratisproject/prysm-stratis/testing/require"
 )
 
-func TestValidatorMap_DistinctCopy(t *testing.T) {
-	count := uint64(100)
-	vals := make([]*ethpb.Validator, 0, count)
-	for i := uint64(1); i < count; i++ {
-		var someRoot [32]byte
-		var someKey [fieldparams.BLSPubkeyLength]byte
-		copy(someRoot[:], strconv.Itoa(int(i)))
-		copy(someKey[:], strconv.Itoa(int(i)))
-		vals = append(vals, &ethpb.Validator{
-			PublicKey:                  someKey[:],
-			WithdrawalCredentials:      someRoot[:],
-			EffectiveBalance:           params.BeaconConfig().MaxEffectiveBalance,
-			Slashed:                    false,
-			ActivationEligibilityEpoch: 1,
-			ActivationEpoch:            1,
-			ExitEpoch:                  1,
-			WithdrawableEpoch:          1,
-		})
-	}
-	handler := stateutil.NewValMapHandler(vals)
-	newHandler := handler.Copy()
-	wantedPubkey := strconv.Itoa(22)
-	handler.Set(bytesutil.ToBytes48([]byte(wantedPubkey)), 27)
-	val1, _ := handler.Get(bytesutil.ToBytes48([]byte(wantedPubkey)))
-	val2, _ := newHandler.Get(bytesutil.ToBytes48([]byte(wantedPubkey)))
-	assert.NotEqual(t, val1, val2, "Values are supposed to be unequal due to copy")
-}
-
 func TestBeaconState_NoDeadlock_Phase0(t *testing.T) {
 	count := uint64(100)
 	vals := make([]*ethpb.Validator, 0, count)
@@ -414,6 +386,26 @@ func TestCopyAllTries(t *testing.T) {
 	newRt, err := nState.stateFieldLeaves[types.Balances].TrieRoot()
 	assert.NoError(t, err)
 	assert.NotEqual(t, rt, newRt)
+}
+
+func TestDuplicateDirtyIndices(t *testing.T) {
+	newState := &BeaconState{
+		rebuildTrie:  make(map[types.FieldIndex]bool),
+		dirtyIndices: make(map[types.FieldIndex][]uint64),
+	}
+	for i := uint64(0); i < indicesLimit-5; i++ {
+		newState.dirtyIndices[types.Balances] = append(newState.dirtyIndices[types.Balances], i)
+	}
+	// Append duplicates
+	newState.dirtyIndices[types.Balances] = append(newState.dirtyIndices[types.Balances], []uint64{0, 1, 2, 3, 4}...)
+
+	// We would remove the duplicates and stay under the threshold
+	newState.addDirtyIndices(types.Balances, []uint64{9997, 9998})
+	assert.Equal(t, false, newState.rebuildTrie[types.Balances])
+
+	// We would trigger above the threshold.
+	newState.addDirtyIndices(types.Balances, []uint64{10000, 10001, 10002, 10003})
+	assert.Equal(t, true, newState.rebuildTrie[types.Balances])
 }
 
 func generateState(t *testing.T) state.BeaconState {

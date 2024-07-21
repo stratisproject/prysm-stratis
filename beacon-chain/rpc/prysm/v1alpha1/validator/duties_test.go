@@ -8,7 +8,7 @@ import (
 
 	mockChain "github.com/stratisproject/prysm-stratis/beacon-chain/blockchain/testing"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/cache"
-	"github.com/stratisproject/prysm-stratis/beacon-chain/cache/depositcache"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/cache/depositsnapshot"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/core/altair"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/core/execution"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/core/helpers"
@@ -334,7 +334,7 @@ func TestGetAltairDuties_UnknownPubkey(t *testing.T) {
 	chain := &mockChain.ChainService{
 		State: bs, Root: genesisRoot[:], Genesis: time.Now().Add(time.Duration(-1*int64(slot-1)) * time.Second),
 	}
-	depositCache, err := depositcache.New()
+	depositCache, err := depositsnapshot.New()
 	require.NoError(t, err)
 
 	vs := &Server{

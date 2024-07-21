@@ -10,7 +10,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	logTest "github.com/sirupsen/logrus/hooks/test"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/cache"
-	"github.com/stratisproject/prysm-stratis/beacon-chain/cache/depositcache"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/cache/depositsnapshot"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/core/blocks"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/core/helpers"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/core/transition"
@@ -80,7 +80,7 @@ func setupBeaconChain(t *testing.T, beaconDB db.Database) *Service {
 	attService, err := attestations.NewService(ctx, &attestations.Config{Pool: attestations.NewPool()})
 	require.NoError(t, err)
 
-	depositCache, err := depositcache.New()
+	depositCache, err := depositsnapshot.New()
 	require.NoError(t, err)
 
 	fc := doublylinkedtree.New()

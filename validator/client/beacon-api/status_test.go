@@ -10,13 +10,13 @@ import (
 	"github.com/stratisproject/prysm-stratis/validator/client/iface"
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/golang/mock/gomock"
 	"github.com/stratisproject/prysm-stratis/config/params"
 	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
 	ethpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
 	"github.com/stratisproject/prysm-stratis/testing/assert"
 	"github.com/stratisproject/prysm-stratis/testing/require"
 	"github.com/stratisproject/prysm-stratis/validator/client/beacon-api/mock"
+	"go.uber.org/mock/gomock"
 )
 
 func TestValidatorStatus_Nominal(t *testing.T) {
@@ -55,7 +55,7 @@ func TestValidatorStatus_Nominal(t *testing.T) {
 	jsonRestHandler := mock.NewMockJsonRestHandler(ctrl)
 	validatorClient := beaconApiValidatorClient{
 		stateValidatorsProvider: stateValidatorsProvider,
-		prysmBeaconChainCLient: prysmBeaconChainClient{
+		prysmChainClient: prysmChainClient{
 			nodeClient: &beaconApiNodeClient{
 				jsonRestHandler: jsonRestHandler,
 			},
@@ -181,7 +181,7 @@ func TestMultipleValidatorStatus_Nominal(t *testing.T) {
 
 	validatorClient := beaconApiValidatorClient{
 		stateValidatorsProvider: stateValidatorsProvider,
-		prysmBeaconChainCLient: prysmBeaconChainClient{
+		prysmChainClient: prysmChainClient{
 			nodeClient: &beaconApiNodeClient{
 				jsonRestHandler: jsonRestHandler,
 			},
@@ -429,7 +429,7 @@ func TestGetValidatorsStatusResponse_Nominal_SomeActiveValidators(t *testing.T) 
 
 	validatorClient := beaconApiValidatorClient{
 		stateValidatorsProvider: stateValidatorsProvider,
-		prysmBeaconChainCLient: prysmBeaconChainClient{
+		prysmChainClient: prysmChainClient{
 			nodeClient: &beaconApiNodeClient{
 				jsonRestHandler: jsonRestHandler,
 			},
@@ -499,7 +499,7 @@ func TestGetValidatorsStatusResponse_Nominal_NoActiveValidators(t *testing.T) {
 
 	validatorClient := beaconApiValidatorClient{
 		stateValidatorsProvider: stateValidatorsProvider,
-		prysmBeaconChainCLient: prysmBeaconChainClient{
+		prysmChainClient: prysmChainClient{
 			nodeClient: &beaconApiNodeClient{
 				jsonRestHandler: jsonRestHandler,
 			},
@@ -729,7 +729,7 @@ func TestValidatorStatusResponse_InvalidData(t *testing.T) {
 
 				validatorClient := beaconApiValidatorClient{
 					stateValidatorsProvider: stateValidatorsProvider,
-					prysmBeaconChainCLient: prysmBeaconChainClient{
+					prysmChainClient: prysmChainClient{
 						nodeClient: &beaconApiNodeClient{
 							jsonRestHandler: jsonRestHandler,
 						},

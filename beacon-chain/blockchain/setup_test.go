@@ -8,7 +8,7 @@ import (
 	"github.com/stratisproject/prysm-stratis/async/event"
 	mock "github.com/stratisproject/prysm-stratis/beacon-chain/blockchain/testing"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/cache"
-	"github.com/stratisproject/prysm-stratis/beacon-chain/cache/depositcache"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/cache/depositsnapshot"
 	statefeed "github.com/stratisproject/prysm-stratis/beacon-chain/core/feed/state"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/db"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/db/filesystem"
@@ -79,7 +79,7 @@ type testServiceRequirements struct {
 	attPool attestations.Pool
 	attSrv  *attestations.Service
 	blsPool *blstoexec.Pool
-	dc      *depositcache.DepositCache
+	dc      *depositsnapshot.Cache
 }
 
 func minimalTestService(t *testing.T, opts ...Option) (*Service, *testServiceRequirements) {
@@ -94,7 +94,7 @@ func minimalTestService(t *testing.T, opts ...Option) (*Service, *testServiceReq
 	attSrv, err := attestations.NewService(ctx, &attestations.Config{Pool: attPool})
 	require.NoError(t, err)
 	blsPool := blstoexec.NewPool()
-	dc, err := depositcache.New()
+	dc, err := depositsnapshot.New()
 	require.NoError(t, err)
 	req := &testServiceRequirements{
 		ctx:     ctx,

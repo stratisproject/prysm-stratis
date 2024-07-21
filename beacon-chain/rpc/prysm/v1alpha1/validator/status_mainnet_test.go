@@ -7,7 +7,7 @@ import (
 	"time"
 
 	mockChain "github.com/stratisproject/prysm-stratis/beacon-chain/blockchain/testing"
-	"github.com/stratisproject/prysm-stratis/beacon-chain/cache/depositcache"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/cache/depositsnapshot"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/core/helpers"
 	mockExecution "github.com/stratisproject/prysm-stratis/beacon-chain/execution/testing"
 	state_native "github.com/stratisproject/prysm-stratis/beacon-chain/state/state-native"
@@ -40,7 +40,7 @@ func TestValidatorStatus_Active(t *testing.T) {
 	}
 	depositTrie, err := trie.NewTrie(params.BeaconConfig().DepositContractTreeDepth)
 	require.NoError(t, err, "Could not setup deposit trie")
-	depositCache, err := depositcache.New()
+	depositCache, err := depositsnapshot.New()
 	require.NoError(t, err)
 
 	root, err := depositTrie.HashTreeRoot()

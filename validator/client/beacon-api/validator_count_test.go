@@ -5,12 +5,12 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/golang/mock/gomock"
 	"github.com/stratisproject/prysm-stratis/api/server/structs"
 	"github.com/stratisproject/prysm-stratis/consensus-types/validator"
 	"github.com/stratisproject/prysm-stratis/testing/require"
 	"github.com/stratisproject/prysm-stratis/validator/client/beacon-api/mock"
 	"github.com/stratisproject/prysm-stratis/validator/client/iface"
+	"go.uber.org/mock/gomock"
 )
 
 func TestGetValidatorCount(t *testing.T) {
@@ -141,7 +141,7 @@ func TestGetValidatorCount(t *testing.T) {
 			).Times(test.validatorCountCalled)
 
 			// Type assertion.
-			var client iface.PrysmBeaconChainClient = &prysmBeaconChainClient{
+			var client iface.PrysmChainClient = &prysmChainClient{
 				nodeClient:      &beaconApiNodeClient{jsonRestHandler: jsonRestHandler},
 				jsonRestHandler: jsonRestHandler,
 			}

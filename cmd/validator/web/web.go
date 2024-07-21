@@ -2,7 +2,9 @@ package web
 
 import (
 	"fmt"
+	"path/filepath"
 
+	"github.com/stratisproject/prysm-stratis/api"
 	"github.com/stratisproject/prysm-stratis/cmd"
 	"github.com/stratisproject/prysm-stratis/cmd/validator/flags"
 	"github.com/stratisproject/prysm-stratis/config/features"
@@ -24,6 +26,7 @@ var Commands = &cli.Command{
 				flags.WalletDirFlag,
 				flags.GRPCGatewayHost,
 				flags.GRPCGatewayPort,
+				flags.AuthTokenPathFlag,
 				cmd.AcceptTosFlag,
 			}),
 			Before: func(cliCtx *cli.Context) error {
@@ -43,7 +46,12 @@ var Commands = &cli.Command{
 				gatewayHost := cliCtx.String(flags.GRPCGatewayHost.Name)
 				gatewayPort := cliCtx.Int(flags.GRPCGatewayPort.Name)
 				validatorWebAddr := fmt.Sprintf("%s:%d", gatewayHost, gatewayPort)
-				if err := rpc.CreateAuthToken(walletDirPath, validatorWebAddr); err != nil {
+				authTokenPath := filepath.Join(walletDirPath, api.AuthTokenFileName)
+				tempAuthTokenPath := cliCtx.String(flags.AuthTokenPathFlag.Name)
+				if tempAuthTokenPath != "" {
+					authTokenPath = tempAuthTokenPath
+				}
+				if err := rpc.CreateAuthToken(authTokenPath, validatorWebAddr); err != nil {
 					log.WithError(err).Fatal("Could not create web auth token")
 				}
 				return nil

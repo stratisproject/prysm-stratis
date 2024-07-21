@@ -6,11 +6,11 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/golang/mock/gomock"
 	"github.com/stratisproject/prysm-stratis/network/httputil"
 	ethpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
 	"github.com/stratisproject/prysm-stratis/testing/assert"
 	"github.com/stratisproject/prysm-stratis/validator/client/beacon-api/mock"
+	"go.uber.org/mock/gomock"
 )
 
 func TestProposeBeaconBlock_Error(t *testing.T) {

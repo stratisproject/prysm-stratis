@@ -7,7 +7,6 @@ import (
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/golang/mock/gomock"
 	"github.com/stratisproject/prysm-stratis/api/server/structs"
 	"github.com/stratisproject/prysm-stratis/encoding/bytesutil"
 	enginev1 "github.com/stratisproject/prysm-stratis/proto/engine/v1"
@@ -16,6 +15,7 @@ import (
 	"github.com/stratisproject/prysm-stratis/testing/require"
 	"github.com/stratisproject/prysm-stratis/validator/client/beacon-api/mock"
 	test_helpers "github.com/stratisproject/prysm-stratis/validator/client/beacon-api/test-helpers"
+	"go.uber.org/mock/gomock"
 )
 
 func TestProposeBeaconBlock_BlindedBellatrix(t *testing.T) {

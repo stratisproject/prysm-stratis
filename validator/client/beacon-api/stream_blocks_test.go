@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/golang/mock/gomock"
 	"github.com/pkg/errors"
 	"github.com/stratisproject/prysm-stratis/api/server/structs"
 	rpctesting "github.com/stratisproject/prysm-stratis/beacon-chain/rpc/eth/shared/testing"
@@ -17,6 +16,7 @@ import (
 	"github.com/stratisproject/prysm-stratis/testing/require"
 	"github.com/stratisproject/prysm-stratis/validator/client/beacon-api/mock"
 	test_helpers "github.com/stratisproject/prysm-stratis/validator/client/beacon-api/test-helpers"
+	"go.uber.org/mock/gomock"
 )
 
 func TestStreamBlocks_UnsupportedConsensusVersion(t *testing.T) {

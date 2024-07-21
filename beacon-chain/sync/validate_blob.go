@@ -3,6 +3,8 @@ package sync
 import (
 	"context"
 	"fmt"
+	"os"
+	"path"
 	"strings"
 
 	pubsub "github.com/libp2p/go-libp2p-pubsub"
@@ -10,11 +12,13 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/verification"
+	"github.com/stratisproject/prysm-stratis/config/features"
 	"github.com/stratisproject/prysm-stratis/config/params"
 	"github.com/stratisproject/prysm-stratis/consensus-types/blocks"
 	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
 	"github.com/stratisproject/prysm-stratis/crypto/rand"
 	"github.com/stratisproject/prysm-stratis/encoding/bytesutil"
+	"github.com/stratisproject/prysm-stratis/io/file"
 	eth "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
 	prysmTime "github.com/stratisproject/prysm-stratis/time"
 	"github.com/stratisproject/prysm-stratis/time/slots"
@@ -109,6 +113,7 @@ func (s *Service) validateBlob(ctx context.Context, pid peer.ID, msg *pubsub.Mes
 	}
 
 	if err := vf.SidecarKzgProofVerified(); err != nil {
+		saveInvalidBlobToTemp(blob)
 		return pubsub.ValidationReject, err
 	}
 
@@ -118,10 +123,12 @@ func (s *Service) validateBlob(ctx context.Context, pid peer.ID, msg *pubsub.Mes
 
 	fields := blobFields(blob)
 	sinceSlotStartTime := receivedTime.Sub(startTime)
+	validationTime := s.cfg.clock.Now().Sub(receivedTime)
 	fields["sinceSlotStartTime"] = sinceSlotStartTime
-	fields["validationTime"] = s.cfg.clock.Now().Sub(receivedTime)
+	fields["validationTime"] = validationTime
 	log.WithFields(fields).Debug("Received blob sidecar gossip")
 
+	blobSidecarVerificationGossipSummary.Observe(float64(validationTime.Milliseconds()))
 	blobSidecarArrivalGossipSummary.Observe(float64(sinceSlotStartTime.Milliseconds()))
 
 	vBlobData, err := vf.VerifiedROBlob()
@@ -164,4 +171,22 @@ func blobFields(b blocks.ROBlob) logrus.Fields {
 
 func computeSubnetForBlobSidecar(index uint64) uint64 {
 	return index % params.BeaconConfig().BlobsidecarSubnetCount
+}
+
+// saveInvalidBlobToTemp as a block ssz. Writes to temp directory.
+func saveInvalidBlobToTemp(b blocks.ROBlob) {
+	if !features.Get().SaveInvalidBlob {
+		return
+	}
+	filename := fmt.Sprintf("blob_sidecar_%#x_%d_%d.ssz", b.BlockRoot(), b.Slot(), b.Index)
+	fp := path.Join(os.TempDir(), filename)
+	log.Warnf("Writing invalid blob sidecar to disk at %s", fp)
+	enc, err := b.MarshalSSZ()
+	if err != nil {
+		log.WithError(err).Error("Failed to ssz encode blob sidecar")
+		return
+	}
+	if err := file.WriteFile(fp, enc); err != nil {
+		log.WithError(err).Error("Failed to write to disk")
+	}
 }

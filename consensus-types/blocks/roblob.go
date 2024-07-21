@@ -1,13 +1,10 @@
 package blocks
 
 import (
-	"github.com/pkg/errors"
 	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
 	"github.com/stratisproject/prysm-stratis/encoding/bytesutil"
 	ethpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
 )
-
-var errNilBlockHeader = errors.New("received nil beacon block header")
 
 // ROBlob represents a read-only blob sidecar with its block root.
 type ROBlob struct {
@@ -15,21 +12,31 @@ type ROBlob struct {
 	root [32]byte
 }
 
+func roblobNilCheck(b *ethpb.BlobSidecar) error {
+	if b == nil {
+		return errNilBlob
+	}
+	if b.SignedBlockHeader == nil || b.SignedBlockHeader.Header == nil {
+		return errNilBlockHeader
+	}
+	if len(b.SignedBlockHeader.Signature) == 0 {
+		return errMissingBlockSignature
+	}
+	return nil
+}
+
 // NewROBlobWithRoot creates a new ROBlob with a given root.
 func NewROBlobWithRoot(b *ethpb.BlobSidecar, root [32]byte) (ROBlob, error) {
-	if b == nil {
-		return ROBlob{}, errNilBlock
+	if err := roblobNilCheck(b); err != nil {
+		return ROBlob{}, err
 	}
 	return ROBlob{BlobSidecar: b, root: root}, nil
 }
 
 // NewROBlob creates a new ROBlob by computing the HashTreeRoot of the header.
 func NewROBlob(b *ethpb.BlobSidecar) (ROBlob, error) {
-	if b == nil {
-		return ROBlob{}, errNilBlock
-	}
-	if b.SignedBlockHeader == nil || b.SignedBlockHeader.Header == nil {
-		return ROBlob{}, errNilBlockHeader
+	if err := roblobNilCheck(b); err != nil {
+		return ROBlob{}, err
 	}
 	root, err := b.SignedBlockHeader.Header.HashTreeRoot()
 	if err != nil {

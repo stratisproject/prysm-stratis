@@ -10,7 +10,7 @@ import (
 	"github.com/stratisproject/prysm-stratis/beacon-chain/blockchain"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/builder"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/cache"
-	"github.com/stratisproject/prysm-stratis/beacon-chain/cache/depositcache"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/cache/depositsnapshot"
 	blockfeed "github.com/stratisproject/prysm-stratis/beacon-chain/core/feed/block"
 	opfeed "github.com/stratisproject/prysm-stratis/beacon-chain/core/feed/operation"
 	statefeed "github.com/stratisproject/prysm-stratis/beacon-chain/core/feed/state"
@@ -69,7 +69,7 @@ type Server struct {
 	BlobReceiver           blockchain.BlobReceiver
 	MockEth1Votes          bool
 	Eth1BlockFetcher       execution.POWBlockFetcher
-	PendingDepositsFetcher depositcache.PendingDepositsFetcher
+	PendingDepositsFetcher depositsnapshot.PendingDepositsFetcher
 	OperationNotifier      opfeed.Notifier
 	StateGen               stategen.StateManager
 	ReplayerBuilder        stategen.ReplayerBuilder
@@ -99,10 +99,15 @@ func (vs *Server) WaitForActivation(req *ethpb.ValidatorActivationRequest, strea
 		return status.Errorf(codes.Internal, "Could not send response over stream: %v", err)
 	}
 
+	waitTime := time.Duration(params.BeaconConfig().SecondsPerSlot) * time.Second
+	timer := time.NewTimer(waitTime)
+	defer timer.Stop()
+
 	for {
+		timer.Reset(waitTime)
 		select {
 		// Pinging every slot for activation.
-		case <-time.After(time.Duration(params.BeaconConfig().SecondsPerSlot) * time.Second):
+		case <-timer.C:
 			activeValidatorExists, validatorStatuses, err := vs.activationStatus(stream.Context(), req.PublicKeys)
 			if err != nil {
 				return status.Errorf(codes.Internal, "Could not fetch validator status: %v", err)
@@ -193,7 +198,7 @@ func (vs *Server) WaitForChainStart(_ *emptypb.Empty, stream ethpb.BeaconNodeVal
 	if err != nil {
 		return status.Error(codes.Canceled, "Context canceled")
 	}
-	log.WithField("starttime", clock.GenesisTime()).Debug("Received chain started event")
+	log.WithField("startTime", clock.GenesisTime()).Debug("Received chain started event")
 	log.Debug("Sending genesis time notification to connected validator clients")
 	gvr := clock.GenesisValidatorsRoot()
 	res := &ethpb.ChainStartResponse{

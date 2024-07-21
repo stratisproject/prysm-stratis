@@ -1,13 +1,14 @@
 package backfill
 
 import (
+	"context"
 	"fmt"
 	"sort"
 	"time"
 
 	"github.com/libp2p/go-libp2p/core/peer"
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/das"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/sync"
 	"github.com/stratisproject/prysm-stratis/consensus-types/blocks"
@@ -55,6 +56,8 @@ const (
 	batchEndSequence
 )
 
+var retryDelay = time.Second
+
 type batchId string
 
 type batch struct {
@@ -62,6 +65,7 @@ type batch struct {
 	scheduled      time.Time
 	seq            int // sequence identifier, ie how many times has the sequence() method served this batch
 	retries        int
+	retryAfter     time.Time
 	begin          primitives.Slot
 	end            primitives.Slot // half-open interval, [begin, end), ie >= start, < end.
 	results        verifiedROBlocks
@@ -73,9 +77,9 @@ type batch struct {
 	bs             *blobSync
 }
 
-func (b batch) logFields() log.Fields {
-	return map[string]interface{}{
-		"batch_id":  b.id(),
+func (b batch) logFields() logrus.Fields {
+	f := map[string]interface{}{
+		"batchId":   b.id(),
 		"state":     b.state.String(),
 		"scheduled": b.scheduled.String(),
 		"seq":       b.seq,
@@ -86,6 +90,10 @@ func (b batch) logFields() log.Fields {
 		"blockPid":  b.blockPid,
 		"blobPid":   b.blobPid,
 	}
+	if b.retries > 0 {
+		f["retryAfter"] = b.retryAfter.String()
+	}
+	return f
 }
 
 func (b batch) replaces(r batch) bool {
@@ -139,7 +147,7 @@ func (b batch) withResults(results verifiedROBlocks, bs *blobSync) batch {
 
 func (b batch) postBlobSync() batch {
 	if b.blobsNeeded() > 0 {
-		log.WithFields(b.logFields()).WithField("blobs_missing", b.blobsNeeded()).Error("batch still missing blobs after downloading from peer")
+		log.WithFields(b.logFields()).WithField("blobsMissing", b.blobsNeeded()).Error("Batch still missing blobs after downloading from peer")
 		b.bs = nil
 		b.results = []blocks.ROBlock{}
 		return b.withState(batchErrRetryable)
@@ -153,14 +161,15 @@ func (b batch) withState(s batchState) batch {
 		switch b.state {
 		case batchErrRetryable:
 			b.retries += 1
-			log.WithFields(b.logFields()).Info("sequencing batch for retry")
+			b.retryAfter = time.Now().Add(retryDelay)
+			log.WithFields(b.logFields()).Info("Sequencing batch for retry after delay")
 		case batchInit, batchNil:
 			b.firstScheduled = b.scheduled
 		}
 	}
 	if s == batchImportComplete {
 		backfillBatchTimeRoundtrip.Observe(float64(time.Since(b.firstScheduled).Milliseconds()))
-		log.WithFields(b.logFields()).Debug("Backfill batch imported.")
+		log.WithFields(b.logFields()).Debug("Backfill batch imported")
 	}
 	b.state = s
 	b.seq += 1
@@ -190,8 +199,32 @@ func (b batch) availabilityStore() das.AvailabilityStore {
 	return b.bs.store
 }
 
+var batchBlockUntil = func(ctx context.Context, untilRetry time.Duration, b batch) error {
+	log.WithFields(b.logFields()).WithField("untilRetry", untilRetry.String()).
+		Debug("Sleeping for retry backoff delay")
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	case <-time.After(untilRetry):
+		return nil
+	}
+}
+
+func (b batch) waitUntilReady(ctx context.Context) error {
+	// Wait to retry a failed batch to avoid hammering peers
+	// if we've hit a state where batches will consistently fail.
+	// Avoids spamming requests and logs.
+	if b.retries > 0 {
+		untilRetry := time.Until(b.retryAfter)
+		if untilRetry > time.Millisecond {
+			return batchBlockUntil(ctx, untilRetry, b)
+		}
+	}
+	return nil
+}
+
 func sortBatchDesc(bb []batch) {
 	sort.Slice(bb, func(i, j int) bool {
-		return bb[j].end < bb[i].end
+		return bb[i].end > bb[j].end
 	})
 }

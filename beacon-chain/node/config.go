@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/ethereum/go-ethereum/common"
-	fastssz "github.com/prysmaticlabs/fastssz"
 	"github.com/stratisproject/prysm-stratis/cmd"
 	"github.com/stratisproject/prysm-stratis/cmd/beacon-chain/flags"
 	"github.com/stratisproject/prysm-stratis/config/params"
@@ -151,19 +150,19 @@ func configureExecutionSetting(cliCtx *cli.Context) error {
 	if cliCtx.IsSet(flags.TerminalTotalDifficultyOverride.Name) {
 		c := params.BeaconConfig()
 		c.TerminalTotalDifficulty = cliCtx.String(flags.TerminalTotalDifficultyOverride.Name)
-		log.WithField("terminal block difficult", c.TerminalTotalDifficulty).Warn("Terminal block difficult overridden")
+		log.WithField("terminalBlockDifficulty", c.TerminalTotalDifficulty).Warn("Terminal block difficult overridden")
 		params.OverrideBeaconConfig(c)
 	}
 	if cliCtx.IsSet(flags.TerminalBlockHashOverride.Name) {
 		c := params.BeaconConfig()
 		c.TerminalBlockHash = common.HexToHash(cliCtx.String(flags.TerminalBlockHashOverride.Name))
-		log.WithField("terminal block hash", c.TerminalBlockHash.Hex()).Warn("Terminal block hash overridden")
+		log.WithField("terminalBlockHash", c.TerminalBlockHash.Hex()).Warn("Terminal block hash overridden")
 		params.OverrideBeaconConfig(c)
 	}
 	if cliCtx.IsSet(flags.TerminalBlockHashActivationEpochOverride.Name) {
 		c := params.BeaconConfig()
 		c.TerminalBlockHashActivationEpoch = primitives.Epoch(cliCtx.Uint64(flags.TerminalBlockHashActivationEpochOverride.Name))
-		log.WithField("terminal block hash activation epoch", c.TerminalBlockHashActivationEpoch).Warn("Terminal block hash activation epoch overridden")
+		log.WithField("terminalBlockHashActivationEpoch", c.TerminalBlockHashActivationEpoch).Warn("Terminal block hash activation epoch overridden")
 		params.OverrideBeaconConfig(c)
 	}
 
@@ -196,8 +195,4 @@ func configureExecutionSetting(cliCtx *cli.Context) error {
 	log.Infof("Default fee recipient is set to %s, recipient may be overwritten from validator client and persist in db."+
 		" Default fee recipient will be used as a fall back", checksumAddress.Hex())
 	return params.SetActive(c)
-}
-
-func configureFastSSZHashingAlgorithm() {
-	fastssz.EnableVectorizedHTR = true
 }

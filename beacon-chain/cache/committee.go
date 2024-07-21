@@ -12,6 +12,7 @@ import (
 	lru "github.com/hashicorp/golang-lru"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
+	log "github.com/sirupsen/logrus"
 	lruwrpr "github.com/stratisproject/prysm-stratis/cache/lru"
 	"github.com/stratisproject/prysm-stratis/config/params"
 	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
@@ -22,7 +23,10 @@ import (
 const (
 	// maxCommitteesCacheSize defines the max number of shuffled committees on per randao basis can cache.
 	// Due to reorgs and long finality, it's good to keep the old cache around for quickly switch over.
-	maxCommitteesCacheSize = int(32)
+	maxCommitteesCacheSize = int(4)
+	// expandedCommitteeCacheSize defines the expanded size of the committee cache in the event we
+	// do not have finality to deal with long forks better.
+	expandedCommitteeCacheSize = int(32)
 )
 
 var (
@@ -43,6 +47,7 @@ type CommitteeCache struct {
 	CommitteeCache *lru.Cache
 	lock           sync.RWMutex
 	inProgress     map[string]bool
+	size           int
 }
 
 // committeeKeyFn takes the seed as the key to retrieve shuffled indices of a committee in a given epoch.
@@ -67,6 +72,33 @@ func (c *CommitteeCache) Clear() {
 	defer c.lock.Unlock()
 	c.CommitteeCache = lruwrpr.New(maxCommitteesCacheSize)
 	c.inProgress = make(map[string]bool)
+	c.size = maxCommitteesCacheSize
+}
+
+// ExpandCommitteeCache expands the size of the committee cache.
+func (c *CommitteeCache) ExpandCommitteeCache() {
+	c.lock.Lock()
+	defer c.lock.Unlock()
+
+	if c.size == expandedCommitteeCacheSize {
+		return
+	}
+	c.CommitteeCache.Resize(expandedCommitteeCacheSize)
+	c.size = expandedCommitteeCacheSize
+	log.Warnf("Expanding committee cache size from %d to %d", maxCommitteesCacheSize, expandedCommitteeCacheSize)
+}
+
+// CompressCommitteeCache compresses the size of the committee cache.
+func (c *CommitteeCache) CompressCommitteeCache() {
+	c.lock.Lock()
+	defer c.lock.Unlock()
+
+	if c.size == maxCommitteesCacheSize {
+		return
+	}
+	c.CommitteeCache.Resize(maxCommitteesCacheSize)
+	c.size = maxCommitteesCacheSize
+	log.Warnf("Reducing committee cache size from %d to %d", expandedCommitteeCacheSize, maxCommitteesCacheSize)
 }
 
 // Committee fetches the shuffled indices by slot and committee index. Every list of indices

@@ -7,13 +7,13 @@ import (
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/golang/mock/gomock"
 	"github.com/pkg/errors"
 	"github.com/stratisproject/prysm-stratis/api/server/structs"
 	ethpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
 	"github.com/stratisproject/prysm-stratis/testing/assert"
 	"github.com/stratisproject/prysm-stratis/testing/require"
 	"github.com/stratisproject/prysm-stratis/validator/client/beacon-api/mock"
+	"go.uber.org/mock/gomock"
 )
 
 const proposeExitTestEndpoint = "/eth/v1/beacon/pool/voluntary_exits"

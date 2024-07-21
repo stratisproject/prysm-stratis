@@ -13,7 +13,6 @@ import (
 	"github.com/stratisproject/prysm-stratis/consensus-types/blocks"
 	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
 	"github.com/stratisproject/prysm-stratis/encoding/bytesutil"
-	ethpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
 	"github.com/stratisproject/prysm-stratis/testing/require"
 	"github.com/stratisproject/prysm-stratis/testing/util"
 	"github.com/stratisproject/prysm-stratis/time/slots"
@@ -112,16 +111,6 @@ func Test_commitmentsToCheck(t *testing.T) {
 			}
 		})
 	}
-}
-
-func daAlwaysSucceeds(_ [][]byte, _ []*ethpb.BlobSidecar) error {
-	return nil
-}
-
-type mockDA struct {
-	t   *testing.T
-	scs []blocks.ROBlob
-	err error
 }
 
 func TestLazilyPersistent_Missing(t *testing.T) {

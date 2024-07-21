@@ -185,9 +185,9 @@ func (node *BeaconNode) saveGenesis(ctx context.Context) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	log.WithField("fork_version", g.Fork().CurrentVersion).
-		WithField("latest_block_header.root", fmt.Sprintf("%#x", lbhr)).
-		WithField("state_root", fmt.Sprintf("%#x", root)).
+	log.WithField("forkVersion", g.Fork().CurrentVersion).
+		WithField("latestBlockHeaderRoot", fmt.Sprintf("%#x", lbhr)).
+		WithField("stateRoot", fmt.Sprintf("%#x", root)).
 		Infof("BeaconState info")
 
 	genesisBytes, err := g.MarshalSSZ()
@@ -257,6 +257,7 @@ func (node *BeaconNode) Start(ctx context.Context) error {
 		fmt.Sprintf("--%s=%s", flags.ExecutionJWTSecretFlag.Name, jwtPath),
 		fmt.Sprintf("--%s=%d", flags.MinSyncPeers.Name, 1),
 		fmt.Sprintf("--%s=%d", cmdshared.P2PUDPPort.Name, e2e.TestParams.Ports.PrysmBeaconNodeUDPPort+index),
+		fmt.Sprintf("--%s=%d", cmdshared.P2PQUICPort.Name, e2e.TestParams.Ports.PrysmBeaconNodeQUICPort+index),
 		fmt.Sprintf("--%s=%d", cmdshared.P2PTCPPort.Name, e2e.TestParams.Ports.PrysmBeaconNodeTCPPort+index),
 		fmt.Sprintf("--%s=%d", cmdshared.P2PMaxPeers.Name, expectedNumOfPeers),
 		fmt.Sprintf("--%s=%d", flags.MonitoringPortFlag.Name, e2e.TestParams.Ports.PrysmBeaconNodeMetricsPort+index),
@@ -275,6 +276,7 @@ func (node *BeaconNode) Start(ctx context.Context) error {
 		"--" + cmdshared.ForceClearDB.Name,
 		"--" + cmdshared.AcceptTosFlag.Name,
 		"--" + flags.EnableDebugRPCEndpoints.Name,
+		"--" + features.EnableQUIC.Name,
 	}
 	if config.UsePprof {
 		args = append(args, "--pprof", fmt.Sprintf("--pprofport=%d", e2e.TestParams.Ports.PrysmBeaconNodePprofPort+index))

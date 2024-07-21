@@ -9,12 +9,14 @@ import (
 	logTest "github.com/sirupsen/logrus/hooks/test"
 	blockchainTesting "github.com/stratisproject/prysm-stratis/beacon-chain/blockchain/testing"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/cache"
+	statefeed "github.com/stratisproject/prysm-stratis/beacon-chain/core/feed/state"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/das"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/operations/voluntaryexits"
 	"github.com/stratisproject/prysm-stratis/config/params"
 	"github.com/stratisproject/prysm-stratis/consensus-types/blocks"
 	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
 	"github.com/stratisproject/prysm-stratis/encoding/bytesutil"
+	ethpbv1 "github.com/stratisproject/prysm-stratis/proto/eth/v1"
 	ethpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
 	"github.com/stratisproject/prysm-stratis/testing/assert"
 	"github.com/stratisproject/prysm-stratis/testing/require"
@@ -308,6 +310,29 @@ func TestCheckSaveHotStateDB_Overflow(t *testing.T) {
 	assert.LogsDoNotContain(t, hook, "Entering mode to save hot states in DB")
 }
 
+func TestHandleCaches_EnablingLargeSize(t *testing.T) {
+	hook := logTest.NewGlobal()
+	s, _ := minimalTestService(t)
+	st := params.BeaconConfig().SlotsPerEpoch.Mul(uint64(epochsSinceFinalitySaveHotStateDB))
+	s.genesisTime = time.Now().Add(time.Duration(-1*int64(st)*int64(params.BeaconConfig().SecondsPerSlot)) * time.Second)
+
+	require.NoError(t, s.handleCaches())
+	assert.LogsContain(t, hook, "Expanding committee cache size")
+}
+
+func TestHandleCaches_DisablingLargeSize(t *testing.T) {
+	hook := logTest.NewGlobal()
+	s, _ := minimalTestService(t)
+
+	st := params.BeaconConfig().SlotsPerEpoch.Mul(uint64(epochsSinceFinalitySaveHotStateDB))
+	s.genesisTime = time.Now().Add(time.Duration(-1*int64(st)*int64(params.BeaconConfig().SecondsPerSlot)) * time.Second)
+	require.NoError(t, s.handleCaches())
+	s.genesisTime = time.Now()
+
+	require.NoError(t, s.handleCaches())
+	assert.LogsContain(t, hook, "Reducing committee cache size")
+}
+
 func TestHandleBlockBLSToExecutionChanges(t *testing.T) {
 	service, tr := minimalTestService(t)
 	pool := tr.blsPool
@@ -354,4 +379,39 @@ func TestHandleBlockBLSToExecutionChanges(t *testing.T) {
 		require.NoError(t, service.markIncludedBlockBLSToExecChanges(blk))
 		require.Equal(t, false, pool.ValidatorExists(idx))
 	})
+}
+
+func Test_sendNewFinalizedEvent(t *testing.T) {
+	s, _ := minimalTestService(t)
+	notifier := &blockchainTesting.MockStateNotifier{RecordEvents: true}
+	s.cfg.StateNotifier = notifier
+	finalizedSt, err := util.NewBeaconState()
+	require.NoError(t, err)
+	finalizedStRoot, err := finalizedSt.HashTreeRoot(s.ctx)
+	require.NoError(t, err)
+	b := util.NewBeaconBlock()
+	b.Block.StateRoot = finalizedStRoot[:]
+	sbb, err := blocks.NewSignedBeaconBlock(b)
+	require.NoError(t, err)
+	sbbRoot, err := sbb.Block().HashTreeRoot()
+	require.NoError(t, err)
+	require.NoError(t, s.cfg.BeaconDB.SaveBlock(s.ctx, sbb))
+	st, err := util.NewBeaconState()
+	require.NoError(t, err)
+	require.NoError(t, st.SetFinalizedCheckpoint(&ethpb.Checkpoint{
+		Epoch: 123,
+		Root:  sbbRoot[:],
+	}))
+
+	s.sendNewFinalizedEvent(s.ctx, st)
+
+	require.Equal(t, 1, len(notifier.ReceivedEvents()))
+	e := notifier.ReceivedEvents()[0]
+	assert.Equal(t, statefeed.FinalizedCheckpoint, int(e.Type))
+	fc, ok := e.Data.(*ethpbv1.EventFinalizedCheckpoint)
+	require.Equal(t, true, ok, "event has wrong data type")
+	assert.Equal(t, primitives.Epoch(123), fc.Epoch)
+	assert.DeepEqual(t, sbbRoot[:], fc.Block)
+	assert.DeepEqual(t, finalizedStRoot[:], fc.State)
+	assert.Equal(t, false, fc.ExecutionOptimistic)
 }

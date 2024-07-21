@@ -9,7 +9,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang/mock/gomock"
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/stratisproject/prysm-stratis/api"
 	"github.com/stratisproject/prysm-stratis/io/logs/mock"
@@ -17,6 +16,7 @@ import (
 	pb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
 	"github.com/stratisproject/prysm-stratis/testing/require"
 	validatormock "github.com/stratisproject/prysm-stratis/testing/validator-mock"
+	"go.uber.org/mock/gomock"
 	"google.golang.org/grpc"
 )
 
@@ -73,8 +73,8 @@ func TestStreamBeaconLogs(t *testing.T) {
 
 	// Setting up the mock in the server struct
 	s := Server{
-		ctx:                    context.Background(),
-		beaconNodeHealthClient: mockClient,
+		ctx:          context.Background(),
+		healthClient: mockClient,
 	}
 
 	// Create a mock ResponseWriter and Request
@@ -119,9 +119,9 @@ func TestStreamValidatorLogs(t *testing.T) {
 	logStreamer := mock.NewMockStreamer(mockLogs)
 	// Setting up the mock in the server struct
 	s := Server{
-		ctx:                  ctx,
-		logsStreamer:         logStreamer,
-		streamLogsBufferSize: 100,
+		ctx:                   ctx,
+		logStreamer:           logStreamer,
+		logStreamerBufferSize: 100,
 	}
 
 	w := &flushableResponseRecorder{
@@ -170,8 +170,8 @@ func TestServer_GetVersion(t *testing.T) {
 	ctx := context.Background()
 	mockNodeClient := validatormock.NewMockNodeClient(ctrl)
 	s := Server{
-		ctx:              ctx,
-		beaconNodeClient: mockNodeClient,
+		ctx:        ctx,
+		nodeClient: mockNodeClient,
 	}
 	mockNodeClient.EXPECT().GetVersion(gomock.Any(), gomock.Any()).Return(&eth.Version{
 		Version:  "4.10.1",

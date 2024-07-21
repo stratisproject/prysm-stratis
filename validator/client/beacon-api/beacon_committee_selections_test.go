@@ -8,11 +8,11 @@ import (
 
 	"github.com/stratisproject/prysm-stratis/validator/client/iface"
 
-	"github.com/golang/mock/gomock"
 	"github.com/pkg/errors"
 	"github.com/stratisproject/prysm-stratis/testing/require"
 	"github.com/stratisproject/prysm-stratis/validator/client/beacon-api/mock"
 	test_helpers "github.com/stratisproject/prysm-stratis/validator/client/beacon-api/test-helpers"
+	"go.uber.org/mock/gomock"
 )
 
 func TestGetAggregatedSelections(t *testing.T) {

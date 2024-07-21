@@ -19,7 +19,7 @@ var (
 	ErrEmptyMnemonic       = errors.New("phrase cannot be empty")
 )
 
-// WalletRecover uses a menmonic seed phrase to recover a wallet into the path provided.
+// WalletRecover uses a mnemonic seed phrase to recover a wallet into the path provided.
 func (acm *CLIManager) WalletRecover(ctx context.Context) (*wallet.Wallet, error) {
 	// Ensure that the wallet directory does not contain a wallet already
 	dirExists, err := wallet.Exists(acm.walletDir)
@@ -48,7 +48,7 @@ func (acm *CLIManager) WalletRecover(ctx context.Context) (*wallet.Wallet, error
 	if err := km.RecoverAccountsFromMnemonic(ctx, acm.mnemonic, acm.mnemonicLanguage, acm.mnemonic25thWord, acm.numAccounts); err != nil {
 		return nil, err
 	}
-	log.WithField("wallet-path", w.AccountsDir()).Infof(
+	log.WithField("walletPath", w.AccountsDir()).Infof(
 		"Successfully recovered HD wallet with %d accounts. Please use `accounts list` to view details for your accounts",
 		acm.numAccounts,
 	)

@@ -103,7 +103,7 @@ func feeRecipientIsPresent(_ *types.EvaluationContext, conns ...*grpc.ClientConn
 				continue
 			}
 			if len(payload.FeeRecipient) == 0 || hexutil.Encode(payload.FeeRecipient) == params.BeaconConfig().EthBurnAddressHex {
-				log.WithField("proposer_index", bb.ProposerIndex).WithField("slot", bb.Slot).Error("fee recipient eval bug")
+				log.WithField("proposerIndex", bb.ProposerIndex).WithField("slot", bb.Slot).Error("fee recipient eval bug")
 				return errors.New("fee recipient is not set")
 			}
 
@@ -127,13 +127,13 @@ func feeRecipientIsPresent(_ *types.EvaluationContext, conns ...*grpc.ClientConn
 			// In e2e we generate deterministic keys by validator index, and then use a slice of their public key bytes
 			// as the fee recipient, so that this will also be deterministic, so this test can statelessly verify it.
 			// These should be the only keys we see.
-			// Otherwise something has changed in e2e and this test needs to be updated.
+			// Otherwise, something has changed in e2e and this test needs to be updated.
 			_, knownKey := valkeys[pk]
 			if !knownKey {
 				log.WithField("pubkey", pk).
 					WithField("slot", bb.Slot).
-					WithField("proposer_index", bb.ProposerIndex).
-					WithField("fee_recipient", fr.Hex()).
+					WithField("proposerIndex", bb.ProposerIndex).
+					WithField("feeRecipient", fr.Hex()).
 					Warn("unknown key observed, not a deterministically generated key")
 				return errors.New("unknown key observed, not a deterministically generated key")
 			}

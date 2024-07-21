@@ -4,13 +4,20 @@ import (
 	"context"
 
 	"github.com/golang/protobuf/ptypes/empty"
+	log "github.com/sirupsen/logrus"
+	"github.com/stratisproject/prysm-stratis/api/client/beacon"
 	ethpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
 	"github.com/stratisproject/prysm-stratis/validator/client/iface"
 	"google.golang.org/grpc"
 )
 
+var (
+	_ = iface.NodeClient(&grpcNodeClient{})
+)
+
 type grpcNodeClient struct {
-	nodeClient ethpb.NodeClient
+	nodeClient    ethpb.NodeClient
+	healthTracker *beacon.NodeHealthTracker
 }
 
 func (c *grpcNodeClient) GetSyncStatus(ctx context.Context, in *empty.Empty) (*ethpb.SyncStatus, error) {
@@ -29,10 +36,21 @@ func (c *grpcNodeClient) ListPeers(ctx context.Context, in *empty.Empty) (*ethpb
 	return c.nodeClient.ListPeers(ctx, in)
 }
 
-func (c *grpcNodeClient) IsHealthy(context.Context) bool {
-	panic("function not supported for gRPC client")
+func (c *grpcNodeClient) IsHealthy(ctx context.Context) bool {
+	_, err := c.nodeClient.GetHealth(ctx, &ethpb.HealthRequest{})
+	if err != nil {
+		log.WithError(err).Debug("failed to get health of node")
+		return false
+	}
+	return true
+}
+
+func (c *grpcNodeClient) HealthTracker() *beacon.NodeHealthTracker {
+	return c.healthTracker
 }
 
 func NewNodeClient(cc grpc.ClientConnInterface) iface.NodeClient {
-	return &grpcNodeClient{ethpb.NewNodeClient(cc)}
+	g := &grpcNodeClient{nodeClient: ethpb.NewNodeClient(cc)}
+	g.healthTracker = beacon.NewNodeHealthTracker(g)
+	return g
 }

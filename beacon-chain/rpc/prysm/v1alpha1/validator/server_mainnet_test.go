@@ -4,9 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/golang/mock/gomock"
 	mockChain "github.com/stratisproject/prysm-stratis/beacon-chain/blockchain/testing"
-	"github.com/stratisproject/prysm-stratis/beacon-chain/cache/depositcache"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/cache/depositsnapshot"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/core/signing"
 	mockExecution "github.com/stratisproject/prysm-stratis/beacon-chain/execution/testing"
 	state_native "github.com/stratisproject/prysm-stratis/beacon-chain/state/state-native"
@@ -19,6 +18,7 @@ import (
 	"github.com/stratisproject/prysm-stratis/testing/mock"
 	"github.com/stratisproject/prysm-stratis/testing/require"
 	"github.com/stratisproject/prysm-stratis/testing/util"
+	"go.uber.org/mock/gomock"
 )
 
 func TestWaitForActivation_ValidatorOriginallyExists(t *testing.T) {
@@ -65,7 +65,7 @@ func TestWaitForActivation_ValidatorOriginallyExists(t *testing.T) {
 	}
 	depositTrie, err := trie.NewTrie(params.BeaconConfig().DepositContractTreeDepth)
 	require.NoError(t, err, "Could not setup deposit trie")
-	depositCache, err := depositcache.New()
+	depositCache, err := depositsnapshot.New()
 	require.NoError(t, err)
 
 	root, err := depositTrie.HashTreeRoot()

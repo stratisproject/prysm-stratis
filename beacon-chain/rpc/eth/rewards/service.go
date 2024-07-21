@@ -8,12 +8,15 @@ import (
 	"github.com/stratisproject/prysm-stratis/api/server/structs"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/core/altair"
 	coreblocks "github.com/stratisproject/prysm-stratis/beacon-chain/core/blocks"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/core/transition"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/core/validators"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/db"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/state"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/state/stategen"
 	consensusblocks "github.com/stratisproject/prysm-stratis/consensus-types/blocks"
 	"github.com/stratisproject/prysm-stratis/consensus-types/interfaces"
 	"github.com/stratisproject/prysm-stratis/network/httputil"
+	"github.com/stratisproject/prysm-stratis/time/slots"
 )
 
 // BlockRewardsFetcher is a interface that provides access to reward related responses
@@ -25,6 +28,7 @@ type BlockRewardsFetcher interface {
 // BlockRewardService implements BlockRewardsFetcher and can be declared to access the underlying functions
 type BlockRewardService struct {
 	Replayer stategen.ReplayerBuilder
+	DB       db.HeadAccessDatabase
 }
 
 // GetBlockRewardsData returns the BlockRewards object which is used for the BlockRewardsResponse and ProduceBlockV3.
@@ -123,7 +127,23 @@ func (rs *BlockRewardService) GetStateForRewards(ctx context.Context, blk interf
 	// We want to run several block processing functions that update the proposer's balance.
 	// This will allow us to calculate proposer rewards for each operation (atts, slashings etc).
 	// To do this, we replay the state up to the block's slot, but before processing the block.
-	st, err := rs.Replayer.ReplayerForSlot(blk.Slot()-1).ReplayToSlot(ctx, blk.Slot())
+
+	// Try getting the state from the next slot cache first.
+	_, prevSlotRoots, err := rs.DB.BlockRootsBySlot(ctx, slots.PrevSlot(blk.Slot()))
+	if err != nil {
+		return nil, &httputil.DefaultJsonError{
+			Message: "Could not get roots for previous slot: " + err.Error(),
+			Code:    http.StatusInternalServerError,
+		}
+	}
+	for _, r := range prevSlotRoots {
+		s := transition.NextSlotState(r[:], blk.Slot())
+		if s != nil {
+			return s, nil
+		}
+	}
+
+	st, err := rs.Replayer.ReplayerForSlot(slots.PrevSlot(blk.Slot())).ReplayToSlot(ctx, blk.Slot())
 	if err != nil {
 		return nil, &httputil.DefaultJsonError{
 			Message: "Could not get state: " + err.Error(),

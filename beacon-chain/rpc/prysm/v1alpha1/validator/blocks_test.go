@@ -4,7 +4,6 @@ import (
 	"context"
 	"testing"
 
-	"github.com/golang/mock/gomock"
 	chainMock "github.com/stratisproject/prysm-stratis/beacon-chain/blockchain/testing"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/core/altair"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/core/feed"
@@ -18,6 +17,7 @@ import (
 	"github.com/stratisproject/prysm-stratis/testing/mock"
 	"github.com/stratisproject/prysm-stratis/testing/require"
 	"github.com/stratisproject/prysm-stratis/testing/util"
+	"go.uber.org/mock/gomock"
 )
 
 func TestServer_StreamAltairBlocksVerified_ContextCanceled(t *testing.T) {

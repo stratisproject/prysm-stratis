@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/execution"
 	"github.com/stratisproject/prysm-stratis/cmd/beacon-chain/flags"
 	"github.com/stratisproject/prysm-stratis/io/file"
@@ -53,7 +52,7 @@ func parseJWTSecretFromFile(c *cli.Context) ([]byte, error) {
 		return nil, err
 	}
 	strData := strings.TrimSpace(string(enc))
-	if len(strData) == 0 {
+	if strData == "" {
 		return nil, fmt.Errorf("provided JWT secret in file %s cannot be empty", jwtSecretFile)
 	}
 	secret, err := hex.DecodeString(strings.TrimPrefix(strData, "0x"))

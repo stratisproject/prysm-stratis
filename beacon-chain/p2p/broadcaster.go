@@ -9,7 +9,9 @@ import (
 
 	"github.com/pkg/errors"
 	ssz "github.com/prysmaticlabs/fastssz"
+	"github.com/sirupsen/logrus"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/core/altair"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/core/helpers"
 	"github.com/stratisproject/prysm-stratis/config/params"
 	"github.com/stratisproject/prysm-stratis/crypto/hash"
 	"github.com/stratisproject/prysm-stratis/monitoring/tracing"
@@ -68,7 +70,7 @@ func (s *Service) BroadcastAttestation(ctx context.Context, subnet uint64, att *
 	}
 
 	// Non-blocking broadcast, with attempts to discover a subnet peer if none available.
-	go s.broadcastAttestation(ctx, subnet, att, forkDigest)
+	go s.internalBroadcastAttestation(ctx, subnet, att, forkDigest)
 
 	return nil
 }
@@ -94,8 +96,8 @@ func (s *Service) BroadcastSyncCommitteeMessage(ctx context.Context, subnet uint
 	return nil
 }
 
-func (s *Service) broadcastAttestation(ctx context.Context, subnet uint64, att *ethpb.Attestation, forkDigest [4]byte) {
-	_, span := trace.StartSpan(ctx, "p2p.broadcastAttestation")
+func (s *Service) internalBroadcastAttestation(ctx context.Context, subnet uint64, att *ethpb.Attestation, forkDigest [4]byte) {
+	_, span := trace.StartSpan(ctx, "p2p.internalBroadcastAttestation")
 	defer span.End()
 	ctx = trace.NewContext(context.Background(), span) // clear parent context / deadline.
 
@@ -136,8 +138,11 @@ func (s *Service) broadcastAttestation(ctx context.Context, subnet uint64, att *
 	// In the event our attestation is outdated and beyond the
 	// acceptable threshold, we exit early and do not broadcast it.
 	currSlot := slots.CurrentSlot(uint64(s.genesisTime.Unix()))
-	if att.Data.Slot+params.BeaconConfig().SlotsPerEpoch < currSlot {
-		log.Warnf("Attestation is too old to broadcast, discarding it. Current Slot: %d , Attestation Slot: %d", currSlot, att.Data.Slot)
+	if err := helpers.ValidateAttestationTime(att.Data.Slot, s.genesisTime, params.BeaconConfig().MaximumGossipClockDisparityDuration()); err != nil {
+		log.WithFields(logrus.Fields{
+			"attestationSlot": att.Data.Slot,
+			"currentSlot":     currSlot,
+		}).WithError(err).Debug("Attestation is too old to broadcast, discarding it")
 		return
 	}
 
@@ -218,13 +223,13 @@ func (s *Service) BroadcastBlob(ctx context.Context, subnet uint64, blob *ethpb.
 	}
 
 	// Non-blocking broadcast, with attempts to discover a subnet peer if none available.
-	go s.broadcastBlob(ctx, subnet, blob, forkDigest)
+	go s.internalBroadcastBlob(ctx, subnet, blob, forkDigest)
 
 	return nil
 }
 
-func (s *Service) broadcastBlob(ctx context.Context, subnet uint64, blobSidecar *ethpb.BlobSidecar, forkDigest [4]byte) {
-	_, span := trace.StartSpan(ctx, "p2p.broadcastBlob")
+func (s *Service) internalBroadcastBlob(ctx context.Context, subnet uint64, blobSidecar *ethpb.BlobSidecar, forkDigest [4]byte) {
+	_, span := trace.StartSpan(ctx, "p2p.internalBroadcastBlob")
 	defer span.End()
 	ctx = trace.NewContext(context.Background(), span) // clear parent context / deadline.
 

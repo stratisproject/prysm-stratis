@@ -15,7 +15,6 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/golang/mock/gomock"
 	"github.com/stratisproject/prysm-stratis/api"
 	"github.com/stratisproject/prysm-stratis/cmd/validator/flags"
 	ethpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
@@ -29,6 +28,7 @@ import (
 	"github.com/stratisproject/prysm-stratis/validator/keymanager"
 	"github.com/stratisproject/prysm-stratis/validator/keymanager/derived"
 	constant "github.com/stratisproject/prysm-stratis/validator/testing"
+	"go.uber.org/mock/gomock"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -292,7 +292,7 @@ func TestServer_VoluntaryExit(t *testing.T) {
 	s := &Server{
 		walletInitialized:         true,
 		wallet:                    w,
-		beaconNodeClient:          mockNodeClient,
+		nodeClient:                mockNodeClient,
 		beaconNodeValidatorClient: mockValidatorClient,
 		validatorService:          vs,
 	}

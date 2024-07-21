@@ -9,6 +9,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/sirupsen/logrus"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/cache"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/core/blocks"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/core/helpers"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/core/time"
@@ -39,6 +40,12 @@ var (
 	})
 )
 
+func setFeeRecipientIfBurnAddress(val *cache.TrackedValidator) {
+	if val.FeeRecipient == primitives.ExecutionAddress([20]byte{}) && val.Index == 0 {
+		val.FeeRecipient = primitives.ExecutionAddress(params.BeaconConfig().DefaultFeeRecipient)
+	}
+}
+
 // This returns the local execution payload of a given slot. The function has full awareness of pre and post merge.
 func (vs *Server) getLocalPayload(ctx context.Context, blk interfaces.ReadOnlyBeaconBlock, st state.BeaconState) (interfaces.ExecutionData, bool, error) {
 	ctx, span := trace.StartSpan(ctx, "ProposerServer.getLocalPayload")
@@ -62,6 +69,7 @@ func (vs *Server) getLocalPayload(ctx context.Context, blk interfaces.ReadOnlyBe
 	if !tracked {
 		logrus.WithFields(logFields).Warn("could not find tracked proposer index")
 	}
+	setFeeRecipientIfBurnAddress(&val)
 
 	var err error
 	if ok && payloadId != [8]byte{} {

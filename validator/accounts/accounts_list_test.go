@@ -11,7 +11,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/golang/mock/gomock"
 	"github.com/google/uuid"
 	"github.com/stratisproject/prysm-stratis/cmd/validator/flags"
 	"github.com/stratisproject/prysm-stratis/config/params"
@@ -27,6 +26,7 @@ import (
 	constant "github.com/stratisproject/prysm-stratis/validator/testing"
 	"github.com/urfave/cli/v2"
 	keystorev4 "github.com/wealdtech/go-eth2-wallet-encryptor-keystorev4"
+	"go.uber.org/mock/gomock"
 )
 
 const (

@@ -9,7 +9,6 @@ import (
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/golang/mock/gomock"
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/pkg/errors"
 	"github.com/stratisproject/prysm-stratis/api/server/structs"
@@ -19,6 +18,7 @@ import (
 	"github.com/stratisproject/prysm-stratis/testing/require"
 	"github.com/stratisproject/prysm-stratis/time/slots"
 	"github.com/stratisproject/prysm-stratis/validator/client/beacon-api/mock"
+	"go.uber.org/mock/gomock"
 )
 
 func TestSubmitSyncMessage_Valid(t *testing.T) {

@@ -35,6 +35,7 @@ load("//tools:ssz.bzl", "SSZ_DEPS", "ssz_gen_marshal")
 ssz_gen_marshal(
     name = "ssz_generated_files",
     go_proto = ":go_proto",
+    out = "gateway.ssz.go",
     includes = [
         "//consensus-types/primitives:go_default_library",
         "//proto/engine/v1:go_default_library",
@@ -113,7 +114,6 @@ ssz_proto_files(
     name = "ssz_proto_files",
     srcs = [
         "beacon_block.proto",
-        "beacon_state.proto",
     ],
     config = select({
         "//conditions:default": "mainnet",

@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/golang/mock/gomock"
 	"github.com/stratisproject/prysm-stratis/api/server/structs"
 	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
+	"go.uber.org/mock/gomock"
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/stratisproject/prysm-stratis/config/params"
@@ -52,12 +52,6 @@ func TestBeaconApiValidatorClient_GetAttestationDataValid(t *testing.T) {
 
 	assert.DeepEqual(t, expectedErr, err)
 	assert.DeepEqual(t, expectedResp, resp)
-}
-
-func TestBeaconApiValidatorClient_GetAttestationDataNilInput(t *testing.T) {
-	validatorClient := beaconApiValidatorClient{}
-	_, err := validatorClient.GetAttestationData(context.Background(), nil)
-	assert.ErrorContains(t, "GetAttestationData received nil argument `in`", err)
 }
 
 func TestBeaconApiValidatorClient_GetAttestationDataError(t *testing.T) {

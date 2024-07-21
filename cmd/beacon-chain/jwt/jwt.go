@@ -1,13 +1,11 @@
 package jwt
 
 import (
-	"errors"
 	"path/filepath"
 
-	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/sirupsen/logrus"
+	"github.com/stratisproject/prysm-stratis/api"
 	"github.com/stratisproject/prysm-stratis/cmd"
-	"github.com/stratisproject/prysm-stratis/crypto/rand"
 	"github.com/stratisproject/prysm-stratis/io/file"
 	"github.com/urfave/cli/v2"
 )
@@ -52,7 +50,7 @@ func generateAuthSecretInFile(c *cli.Context) error {
 			return err
 		}
 	}
-	secret, err := generateRandomHexString()
+	secret, err := api.GenerateRandomHexString()
 	if err != nil {
 		return err
 	}
@@ -61,16 +59,4 @@ func generateAuthSecretInFile(c *cli.Context) error {
 	}
 	logrus.Infof("Successfully wrote JSON-RPC authentication secret to file %s", fileName)
 	return nil
-}
-
-func generateRandomHexString() (string, error) {
-	secret := make([]byte, 32)
-	randGen := rand.NewGenerator()
-	n, err := randGen.Read(secret)
-	if err != nil {
-		return "", err
-	} else if n <= 0 {
-		return "", errors.New("rand: unexpected length")
-	}
-	return hexutil.Encode(secret), nil
 }

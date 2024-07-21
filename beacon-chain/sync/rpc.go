@@ -128,7 +128,7 @@ func (s *Service) registerRPC(baseTopic string, handle rpcHandler) {
 		defer func() {
 			if r := recover(); r != nil {
 				log.WithField("error", r).
-					WithField("recovered_at", "registerRPC").
+					WithField("recoveredAt", "registerRPC").
 					WithField("stack", string(debug.Stack())).
 					Error("Panic occurred")
 			}
@@ -142,7 +142,13 @@ func (s *Service) registerRPC(baseTopic string, handle rpcHandler) {
 		// it successfully writes a response. We don't blindly call
 		// Close here because we may have only written a partial
 		// response.
+		// About the special case for quic-v1, please see:
+		// https://github.com/quic-go/quic-go/issues/3291
 		defer func() {
+			if strings.Contains(stream.Conn().RemoteMultiaddr().String(), "quic-v1") {
+				time.Sleep(2 * time.Second)
+			}
+
 			_err := stream.Reset()
 			_ = _err
 		}()

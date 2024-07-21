@@ -4,7 +4,6 @@ import (
 	"context"
 	"testing"
 
-	"github.com/golang/mock/gomock"
 	"github.com/stratisproject/prysm-stratis/config/params"
 	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
 	"github.com/stratisproject/prysm-stratis/consensus-types/validator"
@@ -13,6 +12,7 @@ import (
 	"github.com/stratisproject/prysm-stratis/testing/util"
 	mock "github.com/stratisproject/prysm-stratis/testing/validator-mock"
 	"github.com/stratisproject/prysm-stratis/validator/client/iface"
+	"go.uber.org/mock/gomock"
 )
 
 func TestGetValidatorCount(t *testing.T) {
@@ -291,8 +291,8 @@ func TestGetValidatorCount(t *testing.T) {
 				})
 			}
 
-			beaconChainClient := mock.NewMockBeaconChainClient(ctrl)
-			beaconChainClient.EXPECT().ListValidators(
+			chainClient := mock.NewMockChainClient(ctrl)
+			chainClient.EXPECT().ListValidators(
 				gomock.Any(),
 				gomock.Any(),
 			).Return(
@@ -300,7 +300,7 @@ func TestGetValidatorCount(t *testing.T) {
 				nil,
 			)
 
-			beaconChainClient.EXPECT().GetChainHead(
+			chainClient.EXPECT().GetChainHead(
 				gomock.Any(),
 				gomock.Any(),
 			).Return(
@@ -308,8 +308,8 @@ func TestGetValidatorCount(t *testing.T) {
 				nil,
 			)
 
-			prysmBeaconChainClient := &grpcPrysmBeaconChainClient{
-				beaconChainClient: beaconChainClient,
+			prysmBeaconChainClient := &grpcPrysmChainClient{
+				chainClient: chainClient,
 			}
 
 			var statuses []validator.Status

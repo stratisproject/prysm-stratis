@@ -6,11 +6,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang/mock/gomock"
 	logTest "github.com/sirupsen/logrus/hooks/test"
 	"github.com/stratisproject/prysm-stratis/async/event"
 	mockChain "github.com/stratisproject/prysm-stratis/beacon-chain/blockchain/testing"
-	"github.com/stratisproject/prysm-stratis/beacon-chain/cache/depositcache"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/cache/depositsnapshot"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/core/signing"
 	mockExecution "github.com/stratisproject/prysm-stratis/beacon-chain/execution/testing"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/startup"
@@ -24,6 +23,7 @@ import (
 	"github.com/stratisproject/prysm-stratis/testing/mock"
 	"github.com/stratisproject/prysm-stratis/testing/require"
 	"github.com/stratisproject/prysm-stratis/testing/util"
+	"go.uber.org/mock/gomock"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -70,7 +70,7 @@ func TestWaitForActivation_ContextClosed(t *testing.T) {
 	require.NoError(t, err, "Could not get signing root")
 
 	ctx, cancel := context.WithCancel(context.Background())
-	depositCache, err := depositcache.New()
+	depositCache, err := depositsnapshot.New()
 	require.NoError(t, err)
 
 	vs := &Server{

@@ -10,10 +10,12 @@ import (
 	logTest "github.com/sirupsen/logrus/hooks/test"
 	fieldparams "github.com/stratisproject/prysm-stratis/config/fieldparams"
 	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
+	"github.com/stratisproject/prysm-stratis/crypto/bls"
 	"github.com/stratisproject/prysm-stratis/encoding/bytesutil"
 	ethpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
 	"github.com/stratisproject/prysm-stratis/testing/assert"
 	"github.com/stratisproject/prysm-stratis/testing/require"
+	"github.com/stratisproject/prysm-stratis/validator/db/common"
 	bolt "go.etcd.io/bbolt"
 )
 
@@ -23,7 +25,7 @@ func TestPendingAttestationRecords_Flush(t *testing.T) {
 	// Add 5 atts
 	num := 5
 	for i := 0; i < num; i++ {
-		queue.Append(&AttestationRecord{
+		queue.Append(&common.AttestationRecord{
 			Target: primitives.Epoch(i),
 		})
 	}
@@ -36,7 +38,7 @@ func TestPendingAttestationRecords_Flush(t *testing.T) {
 func TestPendingAttestationRecords_Len(t *testing.T) {
 	queue := NewQueuedAttestationRecords()
 	assert.Equal(t, queue.Len(), 0)
-	queue.Append(&AttestationRecord{})
+	queue.Append(&common.AttestationRecord{})
 	assert.Equal(t, queue.Len(), 1)
 	queue.Flush()
 	assert.Equal(t, queue.Len(), 0)
@@ -555,19 +557,6 @@ func benchCheckSurroundVote(
 	}
 }
 
-func createAttestation(source, target primitives.Epoch) *ethpb.IndexedAttestation {
-	return &ethpb.IndexedAttestation{
-		Data: &ethpb.AttestationData{
-			Source: &ethpb.Checkpoint{
-				Epoch: source,
-			},
-			Target: &ethpb.Checkpoint{
-				Epoch: target,
-			},
-		},
-	}
-}
-
 func TestStore_flushAttestationRecords_InProgress(t *testing.T) {
 	s := &Store{}
 	s.batchedAttestationsFlushInProgress.Set()
@@ -575,4 +564,56 @@ func TestStore_flushAttestationRecords_InProgress(t *testing.T) {
 	hook := logTest.NewGlobal()
 	s.flushAttestationRecords(context.Background(), nil)
 	assert.LogsContain(t, hook, "Attempted to flush attestation records when already in progress")
+}
+
+func BenchmarkStore_SaveAttestationForPubKey(b *testing.B) {
+	var wg sync.WaitGroup
+	ctx := context.Background()
+
+	// Create pubkeys
+	pubkeys := make([][fieldparams.BLSPubkeyLength]byte, 10)
+	for i := range pubkeys {
+		validatorKey, err := bls.RandKey()
+		require.NoError(b, err, "RandKey should not return an error")
+
+		copy(pubkeys[i][:], validatorKey.PublicKey().Marshal())
+	}
+
+	signingRoot := [32]byte{1}
+	attestation := &ethpb.IndexedAttestation{
+		Data: &ethpb.AttestationData{
+			Source: &ethpb.Checkpoint{
+				Epoch: 42,
+			},
+			Target: &ethpb.Checkpoint{
+				Epoch: 43,
+			},
+		},
+	}
+
+	validatorDB, err := NewKVStore(ctx, b.TempDir(), &Config{PubKeys: pubkeys})
+	require.NoError(b, err)
+
+	for i := 0; i < b.N; i++ {
+		b.StopTimer()
+		err := validatorDB.ClearDB()
+		require.NoError(b, err)
+
+		for _, pubkey := range pubkeys {
+			wg.Add(1)
+
+			go func(pk [fieldparams.BLSPubkeyLength]byte) {
+				defer wg.Done()
+
+				err := validatorDB.SaveAttestationForPubKey(ctx, pk, signingRoot, attestation)
+				require.NoError(b, err)
+			}(pubkey)
+		}
+
+		b.StartTimer()
+		wg.Wait()
+	}
+
+	err = validatorDB.Close()
+	require.NoError(b, err)
 }

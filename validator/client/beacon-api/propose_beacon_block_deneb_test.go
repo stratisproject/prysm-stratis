@@ -6,12 +6,12 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/golang/mock/gomock"
 	"github.com/stratisproject/prysm-stratis/api/server/structs"
 	rpctesting "github.com/stratisproject/prysm-stratis/beacon-chain/rpc/eth/shared/testing"
 	"github.com/stratisproject/prysm-stratis/testing/assert"
 	"github.com/stratisproject/prysm-stratis/testing/require"
 	"github.com/stratisproject/prysm-stratis/validator/client/beacon-api/mock"
+	"go.uber.org/mock/gomock"
 )
 
 func TestProposeBeaconBlock_Deneb(t *testing.T) {

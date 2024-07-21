@@ -7,12 +7,12 @@ Flags:
   -beacon string
         gRPC address of the Prysm beacon node (default "127.0.0.1:4000")
   -genesis uint
-        Genesis time. mainnet=1606824023, prater=1616508000 (default 1606824023)
+        Genesis time. mainnet=1710353050, auroria=1707830378 (default 1710353050)
 ```
 
 Usage:
 ```
-bazel run //tools/eth1voting -- -beacon=127.0.0.1:4000 -genesis=1606824023
+bazel run //tools/eth1voting -- -beacon=127.0.0.1:4000 -genesis=1710353050
 ```
 
 Example response

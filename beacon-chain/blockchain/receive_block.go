@@ -32,6 +32,9 @@ import (
 // This defines how many epochs since finality the run time will begin to save hot state on to the DB.
 var epochsSinceFinalitySaveHotStateDB = primitives.Epoch(100)
 
+// This defines how many epochs since finality the run time will begin to expand our respective cache sizes.
+var epochsSinceFinalityExpandCache = primitives.Epoch(4)
+
 // BlockReceiver interface defines the methods of chain service for receiving and processing new blocks.
 type BlockReceiver interface {
 	ReceiveBlock(ctx context.Context, block interfaces.ReadOnlySignedBeaconBlock, blockRoot [32]byte, avs das.AvailabilityStore) error
@@ -94,6 +97,7 @@ func (s *Service) ReceiveBlock(ctx context.Context, block interfaces.ReadOnlySig
 	eg, _ := errgroup.WithContext(ctx)
 	var postState state.BeaconState
 	eg.Go(func() error {
+		var err error
 		postState, err = s.validateStateTransition(ctx, preState, blockCopy)
 		if err != nil {
 			return errors.Wrap(err, "failed to validate consensus state transition function")
@@ -102,6 +106,7 @@ func (s *Service) ReceiveBlock(ctx context.Context, block interfaces.ReadOnlySig
 	})
 	var isValidPayload bool
 	eg.Go(func() error {
+		var err error
 		isValidPayload, err = s.validateExecutionOnBlock(ctx, preStateVersion, preStateHeader, blockCopy, blockRoot)
 		if err != nil {
 			return errors.Wrap(err, "could not notify the engine of the new payload")
@@ -165,7 +170,7 @@ func (s *Service) ReceiveBlock(ctx context.Context, block interfaces.ReadOnlySig
 	// Send finalized events and finalized deposits in the background
 	if newFinalized {
 		finalized := s.cfg.ForkChoiceStore.FinalizedCheckpoint()
-		go s.sendNewFinalizedEvent(blockCopy, postState)
+		go s.sendNewFinalizedEvent(ctx, postState)
 		depCtx, cancel := context.WithTimeout(context.Background(), depositDeadline)
 		go func() {
 			s.insertFinalizedDeposits(depCtx, finalized.Root)
@@ -185,6 +190,11 @@ func (s *Service) ReceiveBlock(ctx context.Context, block interfaces.ReadOnlySig
 
 	// Have we been finalizing? Should we start saving hot states to db?
 	if err := s.checkSaveHotStateDB(ctx); err != nil {
+		return err
+	}
+
+	// We apply the same heuristic to some of our more important caches.
+	if err := s.handleCaches(); err != nil {
 		return err
 	}
 
@@ -361,6 +371,27 @@ func (s *Service) checkSaveHotStateDB(ctx context.Context) error {
 	return s.cfg.StateGen.DisableSaveHotStateToDB(ctx)
 }
 
+func (s *Service) handleCaches() error {
+	currentEpoch := slots.ToEpoch(s.CurrentSlot())
+	// Prevent `sinceFinality` going underflow.
+	var sinceFinality primitives.Epoch
+	finalized := s.cfg.ForkChoiceStore.FinalizedCheckpoint()
+	if finalized == nil {
+		return errNilFinalizedInStore
+	}
+	if currentEpoch > finalized.Epoch {
+		sinceFinality = currentEpoch - finalized.Epoch
+	}
+
+	if sinceFinality >= epochsSinceFinalityExpandCache {
+		helpers.ExpandCommitteeCache()
+		return nil
+	}
+
+	helpers.CompressCommitteeCache()
+	return nil
+}
+
 // This performs the state transition function and returns the poststate or an
 // error if the block fails to verify the consensus rules
 func (s *Service) validateStateTransition(ctx context.Context, preState state.BeaconState, signed interfaces.ReadOnlySignedBeaconBlock) (state.BeaconState, error) {
@@ -412,7 +443,7 @@ func (s *Service) updateFinalizationOnBlock(ctx context.Context, preState, postS
 
 // sendNewFinalizedEvent sends a new finalization checkpoint event over the
 // event feed. It needs to be called on the background
-func (s *Service) sendNewFinalizedEvent(signed interfaces.ReadOnlySignedBeaconBlock, postState state.BeaconState) {
+func (s *Service) sendNewFinalizedEvent(ctx context.Context, postState state.BeaconState) {
 	isValidPayload := false
 	s.headLock.RLock()
 	if s.head != nil {
@@ -420,8 +451,17 @@ func (s *Service) sendNewFinalizedEvent(signed interfaces.ReadOnlySignedBeaconBl
 	}
 	s.headLock.RUnlock()
 
+	blk, err := s.cfg.BeaconDB.Block(ctx, bytesutil.ToBytes32(postState.FinalizedCheckpoint().Root))
+	if err != nil {
+		log.WithError(err).Error("Could not retrieve block for finalized checkpoint root. Finalized event will not be emitted")
+		return
+	}
+	if blk == nil || blk.IsNil() || blk.Block() == nil || blk.Block().IsNil() {
+		log.WithError(err).Error("Block retrieved for finalized checkpoint root is nil. Finalized event will not be emitted")
+		return
+	}
+	stateRoot := blk.Block().StateRoot()
 	// Send an event regarding the new finalized checkpoint over a common event feed.
-	stateRoot := signed.Block().StateRoot()
 	s.cfg.StateNotifier.StateFeed().Send(&feed.Event{
 		Type: statefeed.FinalizedCheckpoint,
 		Data: &ethpbv1.EventFinalizedCheckpoint{
@@ -457,7 +497,10 @@ func (s *Service) sendBlockAttestationsToSlasher(signed interfaces.ReadOnlySigne
 func (s *Service) validateExecutionOnBlock(ctx context.Context, ver int, header interfaces.ExecutionData, signed interfaces.ReadOnlySignedBeaconBlock, blockRoot [32]byte) (bool, error) {
 	isValidPayload, err := s.notifyNewPayload(ctx, ver, header, signed)
 	if err != nil {
-		return false, s.handleInvalidExecutionError(ctx, err, blockRoot, signed.Block().ParentRoot())
+		s.cfg.ForkChoiceStore.Lock()
+		err = s.handleInvalidExecutionError(ctx, err, blockRoot, signed.Block().ParentRoot())
+		s.cfg.ForkChoiceStore.Unlock()
+		return false, err
 	}
 	if signed.Version() < version.Capella && isValidPayload {
 		if err := s.validateMergeTransitionBlock(ctx, ver, header, signed); err != nil {
