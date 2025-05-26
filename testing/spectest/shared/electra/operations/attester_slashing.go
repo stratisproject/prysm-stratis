@@ -1,0 +1,26 @@
+package operations
+
+import (
+	"testing"
+
+	"github.com/stratisproject/prysm-stratis/consensus-types/blocks"
+	"github.com/stratisproject/prysm-stratis/consensus-types/interfaces"
+	ethpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
+	"github.com/stratisproject/prysm-stratis/runtime/version"
+	common "github.com/stratisproject/prysm-stratis/testing/spectest/shared/common/operations"
+	"github.com/stratisproject/prysm-stratis/testing/util"
+)
+
+func blockWithAttesterSlashing(asSSZ []byte) (interfaces.SignedBeaconBlock, error) {
+	as := &ethpb.AttesterSlashingElectra{}
+	if err := as.UnmarshalSSZ(asSSZ); err != nil {
+		return nil, err
+	}
+	b := util.NewBeaconBlockElectra()
+	b.Block.Body = &ethpb.BeaconBlockBodyElectra{AttesterSlashings: []*ethpb.AttesterSlashingElectra{as}}
+	return blocks.NewSignedBeaconBlock(b)
+}
+
+func RunAttesterSlashingTest(t *testing.T, config string) {
+	common.RunAttesterSlashingTest(t, config, version.String(version.Electra), blockWithAttesterSlashing, sszToState)
+}

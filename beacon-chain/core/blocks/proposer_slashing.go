@@ -12,12 +12,17 @@ import (
 	"github.com/stratisproject/prysm-stratis/config/params"
 	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
 	ethpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
-	"github.com/stratisproject/prysm-stratis/runtime/version"
 	"github.com/stratisproject/prysm-stratis/time/slots"
 	"google.golang.org/protobuf/proto"
 )
 
-type slashValidatorFunc func(ctx context.Context, st state.BeaconState, vid primitives.ValidatorIndex, penaltyQuotient, proposerRewardQuotient uint64) (state.BeaconState, error)
+// ErrCouldNotVerifyBlockHeader is returned when a block header's signature cannot be verified.
+var ErrCouldNotVerifyBlockHeader = errors.New("could not verify beacon block header")
+
+type slashValidatorFunc func(
+	ctx context.Context,
+	st state.BeaconState,
+	vid primitives.ValidatorIndex) (state.BeaconState, error)
 
 // ProcessProposerSlashings is one of the operations performed
 // on each processed beacon block to slash proposers based on
@@ -75,19 +80,7 @@ func ProcessProposerSlashing(
 	if err = VerifyProposerSlashing(beaconState, slashing); err != nil {
 		return nil, errors.Wrap(err, "could not verify proposer slashing")
 	}
-	cfg := params.BeaconConfig()
-	var slashingQuotient uint64
-	switch {
-	case beaconState.Version() == version.Phase0:
-		slashingQuotient = cfg.MinSlashingPenaltyQuotient
-	case beaconState.Version() == version.Altair:
-		slashingQuotient = cfg.MinSlashingPenaltyQuotientAltair
-	case beaconState.Version() >= version.Bellatrix:
-		slashingQuotient = cfg.MinSlashingPenaltyQuotientBellatrix
-	default:
-		return nil, errors.New("unknown state version")
-	}
-	beaconState, err = slashFunc(ctx, beaconState, slashing.Header_1.Header.ProposerIndex, slashingQuotient, cfg.ProposerRewardQuotient)
+	beaconState, err = slashFunc(ctx, beaconState, slashing.Header_1.Header.ProposerIndex)
 	if err != nil {
 		return nil, errors.Wrapf(err, "could not slash proposer index %d", slashing.Header_1.Header.ProposerIndex)
 	}
@@ -124,7 +117,7 @@ func VerifyProposerSlashing(
 	for _, header := range headers {
 		if err := signing.ComputeDomainVerifySigningRoot(beaconState, pIdx, slots.ToEpoch(hSlot),
 			header.Header, params.BeaconConfig().DomainBeaconProposer, header.Signature); err != nil {
-			return errors.Wrap(err, "could not verify beacon block header")
+			return errors.Wrap(ErrCouldNotVerifyBlockHeader, err.Error())
 		}
 	}
 	return nil

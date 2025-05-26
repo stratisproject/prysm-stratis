@@ -1,42 +1,26 @@
 package operations
 
 import (
-	"context"
-	"path"
 	"testing"
 
-	"github.com/golang/snappy"
-	"github.com/stratisproject/prysm-stratis/beacon-chain/core/blocks"
-	v "github.com/stratisproject/prysm-stratis/beacon-chain/core/validators"
-	"github.com/stratisproject/prysm-stratis/beacon-chain/state"
+	"github.com/stratisproject/prysm-stratis/consensus-types/blocks"
 	"github.com/stratisproject/prysm-stratis/consensus-types/interfaces"
 	ethpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
-	"github.com/stratisproject/prysm-stratis/testing/require"
-	"github.com/stratisproject/prysm-stratis/testing/spectest/utils"
+	"github.com/stratisproject/prysm-stratis/runtime/version"
+	common "github.com/stratisproject/prysm-stratis/testing/spectest/shared/common/operations"
 	"github.com/stratisproject/prysm-stratis/testing/util"
 )
 
-// RunProposerSlashingTest executes "operations/proposer_slashing" tests.
-func RunProposerSlashingTest(t *testing.T, config string) {
-	require.NoError(t, utils.SetConfig(t, config))
-	testFolders, testsFolderPath := utils.TestFolders(t, config, "phase0", "operations/proposer_slashing/pyspec_tests")
-	if len(testFolders) == 0 {
-		t.Fatalf("No test folders found for %s/%s/%s", config, "phase0", "operations/proposer_slashing/pyspec_tests")
+func blockWithProposerSlashing(ssz []byte) (interfaces.SignedBeaconBlock, error) {
+	ps := &ethpb.ProposerSlashing{}
+	if err := ps.UnmarshalSSZ(ssz); err != nil {
+		return nil, err
 	}
-	for _, folder := range testFolders {
-		t.Run(folder.Name(), func(t *testing.T) {
-			folderPath := path.Join(testsFolderPath, folder.Name())
-			proposerSlashingFile, err := util.BazelFileBytes(folderPath, "proposer_slashing.ssz_snappy")
-			require.NoError(t, err)
-			proposerSlashingSSZ, err := snappy.Decode(nil /* dst */, proposerSlashingFile)
-			require.NoError(t, err, "Failed to decompress")
-			proposerSlashing := &ethpb.ProposerSlashing{}
-			require.NoError(t, proposerSlashing.UnmarshalSSZ(proposerSlashingSSZ), "Failed to unmarshal")
+	b := util.NewBeaconBlock()
+	b.Block.Body = &ethpb.BeaconBlockBody{ProposerSlashings: []*ethpb.ProposerSlashing{ps}}
+	return blocks.NewSignedBeaconBlock(b)
+}
 
-			body := &ethpb.BeaconBlockBody{ProposerSlashings: []*ethpb.ProposerSlashing{proposerSlashing}}
-			RunBlockOperationTest(t, folderPath, body, func(ctx context.Context, s state.BeaconState, b interfaces.ReadOnlySignedBeaconBlock) (state.BeaconState, error) {
-				return blocks.ProcessProposerSlashings(ctx, s, b.Block().Body().ProposerSlashings(), v.SlashValidator)
-			})
-		})
-	}
+func RunProposerSlashingTest(t *testing.T, config string) {
+	common.RunProposerSlashingTest(t, config, version.String(version.Phase0), blockWithProposerSlashing, sszToState)
 }

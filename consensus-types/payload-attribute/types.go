@@ -2,7 +2,10 @@ package payloadattribute
 
 import (
 	"github.com/pkg/errors"
+	field_params "github.com/stratisproject/prysm-stratis/config/fieldparams"
 	"github.com/stratisproject/prysm-stratis/consensus-types/blocks"
+	"github.com/stratisproject/prysm-stratis/consensus-types/interfaces"
+	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
 	enginev1 "github.com/stratisproject/prysm-stratis/proto/engine/v1"
 	"github.com/stratisproject/prysm-stratis/runtime/version"
 )
@@ -23,6 +26,7 @@ type data struct {
 var (
 	errNilPayloadAttribute         = errors.New("received nil payload attribute")
 	errUnsupportedPayloadAttribute = errors.New("unsupported payload attribute")
+	errNoParentRoot                = errors.New("parent root is empty")
 )
 
 // New returns a new payload attribute with the given input object.
@@ -88,4 +92,15 @@ func initPayloadAttributeFromV3(a *enginev1.PayloadAttributesV3) (Attributer, er
 		withdrawals:           a.Withdrawals,
 		parentBeaconBlockRoot: a.ParentBeaconBlockRoot,
 	}, nil
+}
+
+// EventData holds the values for a PayloadAttributes event.
+type EventData struct {
+	ProposerIndex     primitives.ValidatorIndex
+	ProposalSlot      primitives.Slot
+	ParentBlockNumber uint64
+	ParentBlockHash   []byte
+	Attributer        Attributer
+	HeadBlock         interfaces.ReadOnlySignedBeaconBlock
+	HeadRoot          [field_params.RootLength]byte
 }

@@ -11,10 +11,10 @@ import (
 	"github.com/stratisproject/prysm-stratis/consensus-types/interfaces"
 	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
 	"github.com/stratisproject/prysm-stratis/encoding/bytesutil"
+	"github.com/stratisproject/prysm-stratis/monitoring/tracing/trace"
 	"github.com/stratisproject/prysm-stratis/time/slots"
 	"github.com/stratisproject/prysm-stratis/validator/db/common"
 	bolt "go.etcd.io/bbolt"
-	"go.opencensus.io/trace"
 )
 
 // ProposedPublicKeys retrieves all public keys in our proposals history bucket.

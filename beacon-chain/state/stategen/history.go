@@ -11,7 +11,7 @@ import (
 	"github.com/stratisproject/prysm-stratis/consensus-types/blocks"
 	"github.com/stratisproject/prysm-stratis/consensus-types/interfaces"
 	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
-	"go.opencensus.io/trace"
+	"github.com/stratisproject/prysm-stratis/monitoring/tracing/trace"
 )
 
 func WithCache(c CachedGetter) CanonicalHistoryOption {

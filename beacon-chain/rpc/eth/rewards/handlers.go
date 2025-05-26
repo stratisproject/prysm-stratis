@@ -14,12 +14,13 @@ import (
 	"github.com/stratisproject/prysm-stratis/beacon-chain/state"
 	fieldparams "github.com/stratisproject/prysm-stratis/config/fieldparams"
 	"github.com/stratisproject/prysm-stratis/config/params"
+	"github.com/stratisproject/prysm-stratis/consensus-types/blocks"
 	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
+	"github.com/stratisproject/prysm-stratis/monitoring/tracing/trace"
 	"github.com/stratisproject/prysm-stratis/network/httputil"
 	"github.com/stratisproject/prysm-stratis/runtime/version"
 	"github.com/stratisproject/prysm-stratis/time/slots"
 	"github.com/wealdtech/go-bytesutil"
-	"go.opencensus.io/trace"
 )
 
 // BlockRewards is an HTTP handler for Beacon API getBlockRewards.
@@ -33,6 +34,12 @@ func (s *Server) BlockRewards(w http.ResponseWriter, r *http.Request) {
 	if !shared.WriteBlockFetchError(w, blk, err) {
 		return
 	}
+
+	if err := blocks.BeaconBlockIsNil(blk); err != nil {
+		httputil.HandleError(w, fmt.Sprintf("block id %s was not found", blockId), http.StatusNotFound)
+		return
+	}
+
 	if blk.Version() == version.Phase0 {
 		httputil.HandleError(w, "Block rewards are not supported for Phase 0 blocks", http.StatusBadRequest)
 		return

@@ -6,13 +6,12 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"path/filepath"
-	"strconv"
 	"testing"
 	"time"
 
 	logTest "github.com/sirupsen/logrus/hooks/test"
+	"github.com/stratisproject/prysm-stratis/api/server/middleware"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/blockchain"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/builder"
 	statefeed "github.com/stratisproject/prysm-stratis/beacon-chain/core/feed/state"
@@ -21,13 +20,8 @@ import (
 	mockExecution "github.com/stratisproject/prysm-stratis/beacon-chain/execution/testing"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/monitor"
 	"github.com/stratisproject/prysm-stratis/cmd"
-	"github.com/stratisproject/prysm-stratis/cmd/beacon-chain/flags"
 	"github.com/stratisproject/prysm-stratis/config/features"
-	fieldparams "github.com/stratisproject/prysm-stratis/config/fieldparams"
-	"github.com/stratisproject/prysm-stratis/config/params"
-	ethpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
 	"github.com/stratisproject/prysm-stratis/runtime"
-	"github.com/stratisproject/prysm-stratis/runtime/interop"
 	"github.com/stratisproject/prysm-stratis/testing/assert"
 	"github.com/stratisproject/prysm-stratis/testing/require"
 	"github.com/urfave/cli/v2"
@@ -114,55 +108,6 @@ func TestNodeStart_SyncChecker(t *testing.T) {
 	assert.NotNil(t, node.syncChecker.Svc)
 	node.Close()
 	require.LogsContain(t, hook, "Starting beacon node")
-}
-
-func TestNodeStart_Ok_registerDeterministicGenesisService(t *testing.T) {
-	numValidators := uint64(1)
-	hook := logTest.NewGlobal()
-	app := cli.App{}
-	tmp := fmt.Sprintf("%s/datadirtest2", t.TempDir())
-	set := flag.NewFlagSet("test", 0)
-	set.String("datadir", tmp, "node data directory")
-	set.Uint64(flags.InteropNumValidatorsFlag.Name, numValidators, "")
-	set.String("suggested-fee-recipient", "0x6e35733c5af9B61374A128e6F85f553aF09ff89A", "fee recipient")
-	require.NoError(t, set.Set("suggested-fee-recipient", "0x6e35733c5af9B61374A128e6F85f553aF09ff89A"))
-	genesisState, _, err := interop.GenerateGenesisState(context.Background(), 0, numValidators)
-	require.NoError(t, err, "Could not generate genesis beacon state")
-	for i := uint64(1); i < 2; i++ {
-		var someRoot [32]byte
-		var someKey [fieldparams.BLSPubkeyLength]byte
-		copy(someRoot[:], strconv.Itoa(int(i)))
-		copy(someKey[:], strconv.Itoa(int(i)))
-		genesisState.Validators = append(genesisState.Validators, &ethpb.Validator{
-			PublicKey:                  someKey[:],
-			WithdrawalCredentials:      someRoot[:],
-			EffectiveBalance:           params.BeaconConfig().MaxEffectiveBalance,
-			Slashed:                    false,
-			ActivationEligibilityEpoch: 1,
-			ActivationEpoch:            1,
-			ExitEpoch:                  1,
-			WithdrawableEpoch:          1,
-		})
-		genesisState.Balances = append(genesisState.Balances, params.BeaconConfig().MaxEffectiveBalance)
-	}
-	genesisBytes, err := genesisState.MarshalSSZ()
-	require.NoError(t, err)
-	require.NoError(t, os.WriteFile("genesis_ssz.json", genesisBytes, 0666))
-	set.String("genesis-state", "genesis_ssz.json", "")
-	ctx, cancel := newCliContextWithCancel(&app, set)
-	node, err := New(ctx, cancel, WithBlockchainFlagOptions([]blockchain.Option{}),
-		WithBuilderFlagOptions([]builder.Option{}),
-		WithExecutionChainOptions([]execution.Option{}),
-		WithBlobStorage(filesystem.NewEphemeralBlobStorage(t)))
-	require.NoError(t, err)
-	node.services = &runtime.ServiceRegistry{}
-	go func() {
-		node.Start()
-	}()
-	time.Sleep(3 * time.Second)
-	node.Close()
-	require.LogsContain(t, hook, "Starting beacon node")
-	require.NoError(t, os.Remove("genesis_ssz.json"))
 }
 
 // TestClearDB tests clearing the database
@@ -252,19 +197,19 @@ func Test_hasNetworkFlag(t *testing.T) {
 }
 
 func TestCORS(t *testing.T) {
-	// Mock CLI context with a test CORS domain
-	app := cli.App{}
-	set := flag.NewFlagSet("test", 0)
-	set.String(flags.GPRCGatewayCorsDomain.Name, "http://allowed-example.com", "")
-	cliCtx := cli.NewContext(&app, set, nil)
-	require.NoError(t, cliCtx.Set(flags.GPRCGatewayCorsDomain.Name, "http://allowed-example.com"))
-
-	router := newRouter(cliCtx)
-
+	router := http.NewServeMux()
 	// Ensure a test route exists
 	router.HandleFunc("/some-path", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-	}).Methods(http.MethodGet)
+		if r.Method == http.MethodGet {
+			w.WriteHeader(http.StatusOK)
+		} else {
+			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		}
+	})
+
+	// Register the CORS middleware on mux Router
+	allowedOrigins := []string{"http://allowed-example.com"}
+	handler := middleware.CorsHandler(allowedOrigins)(router)
 
 	// Define test cases
 	tests := []struct {
@@ -285,7 +230,7 @@ func TestCORS(t *testing.T) {
 			rr := httptest.NewRecorder()
 
 			// Serve HTTP
-			router.ServeHTTP(rr, req)
+			handler.ServeHTTP(rr, req)
 
 			// Check the CORS headers based on the expected outcome
 			if tc.expectAllow && rr.Header().Get("Access-Control-Allow-Origin") != tc.origin {

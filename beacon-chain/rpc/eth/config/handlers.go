@@ -10,9 +10,9 @@ import (
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/stratisproject/prysm-stratis/api/server/structs"
 	"github.com/stratisproject/prysm-stratis/config/params"
+	"github.com/stratisproject/prysm-stratis/monitoring/tracing/trace"
 	"github.com/stratisproject/prysm-stratis/network/forks"
 	"github.com/stratisproject/prysm-stratis/network/httputil"
-	"go.opencensus.io/trace"
 )
 
 // GetDepositContract retrieves deposit contract address and genesis fork version.

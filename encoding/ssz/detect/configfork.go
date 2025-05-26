@@ -3,18 +3,17 @@ package detect
 import (
 	"fmt"
 
-	state_native "github.com/stratisproject/prysm-stratis/beacon-chain/state/state-native"
-	"github.com/stratisproject/prysm-stratis/consensus-types/blocks"
-	"github.com/stratisproject/prysm-stratis/consensus-types/interfaces"
-	"github.com/stratisproject/prysm-stratis/encoding/bytesutil"
-	"github.com/stratisproject/prysm-stratis/network/forks"
-
 	"github.com/pkg/errors"
 	ssz "github.com/prysmaticlabs/fastssz"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/state"
+	state_native "github.com/stratisproject/prysm-stratis/beacon-chain/state/state-native"
 	fieldparams "github.com/stratisproject/prysm-stratis/config/fieldparams"
 	"github.com/stratisproject/prysm-stratis/config/params"
+	"github.com/stratisproject/prysm-stratis/consensus-types/blocks"
+	"github.com/stratisproject/prysm-stratis/consensus-types/interfaces"
 	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
+	"github.com/stratisproject/prysm-stratis/encoding/bytesutil"
+	"github.com/stratisproject/prysm-stratis/network/forks"
 	ethpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
 	"github.com/stratisproject/prysm-stratis/runtime/version"
 	"github.com/stratisproject/prysm-stratis/time/slots"
@@ -87,6 +86,10 @@ func FromForkVersion(cv [fieldparams.VersionLength]byte) (*VersionedUnmarshaler,
 		fork = version.Capella
 	case bytesutil.ToBytes4(cfg.DenebForkVersion):
 		fork = version.Deneb
+	case bytesutil.ToBytes4(cfg.ElectraForkVersion):
+		fork = version.Electra
+	case bytesutil.ToBytes4(cfg.FuluForkVersion):
+		fork = version.Fulu
 	default:
 		return nil, errors.Wrapf(ErrForkNotFound, "version=%#x", cv)
 	}
@@ -152,6 +155,26 @@ func (cf *VersionedUnmarshaler) UnmarshalBeaconState(marshaled []byte) (s state.
 		if err != nil {
 			return nil, errors.Wrapf(err, "failed to init state trie from state, detected fork=%s", forkName)
 		}
+	case version.Electra:
+		st := &ethpb.BeaconStateElectra{}
+		err = st.UnmarshalSSZ(marshaled)
+		if err != nil {
+			return nil, errors.Wrapf(err, "failed to unmarshal state, detected fork=%s", forkName)
+		}
+		s, err = state_native.InitializeFromProtoUnsafeElectra(st)
+		if err != nil {
+			return nil, errors.Wrapf(err, "failed to init state trie from state, detected fork=%s", forkName)
+		}
+	case version.Fulu:
+		st := &ethpb.BeaconStateElectra{}
+		err = st.UnmarshalSSZ(marshaled)
+		if err != nil {
+			return nil, errors.Wrapf(err, "failed to unmarshal state, detected fork=%s", forkName)
+		}
+		s, err = state_native.InitializeFromProtoUnsafeFulu(st)
+		if err != nil {
+			return nil, errors.Wrapf(err, "failed to init state trie from state, detected fork=%s", forkName)
+		}
 	default:
 		return nil, fmt.Errorf("unable to initialize BeaconState for fork version=%s", forkName)
 	}
@@ -200,6 +223,10 @@ func (cf *VersionedUnmarshaler) UnmarshalBeaconBlock(marshaled []byte) (interfac
 		blk = &ethpb.SignedBeaconBlockCapella{}
 	case version.Deneb:
 		blk = &ethpb.SignedBeaconBlockDeneb{}
+	case version.Electra:
+		blk = &ethpb.SignedBeaconBlockElectra{}
+	case version.Fulu:
+		blk = &ethpb.SignedBeaconBlockFulu{}
 	default:
 		forkName := version.String(cf.Fork)
 		return nil, fmt.Errorf("unable to initialize ReadOnlyBeaconBlock for fork version=%s at slot=%d", forkName, slot)
@@ -235,6 +262,10 @@ func (cf *VersionedUnmarshaler) UnmarshalBlindedBeaconBlock(marshaled []byte) (i
 		blk = &ethpb.SignedBlindedBeaconBlockCapella{}
 	case version.Deneb:
 		blk = &ethpb.SignedBlindedBeaconBlockDeneb{}
+	case version.Electra:
+		blk = &ethpb.SignedBlindedBeaconBlockElectra{}
+	case version.Fulu:
+		blk = &ethpb.SignedBlindedBeaconBlockFulu{}
 	default:
 		forkName := version.String(cf.Fork)
 		return nil, fmt.Errorf("unable to initialize ReadOnlyBeaconBlock for fork version=%s at slot=%d", forkName, slot)

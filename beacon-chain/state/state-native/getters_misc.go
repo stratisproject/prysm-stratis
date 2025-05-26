@@ -103,7 +103,7 @@ func (b *BeaconState) HistoricalSummaries() ([]*ethpb.HistoricalSummary, error) 
 // historicalSummariesVal of the beacon state.
 // This assumes that a lock is already held on BeaconState.
 func (b *BeaconState) historicalSummariesVal() []*ethpb.HistoricalSummary {
-	return ethpb.CopyHistoricalSummaries(b.historicalSummaries)
+	return ethpb.CopySlice(b.historicalSummaries)
 }
 
 func (b *BeaconState) StakingContractAddress() ([]byte, error) {
@@ -119,7 +119,6 @@ func (b *BeaconState) StakingContractAddress() ([]byte, error) {
 
 func (b *BeaconState) stakingContractAddressVal() []byte {
 	tmp := make([]byte, len(b.stakingContractAddress))
-	copy(tmp, b.stakingContractAddress)
 	copy(tmp, b.stakingContractAddress)
 	return tmp
 }

@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	runtimeDebug "runtime/debug"
+	"time"
 
 	joonix "github.com/joonix/log"
 	"github.com/pkg/errors"
@@ -50,7 +51,6 @@ func startNode(ctx *cli.Context) error {
 
 var appFlags = []cli.Flag{
 	flags.BeaconRPCProviderFlag,
-	flags.BeaconRPCGatewayProviderFlag,
 	flags.BeaconRESTApiProviderFlag,
 	flags.CertFlag,
 	flags.GraffitiFlag,
@@ -60,12 +60,12 @@ var appFlags = []cli.Flag{
 	flags.EnableRPCFlag,
 	flags.RPCHost,
 	flags.RPCPort,
-	flags.GRPCGatewayPort,
-	flags.GRPCGatewayHost,
-	flags.GrpcRetriesFlag,
-	flags.GrpcRetryDelayFlag,
-	flags.GrpcHeadersFlag,
-	flags.GPRCGatewayCorsDomain,
+	flags.HTTPServerPort,
+	flags.HTTPServerHost,
+	flags.GRPCRetriesFlag,
+	flags.GRPCRetryDelayFlag,
+	flags.GRPCHeadersFlag,
+	flags.HTTPServerCorsDomain,
 	flags.DisableAccountMetricsFlag,
 	flags.MonitoringPortFlag,
 	flags.SlasherRPCProviderFlag,
@@ -76,9 +76,11 @@ var appFlags = []cli.Flag{
 	flags.GraffitiFileFlag,
 	flags.EnableDistributed,
 	flags.AuthTokenPathFlag,
+	flags.DisableDutiesPolling,
 	// Consensys' Web3Signer flags
 	flags.Web3SignerURLFlag,
 	flags.Web3SignerPublicValidatorKeysFlag,
+	flags.Web3SignerKeyFileFlag,
 	flags.SuggestedFeeRecipientFlag,
 	flags.ProposerSettingsURLFlag,
 	flags.ProposerSettingsFlag,
@@ -88,7 +90,6 @@ var appFlags = []cli.Flag{
 	////////////////////
 	cmd.DisableMonitoringFlag,
 	cmd.MonitoringHostFlag,
-	cmd.BackupWebhookOutputDir,
 	cmd.EnableBackupWebhookFlag,
 	cmd.MinimalConfigFlag,
 	cmd.E2EConfigFlag,
@@ -110,8 +111,6 @@ var appFlags = []cli.Flag{
 	debug.PProfAddrFlag,
 	debug.PProfPortFlag,
 	debug.MemProfileRateFlag,
-	debug.CPUProfileFlag,
-	debug.TraceFlag,
 	debug.BlockProfileRateFlag,
 	debug.MutexProfileFractionFlag,
 	cmd.AcceptTosFlag,
@@ -153,7 +152,7 @@ func main() {
 			switch format {
 			case "text":
 				formatter := new(prefixed.TextFormatter)
-				formatter.TimestampFormat = "2006-01-02 15:04:05"
+				formatter.TimestampFormat = time.DateTime
 				formatter.FullTimestamp = true
 				// If persistent log files are written - we disable the log messages coloring because
 				// the colors are ANSI codes and seen as gibberish in the log files.
@@ -162,7 +161,7 @@ func main() {
 			case "fluentd":
 				f := joonix.NewFormatter()
 				if err := joonix.DisableTimestampFormat(f); err != nil {
-					panic(err)
+					panic(err) // lint:nopanic -- This shouldn't happen, but crashing immediately at startup is OK.
 				}
 				logrus.SetFormatter(f)
 			case "json":
@@ -192,18 +191,18 @@ func main() {
 				return errors.Wrap(err, "failed to setup debug")
 			}
 
+			if err := features.ValidateNetworkFlags(ctx); err != nil {
+				return errors.Wrap(err, "provided multiple network flags")
+			}
+
 			return cmd.ValidateNoArgs(ctx)
-		},
-		After: func(ctx *cli.Context) error {
-			debug.Exit(ctx)
-			return nil
 		},
 	}
 
 	defer func() {
 		if x := recover(); x != nil {
 			log.Errorf("Runtime panic: %v\n%v", x, string(runtimeDebug.Stack()))
-			panic(x)
+			panic(x) // lint:nopanic -- This is just resurfacing the original panic.
 		}
 	}()
 

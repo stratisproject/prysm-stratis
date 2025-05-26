@@ -4,6 +4,7 @@ import (
 	"context"
 	"sync"
 
+	"github.com/stratisproject/prysm-stratis/beacon-chain/startup"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/state"
 	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
 	ethpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
@@ -14,7 +15,7 @@ type PoolInserter interface {
 	InsertAttesterSlashing(
 		ctx context.Context,
 		state state.ReadOnlyBeaconState,
-		slashing *ethpb.AttesterSlashing,
+		slashing ethpb.AttSlashing,
 	) error
 	InsertProposerSlashing(
 		ctx context.Context,
@@ -27,10 +28,25 @@ type PoolInserter interface {
 // This pool is used by proposers to insert data into new blocks.
 type PoolManager interface {
 	PoolInserter
-	PendingAttesterSlashings(ctx context.Context, state state.ReadOnlyBeaconState, noLimit bool) []*ethpb.AttesterSlashing
+	PendingAttesterSlashings(ctx context.Context, state state.ReadOnlyBeaconState, noLimit bool) []ethpb.AttSlashing
 	PendingProposerSlashings(ctx context.Context, state state.ReadOnlyBeaconState, noLimit bool) []*ethpb.ProposerSlashing
-	MarkIncludedAttesterSlashing(as *ethpb.AttesterSlashing)
+	MarkIncludedAttesterSlashing(as ethpb.AttSlashing)
 	MarkIncludedProposerSlashing(ps *ethpb.ProposerSlashing)
+	ConvertToElectra()
+}
+
+// Option for pool service configuration.
+type Option func(p *PoolService) error
+
+// PoolService manages the Pool.
+type PoolService struct {
+	ctx             context.Context
+	cancel          context.CancelFunc
+	poolManager     PoolManager
+	currentSlotFn   func() primitives.Slot
+	cw              startup.ClockWaiter
+	clock           *startup.Clock
+	runElectraTimer bool
 }
 
 // Pool is a concrete implementation of PoolManager.
@@ -44,6 +60,6 @@ type Pool struct {
 // PendingAttesterSlashing represents an attester slashing in the operation pool.
 // Allows for easy binary searching of included validator indexes.
 type PendingAttesterSlashing struct {
-	attesterSlashing *ethpb.AttesterSlashing
+	attesterSlashing ethpb.AttSlashing
 	validatorToSlash primitives.ValidatorIndex
 }

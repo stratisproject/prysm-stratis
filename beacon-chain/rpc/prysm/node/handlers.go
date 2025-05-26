@@ -13,9 +13,9 @@ import (
 	"github.com/stratisproject/prysm-stratis/beacon-chain/p2p"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/p2p/peers"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/p2p/peers/peerdata"
+	"github.com/stratisproject/prysm-stratis/monitoring/tracing/trace"
 	"github.com/stratisproject/prysm-stratis/network/httputil"
 	eth "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
-	"go.opencensus.io/trace"
 )
 
 // ListTrustedPeer retrieves data about the node's trusted peers.

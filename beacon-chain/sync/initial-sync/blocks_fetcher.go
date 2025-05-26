@@ -19,18 +19,18 @@ import (
 	prysmsync "github.com/stratisproject/prysm-stratis/beacon-chain/sync"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/sync/verify"
 	"github.com/stratisproject/prysm-stratis/cmd/beacon-chain/flags"
+	"github.com/stratisproject/prysm-stratis/config/features"
 	"github.com/stratisproject/prysm-stratis/config/params"
 	"github.com/stratisproject/prysm-stratis/consensus-types/blocks"
-	blocks2 "github.com/stratisproject/prysm-stratis/consensus-types/blocks"
 	"github.com/stratisproject/prysm-stratis/consensus-types/interfaces"
 	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
 	leakybucket "github.com/stratisproject/prysm-stratis/container/leaky-bucket"
 	"github.com/stratisproject/prysm-stratis/crypto/rand"
 	"github.com/stratisproject/prysm-stratis/math"
+	"github.com/stratisproject/prysm-stratis/monitoring/tracing/trace"
 	p2ppb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
 	"github.com/stratisproject/prysm-stratis/runtime/version"
 	"github.com/stratisproject/prysm-stratis/time/slots"
-	"go.opencensus.io/trace"
 )
 
 const (
@@ -120,11 +120,20 @@ type fetchRequestParams struct {
 // fetchRequestResponse is a combined type to hold results of both successful executions and errors.
 // Valid usage pattern will be to check whether result's `err` is nil, before using `blocks`.
 type fetchRequestResponse struct {
-	pid   peer.ID
-	start primitives.Slot
-	count uint64
-	bwb   []blocks2.BlockWithROBlobs
-	err   error
+	blocksFrom peer.ID
+	blobsFrom  peer.ID
+	start      primitives.Slot
+	count      uint64
+	bwb        []blocks.BlockWithROBlobs
+	err        error
+}
+
+func (r *fetchRequestResponse) blocksQueueFetchedData() *blocksQueueFetchedData {
+	return &blocksQueueFetchedData{
+		blocksFrom: r.blocksFrom,
+		blobsFrom:  r.blobsFrom,
+		bwb:        r.bwb,
+	}
 }
 
 // newBlocksFetcher creates ready to use fetcher.
@@ -289,7 +298,7 @@ func (f *blocksFetcher) handleRequest(ctx context.Context, start primitives.Slot
 	response := &fetchRequestResponse{
 		start: start,
 		count: count,
-		bwb:   []blocks2.BlockWithROBlobs{},
+		bwb:   []blocks.BlockWithROBlobs{},
 		err:   nil,
 	}
 
@@ -314,13 +323,14 @@ func (f *blocksFetcher) handleRequest(ctx context.Context, start primitives.Slot
 		}
 	}
 
-	response.bwb, response.pid, response.err = f.fetchBlocksFromPeer(ctx, start, count, peers)
+	response.bwb, response.blocksFrom, response.err = f.fetchBlocksFromPeer(ctx, start, count, peers)
 	if response.err == nil {
-		bwb, err := f.fetchBlobsFromPeer(ctx, response.bwb, response.pid, peers)
+		pid, bwb, err := f.fetchBlobsFromPeer(ctx, response.bwb, response.blocksFrom, peers)
 		if err != nil {
 			response.err = err
 		}
 		response.bwb = bwb
+		response.blobsFrom = pid
 	}
 	return response
 }
@@ -330,7 +340,7 @@ func (f *blocksFetcher) fetchBlocksFromPeer(
 	ctx context.Context,
 	start primitives.Slot, count uint64,
 	peers []peer.ID,
-) ([]blocks2.BlockWithROBlobs, peer.ID, error) {
+) ([]blocks.BlockWithROBlobs, peer.ID, error) {
 	ctx, span := trace.StartSpan(ctx, "initialsync.fetchBlocksFromPeer")
 	defer span.End()
 
@@ -358,21 +368,28 @@ func (f *blocksFetcher) fetchBlocksFromPeer(
 			log.WithField("peer", p).WithError(err).Debug("invalid BeaconBlocksByRange response")
 			continue
 		}
+		if len(features.Get().BlacklistedRoots) > 0 {
+			for _, b := range robs {
+				if features.BlacklistedBlock(b.Block.Root()) {
+					return nil, p, prysmsync.ErrInvalidFetchedData
+				}
+			}
+		}
 		return robs, p, err
 	}
 	return nil, "", errNoPeersAvailable
 }
 
-func sortedBlockWithVerifiedBlobSlice(blocks []interfaces.ReadOnlySignedBeaconBlock) ([]blocks2.BlockWithROBlobs, error) {
-	rb := make([]blocks2.BlockWithROBlobs, len(blocks))
-	for i, b := range blocks {
-		ro, err := blocks2.NewROBlock(b)
+func sortedBlockWithVerifiedBlobSlice(bs []interfaces.ReadOnlySignedBeaconBlock) ([]blocks.BlockWithROBlobs, error) {
+	rb := make([]blocks.BlockWithROBlobs, len(bs))
+	for i, b := range bs {
+		ro, err := blocks.NewROBlock(b)
 		if err != nil {
 			return nil, err
 		}
-		rb[i] = blocks2.BlockWithROBlobs{Block: ro}
+		rb[i] = blocks.BlockWithROBlobs{Block: ro}
 	}
-	sort.Sort(blocks2.BlockWithROBlobsSlice(rb))
+	sort.Sort(blocks.BlockWithROBlobsSlice(rb))
 	return rb, nil
 }
 
@@ -386,7 +403,7 @@ type commitmentCountList []commitmentCount
 
 // countCommitments makes a list of all blocks that have commitments that need to be satisfied.
 // This gives us a representation to finish building the request that is lightweight and readable for testing.
-func countCommitments(bwb []blocks2.BlockWithROBlobs, retentionStart primitives.Slot) commitmentCountList {
+func countCommitments(bwb []blocks.BlockWithROBlobs, retentionStart primitives.Slot) commitmentCountList {
 	if len(bwb) == 0 {
 		return nil
 	}
@@ -468,7 +485,7 @@ func (r *blobRange) Request() *p2ppb.BlobSidecarsByRangeRequest {
 var errBlobVerification = errors.New("peer unable to serve aligned BlobSidecarsByRange and BeaconBlockSidecarsByRange responses")
 var errMissingBlobsForBlockCommitments = errors.Wrap(errBlobVerification, "blobs unavailable for processing block with kzg commitments")
 
-func verifyAndPopulateBlobs(bwb []blocks2.BlockWithROBlobs, blobs []blocks.ROBlob, req *p2ppb.BlobSidecarsByRangeRequest, bss filesystem.BlobStorageSummarizer) ([]blocks2.BlockWithROBlobs, error) {
+func verifyAndPopulateBlobs(bwb []blocks.BlockWithROBlobs, blobs []blocks.ROBlob, req *p2ppb.BlobSidecarsByRangeRequest, bss filesystem.BlobStorageSummarizer) ([]blocks.BlockWithROBlobs, error) {
 	blobsByRoot := make(map[[32]byte][]blocks.ROBlob)
 	for i := range blobs {
 		if blobs[i].Slot() < req.StartSlot {
@@ -492,7 +509,7 @@ func verifyAndPopulateBlobs(bwb []blocks2.BlockWithROBlobs, blobs []blocks.ROBlo
 
 var errDidntPopulate = errors.New("skipping population of block")
 
-func populateBlock(bw blocks2.BlockWithROBlobs, blobs []blocks.ROBlob, req *p2ppb.BlobSidecarsByRangeRequest, bss filesystem.BlobStorageSummarizer) (blocks2.BlockWithROBlobs, error) {
+func populateBlock(bw blocks.BlockWithROBlobs, blobs []blocks.ROBlob, req *p2ppb.BlobSidecarsByRangeRequest, bss filesystem.BlobStorageSummarizer) (blocks.BlockWithROBlobs, error) {
 	blk := bw.Block
 	if blk.Version() < version.Deneb || blk.Block().Slot() < req.StartSlot {
 		return bw, errDidntPopulate
@@ -530,20 +547,20 @@ func missingCommitError(root [32]byte, slot primitives.Slot, missing [][]byte) e
 }
 
 // fetchBlobsFromPeer fetches blocks from a single randomly selected peer.
-func (f *blocksFetcher) fetchBlobsFromPeer(ctx context.Context, bwb []blocks2.BlockWithROBlobs, pid peer.ID, peers []peer.ID) ([]blocks2.BlockWithROBlobs, error) {
+func (f *blocksFetcher) fetchBlobsFromPeer(ctx context.Context, bwb []blocks.BlockWithROBlobs, pid peer.ID, peers []peer.ID) (peer.ID, []blocks.BlockWithROBlobs, error) {
 	ctx, span := trace.StartSpan(ctx, "initialsync.fetchBlobsFromPeer")
 	defer span.End()
 	if slots.ToEpoch(f.clock.CurrentSlot()) < params.BeaconConfig().DenebForkEpoch {
-		return bwb, nil
+		return "", bwb, nil
 	}
 	blobWindowStart, err := prysmsync.BlobRPCMinValidSlot(f.clock.CurrentSlot())
 	if err != nil {
-		return nil, err
+		return "", nil, err
 	}
 	// Construct request message based on observed interval of blocks in need of blobs.
 	req := countCommitments(bwb, blobWindowStart).blobRange(f.bs).Request()
 	if req == nil {
-		return bwb, nil
+		return "", bwb, nil
 	}
 	peers = f.filterPeers(ctx, peers, peersPercentagePerRequest)
 	// We dial the initial peer first to ensure that we get the desired set of blobs.
@@ -566,9 +583,9 @@ func (f *blocksFetcher) fetchBlobsFromPeer(ctx context.Context, bwb []blocks2.Bl
 			log.WithField("peer", p).WithError(err).Debug("Invalid BeaconBlobsByRange response")
 			continue
 		}
-		return robs, err
+		return p, robs, err
 	}
-	return nil, errNoPeersAvailable
+	return "", nil, errNoPeersAvailable
 }
 
 // requestBlocks is a wrapper for handling BeaconBlocksByRangeRequest requests/streams.

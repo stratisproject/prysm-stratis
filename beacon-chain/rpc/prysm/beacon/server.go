@@ -3,6 +3,8 @@ package beacon
 import (
 	"github.com/stratisproject/prysm-stratis/beacon-chain/blockchain"
 	beacondb "github.com/stratisproject/prysm-stratis/beacon-chain/db"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/p2p"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/rpc/core"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/rpc/lookup"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/state/stategen"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/sync"
@@ -18,4 +20,7 @@ type Server struct {
 	Stater                lookup.Stater
 	ChainInfoFetcher      blockchain.ChainInfoFetcher
 	FinalizationFetcher   blockchain.FinalizationFetcher
+	CoreService           *core.Service
+	Broadcaster           p2p.Broadcaster
+	BlobReceiver          blockchain.BlobReceiver
 }

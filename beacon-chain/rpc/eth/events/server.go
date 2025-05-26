@@ -4,16 +4,25 @@
 package events
 
 import (
+	"time"
+
 	"github.com/stratisproject/prysm-stratis/beacon-chain/blockchain"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/cache"
 	opfeed "github.com/stratisproject/prysm-stratis/beacon-chain/core/feed/operation"
 	statefeed "github.com/stratisproject/prysm-stratis/beacon-chain/core/feed/state"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/state/stategen"
 )
 
-// Server defines a server implementation of the gRPC events service,
+// Server defines a server implementation of the http events service,
 // providing RPC endpoints to subscribe to events from the beacon node.
 type Server struct {
-	StateNotifier     statefeed.Notifier
-	OperationNotifier opfeed.Notifier
-	HeadFetcher       blockchain.HeadFetcher
-	ChainInfoFetcher  blockchain.ChainInfoFetcher
+	StateNotifier          statefeed.Notifier
+	OperationNotifier      opfeed.Notifier
+	HeadFetcher            blockchain.HeadFetcher
+	ChainInfoFetcher       blockchain.ChainInfoFetcher
+	TrackedValidatorsCache *cache.TrackedValidatorsCache
+	KeepAliveInterval      time.Duration
+	EventFeedDepth         int
+	EventWriteTimeout      time.Duration
+	StateGen               stategen.StateManager
 }

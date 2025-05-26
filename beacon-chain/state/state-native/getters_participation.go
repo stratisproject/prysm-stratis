@@ -2,6 +2,7 @@ package state_native
 
 import (
 	"github.com/stratisproject/prysm-stratis/beacon-chain/core/time"
+	customtypes "github.com/stratisproject/prysm-stratis/beacon-chain/state/state-native/custom-types"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/state/stateutil"
 	"github.com/stratisproject/prysm-stratis/config/features"
 	"github.com/stratisproject/prysm-stratis/runtime/version"
@@ -37,6 +38,30 @@ func (b *BeaconState) PreviousEpochParticipation() ([]byte, error) {
 	defer b.lock.RUnlock()
 
 	return b.previousEpochParticipationVal(), nil
+}
+
+// CurrentEpochParticipationReadOnly corresponding to participation bits on the beacon chain without copying the data.
+func (b *BeaconState) CurrentEpochParticipationReadOnly() (customtypes.ReadOnlyParticipation, error) {
+	if b.version == version.Phase0 {
+		return customtypes.ReadOnlyParticipation{}, errNotSupported("CurrentEpochParticipation", b.version)
+	}
+
+	b.lock.RLock()
+	defer b.lock.RUnlock()
+
+	return customtypes.NewReadOnlyParticipation(b.currentEpochParticipation), nil
+}
+
+// PreviousEpochParticipationReadOnly corresponding to participation bits on the beacon chain without copying the data.
+func (b *BeaconState) PreviousEpochParticipationReadOnly() (customtypes.ReadOnlyParticipation, error) {
+	if b.version == version.Phase0 {
+		return customtypes.ReadOnlyParticipation{}, errNotSupported("PreviousEpochParticipation", b.version)
+	}
+
+	b.lock.RLock()
+	defer b.lock.RUnlock()
+
+	return customtypes.NewReadOnlyParticipation(b.previousEpochParticipation), nil
 }
 
 // UnrealizedCheckpointBalances returns the total balances: active, target attested in

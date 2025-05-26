@@ -9,7 +9,7 @@ import (
 	"github.com/bazelbuild/rules_go/go/tools/bazel"
 	"github.com/golang/snappy"
 	fssz "github.com/prysmaticlabs/fastssz"
-	field_params "github.com/stratisproject/prysm-stratis/config/fieldparams"
+	"github.com/stratisproject/prysm-stratis/config/params"
 	consensus_blocks "github.com/stratisproject/prysm-stratis/consensus-types/blocks"
 	"github.com/stratisproject/prysm-stratis/container/trie"
 	"github.com/stratisproject/prysm-stratis/testing/require"
@@ -80,7 +80,7 @@ func runSingleMerkleProofTests(t *testing.T, config, forkOrPhase string, unmarsh
 				if err != nil {
 					return
 				}
-				if index < consensus_blocks.KZGOffset || index > consensus_blocks.KZGOffset+field_params.MaxBlobsPerBlock {
+				if index < consensus_blocks.KZGOffset || index > uint64(consensus_blocks.KZGOffset+params.BeaconConfig().MaxBlobsPerBlock(0)) {
 					return
 				}
 				localProof, err := consensus_blocks.MerkleProofKZGCommitment(body, int(index-consensus_blocks.KZGOffset))

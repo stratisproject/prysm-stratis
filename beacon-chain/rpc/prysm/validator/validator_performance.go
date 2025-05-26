@@ -2,36 +2,43 @@ package validator
 
 import (
 	"encoding/json"
+	"io"
 	"net/http"
 
+	"github.com/pkg/errors"
 	"github.com/stratisproject/prysm-stratis/api/server/structs"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/rpc/core"
+	"github.com/stratisproject/prysm-stratis/monitoring/tracing/trace"
 	"github.com/stratisproject/prysm-stratis/network/httputil"
 	ethpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
-	"go.opencensus.io/trace"
 )
 
-// GetValidatorPerformance is an HTTP handler for GetValidatorPerformance.
-func (s *Server) GetValidatorPerformance(w http.ResponseWriter, r *http.Request) {
-	ctx, span := trace.StartSpan(r.Context(), "validator.GetValidatorPerformance")
+// GetPerformance is an HTTP handler for GetPerformance.
+func (s *Server) GetPerformance(w http.ResponseWriter, r *http.Request) {
+	ctx, span := trace.StartSpan(r.Context(), "validator.GetPerformance")
 	defer span.End()
 
 	var req structs.GetValidatorPerformanceRequest
-	if r.Body != http.NoBody {
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			handleHTTPError(w, "Could not decode request body: "+err.Error(), http.StatusBadRequest)
-			return
-		}
+
+	err := json.NewDecoder(r.Body).Decode(&req)
+	switch {
+	case errors.Is(err, io.EOF):
+		httputil.HandleError(w, "No data submitted", http.StatusBadRequest)
+		return
+	case err != nil:
+		httputil.HandleError(w, "Could not decode request body: "+err.Error(), http.StatusBadRequest)
+		return
 	}
-	computed, err := s.CoreService.ComputeValidatorPerformance(
+
+	computed, rpcError := s.CoreService.ComputeValidatorPerformance(
 		ctx,
 		&ethpb.ValidatorPerformanceRequest{
 			PublicKeys: req.PublicKeys,
 			Indices:    req.Indices,
 		},
 	)
-	if err != nil {
-		handleHTTPError(w, "Could not compute validator performance: "+err.Err.Error(), core.ErrorReasonToHTTP(err.Reason))
+	if rpcError != nil {
+		handleHTTPError(w, "Could not compute validator performance: "+rpcError.Err.Error(), core.ErrorReasonToHTTP(rpcError.Reason))
 		return
 	}
 	response := &structs.GetValidatorPerformanceResponse{

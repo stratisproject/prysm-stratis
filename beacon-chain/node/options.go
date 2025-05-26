@@ -5,7 +5,6 @@ import (
 	"github.com/stratisproject/prysm-stratis/beacon-chain/builder"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/db/filesystem"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/execution"
-	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
 )
 
 // Option for beacon node configuration.
@@ -48,14 +47,6 @@ func WithBlobStorage(bs *filesystem.BlobStorage) Option {
 func WithBlobStorageOptions(opt ...filesystem.BlobStorageOption) Option {
 	return func(bn *BeaconNode) error {
 		bn.BlobStorageOptions = append(bn.BlobStorageOptions, opt...)
-		return nil
-	}
-}
-
-// WithBlobRetentionEpochs sets the blobRetentionEpochs value, used in kv store initialization.
-func WithBlobRetentionEpochs(e primitives.Epoch) Option {
-	return func(bn *BeaconNode) error {
-		bn.blobRetentionEpochs = e
 		return nil
 	}
 }

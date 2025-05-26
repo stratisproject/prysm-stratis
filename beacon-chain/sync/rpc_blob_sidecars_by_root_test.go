@@ -8,7 +8,6 @@ import (
 	"github.com/libp2p/go-libp2p/core/network"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/p2p"
 	p2pTypes "github.com/stratisproject/prysm-stratis/beacon-chain/p2p/types"
-	fieldparams "github.com/stratisproject/prysm-stratis/config/fieldparams"
 	"github.com/stratisproject/prysm-stratis/config/params"
 	"github.com/stratisproject/prysm-stratis/consensus-types/blocks"
 	types "github.com/stratisproject/prysm-stratis/consensus-types/primitives"
@@ -157,7 +156,7 @@ func readChunkEncodedBlobsLowMax(t *testing.T, s *Service, expect []*expectedBlo
 	}
 	return func(stream network.Stream) {
 		_, err := readChunkEncodedBlobs(stream, encoding, ctxMap, vf, 1)
-		require.ErrorIs(t, err, ErrInvalidFetchedData)
+		require.ErrorIs(t, err, errMaxRequestBlobSidecarsExceeded)
 	}
 }
 
@@ -223,7 +222,7 @@ func TestBlobsByRootValidation(t *testing.T) {
 			name:    "block with all indices missing between 2 full blocks",
 			nblocks: 3,
 			missing: map[int]bool{1: true},
-			total:   func(i int) *int { return &i }(2 * fieldparams.MaxBlobsPerBlock),
+			total:   func(i int) *int { return &i }(2 * int(params.BeaconConfig().MaxBlobsPerBlock(0))),
 		},
 		{
 			name:    "exceeds req max",

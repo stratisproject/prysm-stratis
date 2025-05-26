@@ -1,4 +1,4 @@
-package validator_client_factory
+package node_client_factory
 
 import (
 	"github.com/stratisproject/prysm-stratis/config/features"

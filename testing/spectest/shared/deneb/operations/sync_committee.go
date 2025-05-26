@@ -1,41 +1,26 @@
 package operations
 
 import (
-	"context"
-	"path"
 	"testing"
 
-	"github.com/golang/snappy"
-	"github.com/stratisproject/prysm-stratis/beacon-chain/core/altair"
-	"github.com/stratisproject/prysm-stratis/beacon-chain/state"
+	"github.com/stratisproject/prysm-stratis/consensus-types/blocks"
 	"github.com/stratisproject/prysm-stratis/consensus-types/interfaces"
 	ethpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
-	"github.com/stratisproject/prysm-stratis/testing/require"
-	"github.com/stratisproject/prysm-stratis/testing/spectest/utils"
+	"github.com/stratisproject/prysm-stratis/runtime/version"
+	common "github.com/stratisproject/prysm-stratis/testing/spectest/shared/common/operations"
 	"github.com/stratisproject/prysm-stratis/testing/util"
 )
 
-func RunSyncCommitteeTest(t *testing.T, config string) {
-	require.NoError(t, utils.SetConfig(t, config))
-	testFolders, testsFolderPath := utils.TestFolders(t, config, "deneb", "operations/sync_aggregate/pyspec_tests")
-	for _, folder := range testFolders {
-		t.Run(folder.Name(), func(t *testing.T) {
-			folderPath := path.Join(testsFolderPath, folder.Name())
-			syncCommitteeFile, err := util.BazelFileBytes(folderPath, "sync_aggregate.ssz_snappy")
-			require.NoError(t, err)
-			syncCommitteeSSZ, err := snappy.Decode(nil /* dst */, syncCommitteeFile)
-			require.NoError(t, err, "Failed to decompress")
-			sc := &ethpb.SyncAggregate{}
-			require.NoError(t, sc.UnmarshalSSZ(syncCommitteeSSZ), "Failed to unmarshal")
-
-			body := &ethpb.BeaconBlockBodyDeneb{SyncAggregate: sc}
-			RunBlockOperationTest(t, folderPath, body, func(ctx context.Context, s state.BeaconState, b interfaces.SignedBeaconBlock) (state.BeaconState, error) {
-				st, _, err := altair.ProcessSyncAggregate(context.Background(), s, body.SyncAggregate)
-				if err != nil {
-					return nil, err
-				}
-				return st, nil
-			})
-		})
+func blockWithSyncAggregate(ssz []byte) (interfaces.SignedBeaconBlock, error) {
+	sa := &ethpb.SyncAggregate{}
+	if err := sa.UnmarshalSSZ(ssz); err != nil {
+		return nil, err
 	}
+	b := util.NewBeaconBlockDeneb()
+	b.Block.Body = &ethpb.BeaconBlockBodyDeneb{SyncAggregate: sa}
+	return blocks.NewSignedBeaconBlock(b)
+}
+
+func RunSyncCommitteeTest(t *testing.T, config string) {
+	common.RunSyncCommitteeTest(t, config, version.String(version.Deneb), blockWithSyncAggregate, sszToState)
 }

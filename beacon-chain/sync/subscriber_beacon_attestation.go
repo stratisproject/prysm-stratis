@@ -6,6 +6,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/cache"
+	"github.com/stratisproject/prysm-stratis/config/features"
 	"github.com/stratisproject/prysm-stratis/config/params"
 	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
 	"github.com/stratisproject/prysm-stratis/container/slice"
@@ -15,32 +16,30 @@ import (
 )
 
 func (s *Service) committeeIndexBeaconAttestationSubscriber(_ context.Context, msg proto.Message) error {
-	a, ok := msg.(*eth.Attestation)
+	a, ok := msg.(eth.Att)
 	if !ok {
-		return fmt.Errorf("message was not type *eth.Attestation, type=%T", msg)
+		return fmt.Errorf("message was not type eth.Att, type=%T", msg)
 	}
 
-	if a.Data == nil {
-		return errors.New("nil attestation")
+	if features.Get().EnableExperimentalAttestationPool {
+		return s.cfg.attestationCache.Add(a)
+	} else {
+		exists, err := s.cfg.attPool.HasAggregatedAttestation(a)
+		if err != nil {
+			return errors.Wrap(err, "could not determine if attestation pool has this attestation")
+		}
+		if exists {
+			return nil
+		}
+		return s.cfg.attPool.SaveUnaggregatedAttestation(a)
 	}
-	s.setSeenCommitteeIndicesSlot(a.Data.Slot, a.Data.CommitteeIndex, a.AggregationBits)
-
-	exists, err := s.cfg.attPool.HasAggregatedAttestation(a)
-	if err != nil {
-		return errors.Wrap(err, "Could not determine if attestation pool has this atttestation")
-	}
-	if exists {
-		return nil
-	}
-
-	return s.cfg.attPool.SaveUnaggregatedAttestation(a)
 }
 
-func (_ *Service) persistentSubnetIndices() []uint64 {
+func (*Service) persistentSubnetIndices() []uint64 {
 	return cache.SubnetIDs.GetAllSubnets()
 }
 
-func (_ *Service) aggregatorSubnetIndices(currentSlot primitives.Slot) []uint64 {
+func (*Service) aggregatorSubnetIndices(currentSlot primitives.Slot) []uint64 {
 	endEpoch := slots.ToEpoch(currentSlot) + 1
 	endSlot := params.BeaconConfig().SlotsPerEpoch.Mul(uint64(endEpoch))
 	var commIds []uint64
@@ -50,7 +49,7 @@ func (_ *Service) aggregatorSubnetIndices(currentSlot primitives.Slot) []uint64 
 	return slice.SetUint64(commIds)
 }
 
-func (_ *Service) attesterSubnetIndices(currentSlot primitives.Slot) []uint64 {
+func (*Service) attesterSubnetIndices(currentSlot primitives.Slot) []uint64 {
 	endEpoch := slots.ToEpoch(currentSlot) + 1
 	endSlot := params.BeaconConfig().SlotsPerEpoch.Mul(uint64(endEpoch))
 	var commIds []uint64

@@ -1,12 +1,10 @@
 package state_native
 
 import (
-	"math/big"
+	"fmt"
 
 	"github.com/stratisproject/prysm-stratis/consensus-types/blocks"
 	"github.com/stratisproject/prysm-stratis/consensus-types/interfaces"
-	enginev1 "github.com/stratisproject/prysm-stratis/proto/engine/v1"
-	ethpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
 	"github.com/stratisproject/prysm-stratis/runtime/version"
 )
 
@@ -19,29 +17,17 @@ func (b *BeaconState) LatestExecutionPayloadHeader() (interfaces.ExecutionData, 
 	b.lock.RLock()
 	defer b.lock.RUnlock()
 
-	if b.version == version.Bellatrix {
-		return blocks.WrappedExecutionPayloadHeader(b.latestExecutionPayloadHeaderVal())
+	if b.version >= version.Deneb {
+		return blocks.WrappedExecutionPayloadHeaderDeneb(b.latestExecutionPayloadHeaderDeneb.Copy())
 	}
 
-	if b.version == version.Capella {
-		return blocks.WrappedExecutionPayloadHeaderCapella(b.latestExecutionPayloadHeaderCapellaVal(), big.NewInt(0))
+	if b.version >= version.Capella {
+		return blocks.WrappedExecutionPayloadHeaderCapella(b.latestExecutionPayloadHeaderCapella.Copy())
 	}
 
-	return blocks.WrappedExecutionPayloadHeaderDeneb(b.latestExecutionPayloadHeaderDenebVal(), big.NewInt(0))
-}
+	if b.version >= version.Bellatrix {
+		return blocks.WrappedExecutionPayloadHeader(b.latestExecutionPayloadHeader.Copy())
+	}
 
-// latestExecutionPayloadHeaderVal of the beacon state.
-// This assumes that a lock is already held on BeaconState.
-func (b *BeaconState) latestExecutionPayloadHeaderVal() *enginev1.ExecutionPayloadHeader {
-	return ethpb.CopyExecutionPayloadHeader(b.latestExecutionPayloadHeader)
-}
-
-// latestExecutionPayloadHeaderCapellaVal of the beacon state.
-// This assumes that a lock is already held on BeaconState.
-func (b *BeaconState) latestExecutionPayloadHeaderCapellaVal() *enginev1.ExecutionPayloadHeaderCapella {
-	return ethpb.CopyExecutionPayloadHeaderCapella(b.latestExecutionPayloadHeaderCapella)
-}
-
-func (b *BeaconState) latestExecutionPayloadHeaderDenebVal() *enginev1.ExecutionPayloadHeaderDeneb {
-	return ethpb.CopyExecutionPayloadHeaderDeneb(b.latestExecutionPayloadHeaderDeneb)
+	return nil, fmt.Errorf("unsupported version (%s) for latest execution payload header", version.String(b.version))
 }

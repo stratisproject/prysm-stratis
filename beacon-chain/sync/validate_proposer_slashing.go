@@ -11,8 +11,8 @@ import (
 	"github.com/stratisproject/prysm-stratis/beacon-chain/core/feed/operation"
 	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
 	"github.com/stratisproject/prysm-stratis/monitoring/tracing"
+	"github.com/stratisproject/prysm-stratis/monitoring/tracing/trace"
 	ethpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
-	"go.opencensus.io/trace"
 )
 
 // Clients who receive a proposer slashing on this topic MUST validate the conditions within VerifyProposerSlashing before

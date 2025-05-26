@@ -3,15 +3,16 @@ package beacon_api
 import (
 	"context"
 
-	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/pkg/errors"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/core/signing"
+	fieldparams "github.com/stratisproject/prysm-stratis/config/fieldparams"
 	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
+	"github.com/stratisproject/prysm-stratis/encoding/bytesutil"
 	"github.com/stratisproject/prysm-stratis/network/forks"
 	ethpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
 )
 
-func (c beaconApiValidatorClient) getDomainData(ctx context.Context, epoch primitives.Epoch, domainType [4]byte) (*ethpb.DomainResponse, error) {
+func (c *beaconApiValidatorClient) domainData(ctx context.Context, epoch primitives.Epoch, domainType [4]byte) (*ethpb.DomainResponse, error) {
 	// Get the fork version from the given epoch
 	fork, err := forks.Fork(epoch)
 	if err != nil {
@@ -19,16 +20,12 @@ func (c beaconApiValidatorClient) getDomainData(ctx context.Context, epoch primi
 	}
 
 	// Get the genesis validator root
-	genesis, err := c.genesisProvider.GetGenesis(ctx)
+	genesis, err := c.genesisProvider.Genesis(ctx)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to get genesis info")
 	}
 
-	if !validRoot(genesis.GenesisValidatorsRoot) {
-		return nil, errors.Errorf("invalid genesis validators root: %s", genesis.GenesisValidatorsRoot)
-	}
-
-	genesisValidatorRoot, err := hexutil.Decode(genesis.GenesisValidatorsRoot)
+	genesisValidatorRoot, err := bytesutil.DecodeHexWithLength(genesis.GenesisValidatorsRoot, fieldparams.RootLength)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to decode genesis validators root")
 	}

@@ -4,9 +4,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/pkg/errors"
-
 	"github.com/logrusorgru/aurora"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/stratisproject/prysm-stratis/cmd"
 	"github.com/stratisproject/prysm-stratis/io/file"

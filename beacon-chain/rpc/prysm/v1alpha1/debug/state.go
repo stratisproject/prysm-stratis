@@ -10,6 +10,8 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+// Deprecated: The gRPC API will remain the default and fully supported through v8 (expected in 2026) but will be eventually removed in favor of REST API.
+//
 // GetBeaconState retrieves an ssz-encoded beacon state
 // from the beacon node by either a slot or block root.
 func (ds *Server) GetBeaconState(

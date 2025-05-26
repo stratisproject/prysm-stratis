@@ -5,9 +5,9 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/stratisproject/prysm-stratis/config/proposer"
+	"github.com/stratisproject/prysm-stratis/monitoring/tracing/trace"
 	validatorpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1/validator-client"
 	bolt "go.etcd.io/bbolt"
-	"go.opencensus.io/trace"
 	"google.golang.org/protobuf/proto"
 )
 

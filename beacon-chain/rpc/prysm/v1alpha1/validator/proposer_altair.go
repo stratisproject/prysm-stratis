@@ -8,12 +8,13 @@ import (
 	"github.com/stratisproject/prysm-stratis/consensus-types/interfaces"
 	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
 	"github.com/stratisproject/prysm-stratis/crypto/bls"
+	"github.com/stratisproject/prysm-stratis/crypto/bls/common"
 	"github.com/stratisproject/prysm-stratis/encoding/bytesutil"
+	"github.com/stratisproject/prysm-stratis/monitoring/tracing/trace"
 	ethpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
 	synccontribution "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1/attestation/aggregation/sync_contribution"
 	"github.com/stratisproject/prysm-stratis/runtime/version"
 	"github.com/stratisproject/prysm-stratis/time/slots"
-	"go.opencensus.io/trace"
 )
 
 func (vs *Server) setSyncAggregate(ctx context.Context, blk interfaces.SignedBeaconBlock) {
@@ -96,7 +97,7 @@ func (vs *Server) getSyncAggregate(ctx context.Context, slot primitives.Slot, ro
 	syncSig := bls.AggregateSignatures(sigsHolder)
 	var syncSigBytes [96]byte
 	if syncSig == nil {
-		syncSigBytes = [96]byte{0xC0} // Infinity signature if itself is nil.
+		syncSigBytes = common.InfiniteSignature // Infinity signature if itself is nil.
 	} else {
 		syncSigBytes = bytesutil.ToBytes96(syncSig.Marshal())
 	}

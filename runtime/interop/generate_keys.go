@@ -5,12 +5,11 @@ import (
 	"math/big"
 	"sync"
 
-	"github.com/stratisproject/prysm-stratis/encoding/bytesutil"
-
 	"github.com/pkg/errors"
 	"github.com/stratisproject/prysm-stratis/async"
 	"github.com/stratisproject/prysm-stratis/crypto/bls"
 	"github.com/stratisproject/prysm-stratis/crypto/hash"
+	"github.com/stratisproject/prysm-stratis/encoding/bytesutil"
 )
 
 const (

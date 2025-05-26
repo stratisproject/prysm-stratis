@@ -3,6 +3,7 @@ package client
 import (
 	"context"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/dgraph-io/ristretto"
@@ -23,8 +24,8 @@ import (
 	beaconApi "github.com/stratisproject/prysm-stratis/validator/client/beacon-api"
 	beaconChainClientFactory "github.com/stratisproject/prysm-stratis/validator/client/beacon-chain-client-factory"
 	"github.com/stratisproject/prysm-stratis/validator/client/iface"
-	nodeClientFactory "github.com/stratisproject/prysm-stratis/validator/client/node-client-factory"
-	validatorClientFactory "github.com/stratisproject/prysm-stratis/validator/client/validator-client-factory"
+	nodeclientfactory "github.com/stratisproject/prysm-stratis/validator/client/node-client-factory"
+	validatorclientfactory "github.com/stratisproject/prysm-stratis/validator/client/validator-client-factory"
 	"github.com/stratisproject/prysm-stratis/validator/db"
 	"github.com/stratisproject/prysm-stratis/validator/graffiti"
 	validatorHelpers "github.com/stratisproject/prysm-stratis/validator/helpers"
@@ -32,6 +33,7 @@ import (
 	"github.com/stratisproject/prysm-stratis/validator/keymanager/local"
 	remoteweb3signer "github.com/stratisproject/prysm-stratis/validator/keymanager/remote-web3signer"
 	"go.opencensus.io/plugin/ocgrpc"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )
@@ -52,10 +54,11 @@ type ValidatorService struct {
 	web3SignerConfig        *remoteweb3signer.SetupConfig
 	proposerSettings        *proposer.Settings
 	validatorsRegBatchSize  int
-	useWeb                  bool
+	enableAPI               bool
 	emitAccountMetrics      bool
 	logValidatorPerformance bool
 	distributed             bool
+	disableDutiesPolling    bool
 }
 
 // Config for the validator service.
@@ -78,10 +81,11 @@ type Config struct {
 	Web3SignerConfig        *remoteweb3signer.SetupConfig
 	ProposerSettings        *proposer.Settings
 	ValidatorsRegBatchSize  int
-	UseWeb                  bool
+	EnableAPI               bool
 	LogValidatorPerformance bool
 	EmitAccountMetrics      bool
 	Distributed             bool
+	DisableDutiesPolling    bool
 }
 
 // NewValidatorService creates a new validator service for the service
@@ -101,10 +105,11 @@ func NewValidatorService(ctx context.Context, cfg *Config) (*ValidatorService, e
 		web3SignerConfig:        cfg.Web3SignerConfig,
 		proposerSettings:        cfg.ProposerSettings,
 		validatorsRegBatchSize:  cfg.ValidatorsRegBatchSize,
-		useWeb:                  cfg.UseWeb,
+		enableAPI:               cfg.EnableAPI,
 		emitAccountMetrics:      cfg.EmitAccountMetrics,
 		logValidatorPerformance: cfg.LogValidatorPerformance,
 		distributed:             cfg.Distributed,
+		disableDutiesPolling:    cfg.DisableDutiesPolling,
 	}
 
 	dialOpts := ConstructDialOptions(
@@ -144,7 +149,7 @@ func (v *ValidatorService) Start() {
 		BufferItems: 64,   // number of keys per Get buffer.
 	})
 	if err != nil {
-		panic(err)
+		panic(err) // lint:nopanic -- Only errors on misconfiguration of config values.
 	}
 
 	aggregatedSlotCommitteeIDCache := lruwrpr.New(int(params.BeaconConfig().MaxCommitteesPerSlot))
@@ -165,28 +170,37 @@ func (v *ValidatorService) Start() {
 		return
 	}
 
+	u := strings.ReplaceAll(v.conn.GetBeaconApiUrl(), " ", "")
+	hosts := strings.Split(u, ",")
+	if len(hosts) == 0 {
+		log.WithError(err).Error("No API hosts provided")
+		return
+	}
+
 	restHandler := beaconApi.NewBeaconApiJsonRestHandler(
-		http.Client{Timeout: v.conn.GetBeaconApiTimeout()},
-		v.conn.GetBeaconApiUrl(),
+		http.Client{Timeout: v.conn.GetBeaconApiTimeout(), Transport: otelhttp.NewTransport(http.DefaultTransport)},
+		hosts[0],
 	)
 
-	validatorClient := validatorClientFactory.NewValidatorClient(v.conn, restHandler)
+	validatorClient := validatorclientfactory.NewValidatorClient(v.conn, restHandler)
 
 	valStruct := &validator{
 		slotFeed:                       new(event.Feed),
 		startBalances:                  make(map[[fieldparams.BLSPubkeyLength]byte]uint64),
 		prevEpochBalances:              make(map[[fieldparams.BLSPubkeyLength]byte]uint64),
 		blacklistedPubkeys:             slashablePublicKeys,
-		pubkeyToValidatorIndex:         make(map[[fieldparams.BLSPubkeyLength]byte]primitives.ValidatorIndex),
+		pubkeyToStatus:                 make(map[[fieldparams.BLSPubkeyLength]byte]*validatorStatus),
 		wallet:                         v.wallet,
 		walletInitializedChan:          make(chan *wallet.Wallet, 1),
 		walletInitializedFeed:          v.walletInitializedFeed,
 		graffiti:                       v.graffiti,
 		graffitiStruct:                 v.graffitiStruct,
 		graffitiOrderedIndex:           graffitiOrderedIndex,
+		beaconNodeHosts:                hosts,
+		currentHostIndex:               0,
 		validatorClient:                validatorClient,
 		chainClient:                    beaconChainClientFactory.NewChainClient(v.conn, restHandler),
-		nodeClient:                     nodeClientFactory.NewNodeClient(v.conn, restHandler),
+		nodeClient:                     nodeclientfactory.NewNodeClient(v.conn, restHandler),
 		prysmChainClient:               beaconChainClientFactory.NewPrysmChainClient(v.conn, restHandler),
 		db:                             v.db,
 		km:                             nil,
@@ -204,8 +218,9 @@ func (v *ValidatorService) Start() {
 		submittedAggregates:            make(map[submittedAttKey]*submittedAtt),
 		logValidatorPerformance:        v.logValidatorPerformance,
 		emitAccountMetrics:             v.emitAccountMetrics,
-		useWeb:                         v.useWeb,
+		enableAPI:                      v.enableAPI,
 		distributed:                    v.distributed,
+		disableDutiesPolling:           v.disableDutiesPolling,
 	}
 
 	v.validator = valStruct
@@ -261,7 +276,7 @@ func (v *ValidatorService) SetProposerSettings(ctx context.Context, settings *pr
 	v.proposerSettings = settings
 
 	// passes settings down to be updated in database and saved in memory.
-	// updates to validator porposer settings will be in the validator object and not validator service.
+	// updates to validator proposer settings will be in the validator object and not validator service.
 	return v.validator.SetProposerSettings(ctx, settings)
 }
 
@@ -319,11 +334,11 @@ func ConstructDialOptions(
 	return dialOpts
 }
 
-func (v *ValidatorService) GetGraffiti(ctx context.Context, pubKey [fieldparams.BLSPubkeyLength]byte) ([]byte, error) {
+func (v *ValidatorService) Graffiti(ctx context.Context, pubKey [fieldparams.BLSPubkeyLength]byte) ([]byte, error) {
 	if v.validator == nil {
 		return nil, errors.New("validator is unavailable")
 	}
-	return v.validator.GetGraffiti(ctx, pubKey)
+	return v.validator.Graffiti(ctx, pubKey)
 }
 
 func (v *ValidatorService) SetGraffiti(ctx context.Context, pubKey [fieldparams.BLSPubkeyLength]byte, graffiti []byte) error {

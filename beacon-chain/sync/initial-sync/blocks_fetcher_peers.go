@@ -12,9 +12,9 @@ import (
 	"github.com/stratisproject/prysm-stratis/cmd/beacon-chain/flags"
 	"github.com/stratisproject/prysm-stratis/config/params"
 	mathutil "github.com/stratisproject/prysm-stratis/math"
+	"github.com/stratisproject/prysm-stratis/monitoring/tracing/trace"
 	prysmTime "github.com/stratisproject/prysm-stratis/time"
 	"github.com/stratisproject/prysm-stratis/time/slots"
-	"go.opencensus.io/trace"
 )
 
 // peerLock returns peer lock for a given peer. If lock is not found, it is created.

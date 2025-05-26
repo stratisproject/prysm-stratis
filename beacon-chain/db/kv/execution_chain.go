@@ -5,9 +5,9 @@ import (
 	"errors"
 
 	"github.com/stratisproject/prysm-stratis/monitoring/tracing"
+	"github.com/stratisproject/prysm-stratis/monitoring/tracing/trace"
 	v2 "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
 	bolt "go.etcd.io/bbolt"
-	"go.opencensus.io/trace"
 	"google.golang.org/protobuf/proto"
 )
 

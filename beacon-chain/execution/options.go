@@ -7,6 +7,7 @@ import (
 	"github.com/stratisproject/prysm-stratis/beacon-chain/db"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/state"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/state/stategen"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/verification"
 	"github.com/stratisproject/prysm-stratis/network"
 	"github.com/stratisproject/prysm-stratis/network/authorization"
 )
@@ -112,6 +113,14 @@ func WithFinalizedStateAtStartup(st state.BeaconState) Option {
 func WithJwtId(jwtId string) Option {
 	return func(s *Service) error {
 		s.cfg.jwtId = jwtId
+		return nil
+	}
+}
+
+// WithVerifierWaiter gives the sync package direct access to the verifier waiter.
+func WithVerifierWaiter(v *verification.InitializerWaiter) Option {
+	return func(s *Service) error {
+		s.verifierWaiter = v
 		return nil
 	}
 }

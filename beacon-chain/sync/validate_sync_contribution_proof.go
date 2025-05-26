@@ -16,8 +16,8 @@ import (
 	"github.com/stratisproject/prysm-stratis/crypto/bls"
 	"github.com/stratisproject/prysm-stratis/encoding/bytesutil"
 	"github.com/stratisproject/prysm-stratis/monitoring/tracing"
+	"github.com/stratisproject/prysm-stratis/monitoring/tracing/trace"
 	ethpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
-	"go.opencensus.io/trace"
 )
 
 // validateSyncContributionAndProof verifies the aggregated signature and the selection proof is valid before forwarding to the

@@ -2,6 +2,7 @@ package validator
 
 import (
 	"io"
+	"os"
 	"testing"
 
 	"github.com/sirupsen/logrus"
@@ -16,5 +17,5 @@ func TestMain(m *testing.M) {
 	defer params.OverrideBeaconConfig(prevConfig)
 	params.OverrideBeaconConfig(params.MinimalSpecConfig())
 
-	m.Run()
+	os.Exit(m.Run())
 }

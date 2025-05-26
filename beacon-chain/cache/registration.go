@@ -7,8 +7,8 @@ import (
 	"github.com/pkg/errors"
 	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
 	"github.com/stratisproject/prysm-stratis/encoding/bytesutil"
+	"github.com/stratisproject/prysm-stratis/monitoring/tracing/trace"
 	ethpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
-	"go.opencensus.io/trace"
 )
 
 // RegistrationCache is used to store the cached results of an Validator Registration request.

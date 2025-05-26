@@ -32,7 +32,6 @@ var (
 	generateGenesisStateFlags = struct {
 		DepositJsonFile        string
 		ChainConfigFile        string
-		ConfigName             string
 		NumValidators          uint64
 		GenesisTime            uint64
 		GenesisTimeDelay       uint64
@@ -89,12 +88,6 @@ var (
 				Name:        "staking-contract-address",
 				Destination: &generateGenesisStateFlags.StakingContractAddress,
 				Usage:       "Address of master node staking contract",
-			},
-			&cli.StringFlag{
-				Name:        "config-name",
-				Usage:       "Config kind to be used for generating the genesis state. Default: mainnet. Options include mainnet, interop, minimal, auroria. --chain-config-file will override this flag.",
-				Destination: &generateGenesisStateFlags.ConfigName,
-				Value:       params.MainnetName,
 			},
 			&cli.Uint64Flag{
 				Name:        "num-validators",
@@ -181,11 +174,11 @@ func cliActionGenerateGenesisState(cliCtx *cli.Context) error {
 		)
 	}
 	if err := setGlobalParams(); err != nil {
-		return fmt.Errorf("could not set config params: %v", err)
+		return fmt.Errorf("could not set config params: %w", err)
 	}
 	st, err := generateGenesis(cliCtx.Context)
 	if err != nil {
-		return fmt.Errorf("could not generate genesis state: %v", err)
+		return fmt.Errorf("could not generate genesis state: %w", err)
 	}
 
 	if outputJson != "" {
@@ -223,11 +216,7 @@ func setGlobalParams() error {
 		log.Infof("Specified a chain config file: %s", chainConfigFile)
 		return params.LoadChainConfigFile(chainConfigFile, nil)
 	}
-	cfg, err := params.ByName(generateGenesisStateFlags.ConfigName)
-	if err != nil {
-		return fmt.Errorf("unable to find config using name %s: %v", generateGenesisStateFlags.ConfigName, err)
-	}
-	return params.SetActive(cfg.Copy())
+	return errors.New("No chain config file was provided. Use `--chain-config-file` to provide a chain config.")
 }
 
 func generateGenesis(ctx context.Context) (state.BeaconState, error) {
@@ -284,6 +273,7 @@ func generateGenesis(ctx context.Context) (state.BeaconState, error) {
 		gen.Timestamp = f.GenesisTime
 		gen.Config.ShanghaiTime = interop.GethShanghaiTime(f.GenesisTime, params.BeaconConfig())
 		gen.Config.CancunTime = interop.GethCancunTime(f.GenesisTime, params.BeaconConfig())
+		gen.Config.PragueTime = interop.GethPragueTime(f.GenesisTime, params.BeaconConfig())
 
 		fields := logrus.Fields{}
 		if gen.Config.ShanghaiTime != nil {
@@ -292,11 +282,13 @@ func generateGenesis(ctx context.Context) (state.BeaconState, error) {
 		if gen.Config.CancunTime != nil {
 			fields["cancun"] = fmt.Sprintf("%d", *gen.Config.CancunTime)
 		}
+		if gen.Config.PragueTime != nil {
+			fields["prague"] = fmt.Sprintf("%d", *gen.Config.PragueTime)
+		}
 		log.WithFields(fields).Info("Setting fork geth times")
 		if v > version.Altair {
 			// set ttd to zero so EL goes post-merge immediately
 			gen.Config.TerminalTotalDifficulty = big.NewInt(0)
-			gen.Config.TerminalTotalDifficultyPassed = true
 		}
 	} else {
 		gen = interop.GethTestnetGenesis(f.GenesisTime, params.BeaconConfig())
@@ -307,7 +299,7 @@ func generateGenesis(ctx context.Context) (state.BeaconState, error) {
 		if err != nil {
 			return nil, err
 		}
-		if err := os.WriteFile(f.GethGenesisJsonOut, gbytes, os.ModePerm); err != nil {
+		if err := os.WriteFile(f.GethGenesisJsonOut, gbytes, 0600); err != nil {
 			return nil, errors.Wrapf(err, "failed to write %s", f.GethGenesisJsonOut)
 		}
 	}

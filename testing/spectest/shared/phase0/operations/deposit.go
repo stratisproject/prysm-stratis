@@ -1,42 +1,27 @@
 package operations
 
 import (
-	"context"
-	"path"
 	"testing"
 
-	"github.com/golang/snappy"
-	"github.com/stratisproject/prysm-stratis/beacon-chain/core/blocks"
-	"github.com/stratisproject/prysm-stratis/beacon-chain/state"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/core/altair"
+	"github.com/stratisproject/prysm-stratis/consensus-types/blocks"
 	"github.com/stratisproject/prysm-stratis/consensus-types/interfaces"
 	ethpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
-	"github.com/stratisproject/prysm-stratis/testing/require"
-	"github.com/stratisproject/prysm-stratis/testing/spectest/utils"
+	"github.com/stratisproject/prysm-stratis/runtime/version"
+	common "github.com/stratisproject/prysm-stratis/testing/spectest/shared/common/operations"
 	"github.com/stratisproject/prysm-stratis/testing/util"
 )
 
-// RunDepositTest executes "operations/deposit" tests.
-func RunDepositTest(t *testing.T, config string) {
-	require.NoError(t, utils.SetConfig(t, config))
-	testFolders, testsFolderPath := utils.TestFolders(t, config, "phase0", "operations/deposit/pyspec_tests")
-	if len(testFolders) == 0 {
-		t.Fatalf("No test folders found for %s/%s/%s", config, "phase0", "operations/deposit/pyspec_tests")
+func blockWithDeposit(ssz []byte) (interfaces.SignedBeaconBlock, error) {
+	d := &ethpb.Deposit{}
+	if err := d.UnmarshalSSZ(ssz); err != nil {
+		return nil, err
 	}
-	for _, folder := range testFolders {
-		t.Run(folder.Name(), func(t *testing.T) {
-			folderPath := path.Join(testsFolderPath, folder.Name())
-			depositFile, err := util.BazelFileBytes(folderPath, "deposit.ssz_snappy")
-			require.NoError(t, err)
-			depositSSZ, err := snappy.Decode(nil /* dst */, depositFile)
-			require.NoError(t, err, "Failed to decompress")
-			deposit := &ethpb.Deposit{}
-			require.NoError(t, deposit.UnmarshalSSZ(depositSSZ), "Failed to unmarshal")
+	b := util.NewBeaconBlock()
+	b.Block.Body = &ethpb.BeaconBlockBody{Deposits: []*ethpb.Deposit{d}}
+	return blocks.NewSignedBeaconBlock(b)
+}
 
-			body := &ethpb.BeaconBlockBody{Deposits: []*ethpb.Deposit{deposit}}
-			processDepositsFunc := func(ctx context.Context, s state.BeaconState, b interfaces.ReadOnlySignedBeaconBlock) (state.BeaconState, error) {
-				return blocks.ProcessDeposits(ctx, s, b.Block().Body().Deposits())
-			}
-			RunBlockOperationTest(t, folderPath, body, processDepositsFunc)
-		})
-	}
+func RunDepositTest(t *testing.T, config string) {
+	common.RunDepositTest(t, config, version.String(version.Phase0), blockWithDeposit, altair.ProcessDeposits, sszToState)
 }

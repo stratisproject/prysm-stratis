@@ -1,5 +1,7 @@
 package params
 
+import "math"
+
 // UseAuroriaNetworkConfig uses the Auroria beacon chain specific network config.
 func UseAuroriaNetworkConfig() {
 	cfg := BeaconNetworkConfig().Copy()
@@ -16,13 +18,23 @@ func UseAuroriaNetworkConfig() {
 func AuroriaConfig() *BeaconChainConfig {
 	cfg := MainnetConfig().Copy()
 	cfg.ConfigName = AuroriaName
+	cfg.MinGenesisTime = 1741097966
+	cfg.GenesisValidatorsRoot = [32]byte{229, 7, 97, 181, 28, 220, 131, 190, 95, 111, 32, 17, 65, 66, 211, 143, 206, 86, 110, 28, 175, 33, 1, 80, 171, 95, 107, 75, 130, 132, 90, 77}
 	cfg.GenesisForkVersion = []byte{10, 0, 10, 20}
 	cfg.DepositChainID = 205205
 	cfg.DepositNetworkID = 205205
 	cfg.AltairForkVersion = []byte{11, 0, 10, 20}
+	cfg.AltairForkEpoch = 0
 	cfg.BellatrixForkVersion = []byte{12, 0, 10, 20}
+	cfg.BellatrixForkEpoch = 0
 	cfg.CapellaForkVersion = []byte{13, 0, 10, 20}
+	cfg.CapellaForkEpoch = 0
 	cfg.DenebForkVersion = []byte{14, 0, 10, 20}
+	cfg.DenebForkEpoch = 0
+	cfg.ElectraForkVersion = []byte{15, 0, 10, 20}
+	cfg.ElectraForkEpoch = math.MaxUint64
+	cfg.FuluForkVersion = []byte{16, 0, 10, 20}
+	cfg.FuluForkEpoch = math.MaxUint64
 	cfg.EjectionBalance = 17500 * 1e9
 
 	cfg.InitializeForkSchedule()

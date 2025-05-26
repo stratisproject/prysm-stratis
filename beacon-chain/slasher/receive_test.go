@@ -14,6 +14,7 @@ import (
 	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
 	"github.com/stratisproject/prysm-stratis/encoding/bytesutil"
 	ethpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
+	"github.com/stratisproject/prysm-stratis/runtime/version"
 	"github.com/stratisproject/prysm-stratis/testing/assert"
 	"github.com/stratisproject/prysm-stratis/testing/require"
 	"github.com/stratisproject/prysm-stratis/testing/util"
@@ -29,7 +30,7 @@ func TestSlasher_receiveAttestations_OK(t *testing.T) {
 		},
 		attsQueue: newAttestationsQueue(),
 	}
-	indexedAttsChan := make(chan *ethpb.IndexedAttestation)
+	indexedAttsChan := make(chan *slashertypes.WrappedIndexedAtt)
 	defer close(indexedAttsChan)
 
 	s.wg.Add(1)
@@ -38,15 +39,17 @@ func TestSlasher_receiveAttestations_OK(t *testing.T) {
 	}()
 	firstIndices := []uint64{1, 2, 3}
 	secondIndices := []uint64{4, 5, 6}
-	att1 := createAttestationWrapperEmptySig(t, 1, 2, firstIndices, nil)
-	att2 := createAttestationWrapperEmptySig(t, 1, 2, secondIndices, nil)
-	indexedAttsChan <- att1.IndexedAttestation
-	indexedAttsChan <- att2.IndexedAttestation
+	att1 := createAttestationWrapperEmptySig(t, version.Phase0, 1, 2, firstIndices, nil)
+	att2 := createAttestationWrapperEmptySig(t, version.Phase0, 1, 2, secondIndices, nil)
+	wrappedAtt1 := &slashertypes.WrappedIndexedAtt{IndexedAtt: att1.IndexedAttestation}
+	wrappedAtt2 := &slashertypes.WrappedIndexedAtt{IndexedAtt: att2.IndexedAttestation}
+	indexedAttsChan <- wrappedAtt1
+	indexedAttsChan <- wrappedAtt2
 	cancel()
 	s.wg.Wait()
 	wanted := []*slashertypes.IndexedAttestationWrapper{
-		att1,
-		att2,
+		{IndexedAttestation: att1.IndexedAttestation, DataRoot: att1.DataRoot},
+		{IndexedAttestation: att2.IndexedAttestation, DataRoot: att2.DataRoot},
 	}
 	require.DeepEqual(t, wanted, s.attsQueue.dequeue())
 }
@@ -65,14 +68,14 @@ func TestService_pruneSlasherDataWithinSlidingWindow_AttestationsPruned(t *testi
 
 	// Setup attestations for 2 validators at each epoch for epochs 0, 1, 2, 3.
 	err := slasherDB.SaveAttestationRecordsForValidators(ctx, []*slashertypes.IndexedAttestationWrapper{
-		createAttestationWrapperEmptySig(t, 0, 0, []uint64{0}, bytesutil.PadTo([]byte("0a"), 32)),
-		createAttestationWrapperEmptySig(t, 0, 0, []uint64{1}, bytesutil.PadTo([]byte("0b"), 32)),
-		createAttestationWrapperEmptySig(t, 0, 1, []uint64{0}, bytesutil.PadTo([]byte("1a"), 32)),
-		createAttestationWrapperEmptySig(t, 0, 1, []uint64{1}, bytesutil.PadTo([]byte("1b"), 32)),
-		createAttestationWrapperEmptySig(t, 0, 2, []uint64{0}, bytesutil.PadTo([]byte("2a"), 32)),
-		createAttestationWrapperEmptySig(t, 0, 2, []uint64{1}, bytesutil.PadTo([]byte("2b"), 32)),
-		createAttestationWrapperEmptySig(t, 0, 3, []uint64{0}, bytesutil.PadTo([]byte("3a"), 32)),
-		createAttestationWrapperEmptySig(t, 0, 3, []uint64{1}, bytesutil.PadTo([]byte("3b"), 32)),
+		createAttestationWrapperEmptySig(t, version.Phase0, 0, 0, []uint64{0}, bytesutil.PadTo([]byte("0a"), 32)),
+		createAttestationWrapperEmptySig(t, version.Phase0, 0, 0, []uint64{1}, bytesutil.PadTo([]byte("0b"), 32)),
+		createAttestationWrapperEmptySig(t, version.Phase0, 0, 1, []uint64{0}, bytesutil.PadTo([]byte("1a"), 32)),
+		createAttestationWrapperEmptySig(t, version.Phase0, 0, 1, []uint64{1}, bytesutil.PadTo([]byte("1b"), 32)),
+		createAttestationWrapperEmptySig(t, version.Phase0, 0, 2, []uint64{0}, bytesutil.PadTo([]byte("2a"), 32)),
+		createAttestationWrapperEmptySig(t, version.Phase0, 0, 2, []uint64{1}, bytesutil.PadTo([]byte("2b"), 32)),
+		createAttestationWrapperEmptySig(t, version.Phase0, 0, 3, []uint64{0}, bytesutil.PadTo([]byte("3a"), 32)),
+		createAttestationWrapperEmptySig(t, version.Phase0, 0, 3, []uint64{1}, bytesutil.PadTo([]byte("3b"), 32)),
 	})
 	require.NoError(t, err)
 
@@ -93,8 +96,8 @@ func TestService_pruneSlasherDataWithinSlidingWindow_AttestationsPruned(t *testi
 
 	// Setup attestations for 2 validators at epoch 4.
 	err = slasherDB.SaveAttestationRecordsForValidators(ctx, []*slashertypes.IndexedAttestationWrapper{
-		createAttestationWrapperEmptySig(t, 0, 4, []uint64{0}, bytesutil.PadTo([]byte("4a"), 32)),
-		createAttestationWrapperEmptySig(t, 0, 4, []uint64{1}, bytesutil.PadTo([]byte("4b"), 32)),
+		createAttestationWrapperEmptySig(t, version.Phase0, 0, 4, []uint64{0}, bytesutil.PadTo([]byte("4a"), 32)),
+		createAttestationWrapperEmptySig(t, version.Phase0, 0, 4, []uint64{1}, bytesutil.PadTo([]byte("4b"), 32)),
 	})
 	require.NoError(t, err)
 
@@ -212,7 +215,7 @@ func TestSlasher_receiveAttestations_OnlyValidAttestations(t *testing.T) {
 		},
 		attsQueue: newAttestationsQueue(),
 	}
-	indexedAttsChan := make(chan *ethpb.IndexedAttestation)
+	indexedAttsChan := make(chan *slashertypes.WrappedIndexedAtt)
 	defer close(indexedAttsChan)
 
 	s.wg.Add(1)
@@ -222,19 +225,22 @@ func TestSlasher_receiveAttestations_OnlyValidAttestations(t *testing.T) {
 	firstIndices := []uint64{1, 2, 3}
 	secondIndices := []uint64{4, 5, 6}
 	// Add a valid attestation.
-	validAtt := createAttestationWrapperEmptySig(t, 1, 2, firstIndices, nil)
-	indexedAttsChan <- validAtt.IndexedAttestation
+	validAtt := createAttestationWrapperEmptySig(t, version.Phase0, 1, 2, firstIndices, nil)
+	wrappedValidAtt := &slashertypes.WrappedIndexedAtt{IndexedAtt: validAtt.IndexedAttestation}
+	indexedAttsChan <- wrappedValidAtt
 	// Send an invalid, bad attestation which will not
 	// pass integrity checks at it has invalid attestation data.
-	indexedAttsChan <- &ethpb.IndexedAttestation{
-		AttestingIndices: secondIndices,
+	indexedAttsChan <- &slashertypes.WrappedIndexedAtt{
+		IndexedAtt: &ethpb.IndexedAttestation{
+			AttestingIndices: secondIndices,
+		},
 	}
 	cancel()
 	s.wg.Wait()
 	// Expect only a single, valid attestation was added to the queue.
 	require.Equal(t, 1, s.attsQueue.size())
 	wanted := []*slashertypes.IndexedAttestationWrapper{
-		validAtt,
+		{IndexedAttestation: validAtt.IndexedAttestation, DataRoot: validAtt.DataRoot},
 	}
 	require.DeepEqual(t, wanted, s.attsQueue.dequeue())
 }

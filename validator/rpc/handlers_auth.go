@@ -5,9 +5,9 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/stratisproject/prysm-stratis/io/file"
+	"github.com/stratisproject/prysm-stratis/monitoring/tracing/trace"
 	"github.com/stratisproject/prysm-stratis/network/httputil"
 	"github.com/stratisproject/prysm-stratis/validator/accounts/wallet"
-	"go.opencensus.io/trace"
 )
 
 // Initialize returns metadata regarding whether the caller has authenticated and has a wallet.

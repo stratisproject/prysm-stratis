@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
 	"github.com/stratisproject/prysm-stratis/api/client/builder"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/blockchain"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/cache"
@@ -15,9 +14,9 @@ import (
 	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
 	"github.com/stratisproject/prysm-stratis/encoding/bytesutil"
 	"github.com/stratisproject/prysm-stratis/monitoring/tracing"
+	"github.com/stratisproject/prysm-stratis/monitoring/tracing/trace"
 	v1 "github.com/stratisproject/prysm-stratis/proto/engine/v1"
 	ethpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
-	"go.opencensus.io/trace"
 )
 
 // ErrNoBuilder is used when builder endpoint is not configured.

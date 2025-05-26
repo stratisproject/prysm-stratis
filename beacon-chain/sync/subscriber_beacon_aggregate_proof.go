@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/stratisproject/prysm-stratis/beacon-chain/core/helpers"
+	"github.com/stratisproject/prysm-stratis/config/features"
 	ethpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
 	"google.golang.org/protobuf/proto"
 )
@@ -13,19 +13,24 @@ import (
 // beaconAggregateProofSubscriber forwards the incoming validated aggregated attestation and proof to the
 // attestation pool for processing.
 func (s *Service) beaconAggregateProofSubscriber(_ context.Context, msg proto.Message) error {
-	a, ok := msg.(*ethpb.SignedAggregateAttestationAndProof)
+	a, ok := msg.(ethpb.SignedAggregateAttAndProof)
 	if !ok {
-		return fmt.Errorf("message was not type *ethpb.SignedAggregateAttestationAndProof, type=%T", msg)
+		return fmt.Errorf("message was not type ethpb.SignedAggregateAttAndProof, type=%T", msg)
 	}
 
-	if a.Message.Aggregate == nil || a.Message.Aggregate.Data == nil {
+	aggregate := a.AggregateAttestationAndProof().AggregateVal()
+
+	if aggregate == nil || aggregate.GetData() == nil {
 		return errors.New("nil aggregate")
 	}
 
-	// An unaggregated attestation can make it here. It’s valid, the aggregator it just itself, although it means poor performance for the subnet.
-	if !helpers.IsAggregated(a.Message.Aggregate) {
-		return s.cfg.attPool.SaveUnaggregatedAttestation(a.Message.Aggregate)
+	if features.Get().EnableExperimentalAttestationPool {
+		return s.cfg.attestationCache.Add(aggregate)
+	} else {
+		// An unaggregated attestation can make it here. It’s valid, the aggregator it just itself, although it means poor performance for the subnet.
+		if !aggregate.IsAggregated() {
+			return s.cfg.attPool.SaveUnaggregatedAttestation(aggregate)
+		}
+		return s.cfg.attPool.SaveAggregatedAttestation(aggregate)
 	}
-
-	return s.cfg.attPool.SaveAggregatedAttestation(a.Message.Aggregate)
 }

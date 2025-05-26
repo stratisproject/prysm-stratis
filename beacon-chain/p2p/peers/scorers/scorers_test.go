@@ -3,6 +3,7 @@ package scorers_test
 import (
 	"io"
 	"math"
+	"os"
 	"testing"
 
 	"github.com/sirupsen/logrus"
@@ -28,7 +29,7 @@ func TestMain(m *testing.M) {
 	defer func() {
 		flags.Init(resetFlags)
 	}()
-	m.Run()
+	os.Exit(m.Run())
 }
 
 // roundScore returns score rounded in accordance with the score manager's rounding factor.

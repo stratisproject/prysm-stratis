@@ -3,6 +3,7 @@ package blockchain
 import (
 	"testing"
 
+	mock "github.com/stratisproject/prysm-stratis/beacon-chain/blockchain/testing"
 	testDB "github.com/stratisproject/prysm-stratis/beacon-chain/db/testing"
 	doublylinkedtree "github.com/stratisproject/prysm-stratis/beacon-chain/forkchoice/doubly-linked-tree"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/startup"
@@ -18,6 +19,8 @@ func testServiceOptsWithDB(t *testing.T) []Option {
 		WithStateGen(stategen.New(beaconDB, fcs)),
 		WithForkChoiceStore(fcs),
 		WithClockSynchronizer(cs),
+		WithStateNotifier(&mock.MockStateNotifier{RecordEvents: true}),
+		WithSyncChecker(&mock.MockSyncChecker{}),
 	}
 }
 

@@ -2,7 +2,7 @@ package verify
 
 import (
 	"github.com/pkg/errors"
-	fieldparams "github.com/stratisproject/prysm-stratis/config/fieldparams"
+	"github.com/stratisproject/prysm-stratis/config/params"
 	"github.com/stratisproject/prysm-stratis/consensus-types/blocks"
 	"github.com/stratisproject/prysm-stratis/encoding/bytesutil"
 	"github.com/stratisproject/prysm-stratis/runtime/version"
@@ -20,8 +20,9 @@ func BlobAlignsWithBlock(blob blocks.ROBlob, block blocks.ROBlock) error {
 	if block.Version() < version.Deneb {
 		return nil
 	}
-	if blob.Index >= fieldparams.MaxBlobsPerBlock {
-		return errors.Wrapf(ErrIncorrectBlobIndex, "index %d exceeds MAX_BLOBS_PER_BLOCK %d", blob.Index, fieldparams.MaxBlobsPerBlock)
+	maxBlobsPerBlock := params.BeaconConfig().MaxBlobsPerBlock(blob.Slot())
+	if blob.Index >= uint64(maxBlobsPerBlock) {
+		return errors.Wrapf(ErrIncorrectBlobIndex, "index %d exceeds MAX_BLOBS_PER_BLOCK %d", blob.Index, maxBlobsPerBlock)
 	}
 
 	if blob.BlockRoot() != block.Root() {

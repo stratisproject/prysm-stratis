@@ -13,6 +13,8 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+// Deprecated: The gRPC API will remain the default and fully supported through v8 (expected in 2026) but will be eventually removed in favor of REST API.
+//
 // GetPeer returns the data known about the peer defined by the provided peer id.
 func (ds *Server) GetPeer(_ context.Context, peerReq *ethpb.PeerRequest) (*ethpb.DebugPeerResponse, error) {
 	pid, err := peer.Decode(peerReq.PeerId)
@@ -22,6 +24,8 @@ func (ds *Server) GetPeer(_ context.Context, peerReq *ethpb.PeerRequest) (*ethpb
 	return ds.getPeer(pid)
 }
 
+// Deprecated: The gRPC API will remain the default and fully supported through v8 (expected in 2026) but will be eventually removed in favor of REST API.
+//
 // ListPeers returns all peers known to the host node, regardless of if they are connected/
 // disconnected.
 func (ds *Server) ListPeers(_ context.Context, _ *empty.Empty) (*ethpb.DebugPeerResponses, error) {

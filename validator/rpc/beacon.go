@@ -16,10 +16,11 @@ import (
 	nodeClientFactory "github.com/stratisproject/prysm-stratis/validator/client/node-client-factory"
 	validatorClientFactory "github.com/stratisproject/prysm-stratis/validator/client/validator-client-factory"
 	validatorHelpers "github.com/stratisproject/prysm-stratis/validator/helpers"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"google.golang.org/grpc"
 )
 
-// Initialize a client connect to a beacon node gRPC endpoint.
+// Initialize a client connect to a beacon node gRPC or HTTP endpoint.
 func (s *Server) registerBeaconClient() error {
 	streamInterceptor := grpc.WithStreamInterceptor(middleware.ChainStreamClient(
 		grpcopentracing.StreamClientInterceptor(),
@@ -54,11 +55,13 @@ func (s *Server) registerBeaconClient() error {
 		s.beaconApiTimeout,
 	)
 
-	restHandler := beaconApi.NewBeaconApiJsonRestHandler(http.Client{Timeout: s.beaconApiTimeout}, s.beaconApiEndpoint)
+	restHandler := beaconApi.NewBeaconApiJsonRestHandler(
+		http.Client{Timeout: s.beaconApiTimeout, Transport: otelhttp.NewTransport(http.DefaultTransport)},
+		s.beaconApiEndpoint,
+	)
 
 	s.chainClient = beaconChainClientFactory.NewChainClient(conn, restHandler)
 	s.nodeClient = nodeClientFactory.NewNodeClient(conn, restHandler)
 	s.beaconNodeValidatorClient = validatorClientFactory.NewValidatorClient(conn, restHandler)
-
 	return nil
 }

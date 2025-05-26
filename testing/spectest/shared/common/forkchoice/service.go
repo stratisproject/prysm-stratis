@@ -22,6 +22,7 @@ import (
 	"github.com/stratisproject/prysm-stratis/beacon-chain/startup"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/state"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/state/stategen"
+	"github.com/stratisproject/prysm-stratis/consensus-types/blocks"
 	"github.com/stratisproject/prysm-stratis/consensus-types/interfaces"
 	payloadattribute "github.com/stratisproject/prysm-stratis/consensus-types/payload-attribute"
 	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
@@ -76,7 +77,6 @@ func startChainService(t testing.TB,
 		blockchain.WithClockSynchronizer(clockSync),
 		blockchain.WithBlobStorage(filesystem.NewEphemeralBlobStorage(t)),
 		blockchain.WithSyncChecker(mock.MockChecker{}),
-		blockchain.WithBlobStorage(filesystem.NewEphemeralBlobStorage(t)),
 	)
 	service, err := blockchain.NewService(context.Background(), opts...)
 	require.NoError(t, err)
@@ -92,8 +92,8 @@ type engineMock struct {
 	payloadStatus   error
 }
 
-func (m *engineMock) GetPayload(context.Context, [8]byte, primitives.Slot) (interfaces.ExecutionData, *pb.BlobsBundle, bool, error) {
-	return nil, nil, false, nil
+func (m *engineMock) GetPayload(context.Context, [8]byte, primitives.Slot) (*blocks.GetPayloadResponse, error) {
+	return nil, nil
 }
 func (m *engineMock) GetPayloadV2(context.Context, [8]byte) (*pb.ExecutionPayloadCapella, error) {
 	return nil, nil
@@ -102,7 +102,7 @@ func (m *engineMock) ForkchoiceUpdated(context.Context, *pb.ForkchoiceState, pay
 	return nil, m.latestValidHash, m.payloadStatus
 }
 
-func (m *engineMock) NewPayload(context.Context, interfaces.ExecutionData, []common.Hash, *common.Hash) ([]byte, error) {
+func (m *engineMock) NewPayload(context.Context, interfaces.ExecutionData, []common.Hash, *common.Hash, *pb.ExecutionRequests) ([]byte, error) {
 	return m.latestValidHash, m.payloadStatus
 }
 

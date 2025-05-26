@@ -107,6 +107,9 @@ var Buckets = [][]byte{
 	powchainBucket,
 	stateSummaryBucket,
 	stateValidatorsBucket,
+	lightClientUpdatesBucket,
+	lightClientBootstrapBucket,
+	lightClientSyncCommitteeBucket,
 	// Indices buckets.
 	blockSlotIndicesBucket,
 	stateSlotIndicesBucket,

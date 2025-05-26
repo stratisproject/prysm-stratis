@@ -9,6 +9,7 @@ import (
 	"github.com/stratisproject/prysm-stratis/beacon-chain/db/filesystem"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/verification"
 	fieldparams "github.com/stratisproject/prysm-stratis/config/fieldparams"
+	"github.com/stratisproject/prysm-stratis/config/params"
 	"github.com/stratisproject/prysm-stratis/consensus-types/blocks"
 	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
 	"github.com/stratisproject/prysm-stratis/encoding/bytesutil"
@@ -44,7 +45,7 @@ func newBlobSync(current primitives.Slot, vbs verifiedROBlocks, cfg *blobSyncCon
 	return &blobSync{current: current, expected: expected, bbv: bbv, store: as}, nil
 }
 
-type blobVerifierMap map[[32]byte][fieldparams.MaxBlobsPerBlock]verification.BlobVerifier
+type blobVerifierMap map[[32]byte][]verification.BlobVerifier
 
 type blobSync struct {
 	store    das.AvailabilityStore
@@ -106,8 +107,11 @@ type blobBatchVerifier struct {
 }
 
 func (bbv *blobBatchVerifier) newVerifier(rb blocks.ROBlob) verification.BlobVerifier {
-	m := bbv.verifiers[rb.BlockRoot()]
-	m[rb.Index] = bbv.newBlobVerifier(rb, verification.BackfillSidecarRequirements)
+	m, ok := bbv.verifiers[rb.BlockRoot()]
+	if !ok {
+		m = make([]verification.BlobVerifier, params.BeaconConfig().MaxBlobsPerBlock(rb.Slot()))
+	}
+	m[rb.Index] = bbv.newBlobVerifier(rb, verification.BackfillBlobSidecarRequirements)
 	bbv.verifiers[rb.BlockRoot()] = m
 	return m[rb.Index]
 }

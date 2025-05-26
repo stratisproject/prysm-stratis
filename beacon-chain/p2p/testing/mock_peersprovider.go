@@ -16,6 +16,11 @@ import (
 	pb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
 )
 
+const (
+	MockRawPeerId0 = "16Uiu2HAkyWZ4Ni1TpvDS8dPxsozmHY85KaiFjodQuV6Tz5tkHVeR"
+	MockRawPeerId1 = "16Uiu2HAm4HgJ9N1o222xK61o7LSgToYWoAy1wNTJRkh9gLZapVAy"
+)
+
 // MockPeersProvider implements PeersProvider for testing.
 type MockPeersProvider struct {
 	lock  sync.Mutex
@@ -50,7 +55,7 @@ func (m *MockPeersProvider) Peers() *peers.Status {
 			},
 		})
 		// Pretend we are connected to two peers
-		id0, err := peer.Decode("16Uiu2HAkyWZ4Ni1TpvDS8dPxsozmHY85KaiFjodQuV6Tz5tkHVeR")
+		id0, err := peer.Decode(MockRawPeerId0)
 		if err != nil {
 			log.WithError(err).Debug("Cannot decode")
 		}
@@ -59,9 +64,9 @@ func (m *MockPeersProvider) Peers() *peers.Status {
 			log.WithError(err).Debug("Cannot decode")
 		}
 		m.peers.Add(createENR(), id0, ma0, network.DirInbound)
-		m.peers.SetConnectionState(id0, peers.PeerConnected)
+		m.peers.SetConnectionState(id0, peers.Connected)
 		m.peers.SetChainState(id0, &pb.Status{FinalizedEpoch: 10})
-		id1, err := peer.Decode("16Uiu2HAm4HgJ9N1o222xK61o7LSgToYWoAy1wNTJRkh9gLZapVAy")
+		id1, err := peer.Decode(MockRawPeerId1)
 		if err != nil {
 			log.WithError(err).Debug("Cannot decode")
 		}
@@ -70,7 +75,7 @@ func (m *MockPeersProvider) Peers() *peers.Status {
 			log.WithError(err).Debug("Cannot decode")
 		}
 		m.peers.Add(createENR(), id1, ma1, network.DirOutbound)
-		m.peers.SetConnectionState(id1, peers.PeerConnected)
+		m.peers.SetConnectionState(id1, peers.Connected)
 		m.peers.SetChainState(id1, &pb.Status{FinalizedEpoch: 11})
 	}
 	return m.peers

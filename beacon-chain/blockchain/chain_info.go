@@ -6,18 +6,18 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"go.opencensus.io/trace"
-
 	"github.com/stratisproject/prysm-stratis/beacon-chain/core/helpers"
 	f "github.com/stratisproject/prysm-stratis/beacon-chain/forkchoice"
 	doublylinkedtree "github.com/stratisproject/prysm-stratis/beacon-chain/forkchoice/doubly-linked-tree"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/state"
 	fieldparams "github.com/stratisproject/prysm-stratis/config/fieldparams"
 	"github.com/stratisproject/prysm-stratis/config/params"
+	consensus_blocks "github.com/stratisproject/prysm-stratis/consensus-types/blocks"
 	"github.com/stratisproject/prysm-stratis/consensus-types/forkchoice"
 	"github.com/stratisproject/prysm-stratis/consensus-types/interfaces"
 	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
 	"github.com/stratisproject/prysm-stratis/encoding/bytesutil"
+	"github.com/stratisproject/prysm-stratis/monitoring/tracing/trace"
 	ethpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
 	"github.com/stratisproject/prysm-stratis/time/slots"
 )
@@ -45,10 +45,13 @@ type ForkchoiceFetcher interface {
 	UpdateHead(context.Context, primitives.Slot)
 	HighestReceivedBlockSlot() primitives.Slot
 	ReceivedBlocksLastEpoch() (uint64, error)
-	InsertNode(context.Context, state.BeaconState, [32]byte) error
+	InsertNode(context.Context, state.BeaconState, consensus_blocks.ROBlock) error
 	ForkChoiceDump(context.Context) (*forkchoice.Dump, error)
 	NewSlot(context.Context, primitives.Slot) error
 	ProposerBoost() [32]byte
+	RecentBlockSlot(root [32]byte) (primitives.Slot, error)
+	IsCanonical(ctx context.Context, blockRoot [32]byte) (bool, error)
+	DependentRoot(primitives.Epoch) ([32]byte, error)
 }
 
 // TimeFetcher retrieves the Ethereum consensus data that's related to time.
@@ -202,7 +205,7 @@ func (s *Service) HeadState(ctx context.Context) (state.BeaconState, error) {
 	defer s.headLock.RUnlock()
 
 	ok := s.hasHeadState()
-	span.AddAttributes(trace.BoolAttribute("cache_hit", ok))
+	span.SetAttributes(trace.BoolAttribute("cache_hit", ok))
 
 	if ok {
 		return s.headState(ctx), nil
@@ -224,7 +227,7 @@ func (s *Service) HeadStateReadOnly(ctx context.Context) (state.ReadOnlyBeaconSt
 	defer s.headLock.RUnlock()
 
 	ok := s.hasHeadState()
-	span.AddAttributes(trace.BoolAttribute("cache_hit", ok))
+	span.SetAttributes(trace.BoolAttribute("cache_hit", ok))
 
 	if ok {
 		return s.headStateReadOnly(ctx), nil
@@ -241,7 +244,7 @@ func (s *Service) HeadValidatorsIndices(ctx context.Context, epoch primitives.Ep
 	if !s.hasHeadState() {
 		return []primitives.ValidatorIndex{}, nil
 	}
-	return helpers.ActiveValidatorIndices(ctx, s.headState(ctx), epoch)
+	return helpers.ActiveValidatorIndices(ctx, s.headStateReadOnly(ctx), epoch)
 }
 
 // HeadGenesisValidatorsRoot returns genesis validators root of the head state.

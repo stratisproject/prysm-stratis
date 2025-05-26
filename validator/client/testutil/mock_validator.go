@@ -8,7 +8,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 	api "github.com/stratisproject/prysm-stratis/api/client"
-	"github.com/stratisproject/prysm-stratis/api/client/beacon"
+	"github.com/stratisproject/prysm-stratis/api/client/beacon/health"
 	"github.com/stratisproject/prysm-stratis/api/client/event"
 	fieldparams "github.com/stratisproject/prysm-stratis/config/fieldparams"
 	"github.com/stratisproject/prysm-stratis/config/proposer"
@@ -60,7 +60,7 @@ type FakeValidator struct {
 	ProposerSettingWait               time.Duration
 	Km                                keymanager.IKeymanager
 	graffiti                          string
-	Tracker                           *beacon.NodeHealthTracker
+	Tracker                           health.Tracker
 	AttSubmitted                      chan interface{}
 	BlockProposed                     chan interface{}
 }
@@ -137,9 +137,8 @@ func (fv *FakeValidator) NextSlot() <-chan primitives.Slot {
 }
 
 // UpdateDuties for mocking.
-func (fv *FakeValidator) UpdateDuties(_ context.Context, slot primitives.Slot) error {
+func (fv *FakeValidator) UpdateDuties(_ context.Context) error {
 	fv.UpdateDutiesCalled = true
-	fv.UpdateDutiesArg1 = uint64(slot)
 	return fv.UpdateDutiesRet
 }
 
@@ -254,10 +253,7 @@ func (*FakeValidator) HasProposerSettings() bool {
 }
 
 // PushProposerSettings for mocking
-func (fv *FakeValidator) PushProposerSettings(ctx context.Context, km keymanager.IKeymanager, slot primitives.Slot, deadline time.Time) error {
-	nctx, cancel := context.WithDeadline(ctx, deadline)
-	ctx = nctx
-	defer cancel()
+func (fv *FakeValidator) PushProposerSettings(ctx context.Context, _ keymanager.IKeymanager, _ primitives.Slot, _ bool) error {
 	time.Sleep(fv.ProposerSettingWait)
 	if errors.Is(ctx.Err(), context.DeadlineExceeded) {
 		log.Error("deadline exceeded")
@@ -279,8 +275,8 @@ func (*FakeValidator) SetPubKeyToValidatorIndexMap(_ context.Context, _ keymanag
 }
 
 // SignValidatorRegistrationRequest for mocking
-func (*FakeValidator) SignValidatorRegistrationRequest(_ context.Context, _ iface.SigningFunc, _ *ethpb.ValidatorRegistrationV1) (*ethpb.SignedValidatorRegistrationV1, error) {
-	return nil, nil
+func (*FakeValidator) SignValidatorRegistrationRequest(_ context.Context, _ iface.SigningFunc, _ *ethpb.ValidatorRegistrationV1) (*ethpb.SignedValidatorRegistrationV1, bool, error) {
+	return nil, false, nil
 }
 
 // ProposerSettings for mocking
@@ -294,8 +290,8 @@ func (fv *FakeValidator) SetProposerSettings(_ context.Context, settings *propos
 	return nil
 }
 
-// GetGraffiti for mocking
-func (fv *FakeValidator) GetGraffiti(_ context.Context, _ [fieldparams.BLSPubkeyLength]byte) ([]byte, error) {
+// Graffiti for mocking
+func (fv *FakeValidator) Graffiti(_ context.Context, _ [fieldparams.BLSPubkeyLength]byte) ([]byte, error) {
 	return []byte(fv.graffiti), nil
 }
 
@@ -315,12 +311,20 @@ func (*FakeValidator) StartEventStream(_ context.Context, _ []string, _ chan<- *
 
 }
 
-func (*FakeValidator) ProcessEvent(_ *event.Event) {}
+func (*FakeValidator) ProcessEvent(_ context.Context, _ *event.Event) {}
 
 func (*FakeValidator) EventStreamIsRunning() bool {
 	return true
 }
 
-func (fv *FakeValidator) HealthTracker() *beacon.NodeHealthTracker {
+func (fv *FakeValidator) HealthTracker() health.Tracker {
 	return fv.Tracker
+}
+
+func (*FakeValidator) Host() string {
+	return "127.0.0.1:0"
+}
+
+func (fv *FakeValidator) ChangeHost() {
+	fv.Host()
 }

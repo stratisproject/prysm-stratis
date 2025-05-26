@@ -31,7 +31,7 @@ func IsCurrentPeriodSyncCommittee(st state.BeaconState, valIdx primitives.Valida
 		return false, err
 	}
 	indices, err := syncCommitteeCache.CurrentPeriodIndexPosition(root, valIdx)
-	if err == cache.ErrNonExistingSyncCommitteeKey {
+	if errors.Is(err, cache.ErrNonExistingSyncCommitteeKey) {
 		val, err := st.ValidatorAtIndex(valIdx)
 		if err != nil {
 			return false, err
@@ -68,16 +68,17 @@ func IsNextPeriodSyncCommittee(
 		return false, err
 	}
 	indices, err := syncCommitteeCache.NextPeriodIndexPosition(root, valIdx)
-	if err == cache.ErrNonExistingSyncCommitteeKey {
-		val, err := st.ValidatorAtIndex(valIdx)
+	if errors.Is(err, cache.ErrNonExistingSyncCommitteeKey) {
+		val, err := st.ValidatorAtIndexReadOnly(valIdx)
 		if err != nil {
 			return false, err
 		}
+		pk := val.PublicKey()
 		committee, err := st.NextSyncCommittee()
 		if err != nil {
 			return false, err
 		}
-		return len(findSubCommitteeIndices(val.PublicKey, committee.Pubkeys)) > 0, nil
+		return len(findSubCommitteeIndices(pk[:], committee.Pubkeys)) > 0, nil
 	}
 	if err != nil {
 		return false, err
@@ -95,11 +96,12 @@ func CurrentPeriodSyncSubcommitteeIndices(
 		return nil, err
 	}
 	indices, err := syncCommitteeCache.CurrentPeriodIndexPosition(root, valIdx)
-	if err == cache.ErrNonExistingSyncCommitteeKey {
-		val, err := st.ValidatorAtIndex(valIdx)
+	if errors.Is(err, cache.ErrNonExistingSyncCommitteeKey) {
+		val, err := st.ValidatorAtIndexReadOnly(valIdx)
 		if err != nil {
 			return nil, err
 		}
+		pk := val.PublicKey()
 		committee, err := st.CurrentSyncCommittee()
 		if err != nil {
 			return nil, err
@@ -112,7 +114,7 @@ func CurrentPeriodSyncSubcommitteeIndices(
 			}
 		}()
 
-		return findSubCommitteeIndices(val.PublicKey, committee.Pubkeys), nil
+		return findSubCommitteeIndices(pk[:], committee.Pubkeys), nil
 	}
 	if err != nil {
 		return nil, err
@@ -129,16 +131,17 @@ func NextPeriodSyncSubcommitteeIndices(
 		return nil, err
 	}
 	indices, err := syncCommitteeCache.NextPeriodIndexPosition(root, valIdx)
-	if err == cache.ErrNonExistingSyncCommitteeKey {
-		val, err := st.ValidatorAtIndex(valIdx)
+	if errors.Is(err, cache.ErrNonExistingSyncCommitteeKey) {
+		val, err := st.ValidatorAtIndexReadOnly(valIdx)
 		if err != nil {
 			return nil, err
 		}
+		pk := val.PublicKey()
 		committee, err := st.NextSyncCommittee()
 		if err != nil {
 			return nil, err
 		}
-		return findSubCommitteeIndices(val.PublicKey, committee.Pubkeys), nil
+		return findSubCommitteeIndices(pk[:], committee.Pubkeys), nil
 	}
 	if err != nil {
 		return nil, err

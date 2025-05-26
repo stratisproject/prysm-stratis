@@ -8,8 +8,8 @@ import (
 	"github.com/stratisproject/prysm-stratis/config/params"
 	"github.com/stratisproject/prysm-stratis/consensus-types/blocks"
 	"github.com/stratisproject/prysm-stratis/io/file"
+	"github.com/stratisproject/prysm-stratis/monitoring/tracing/trace"
 	bolt "go.etcd.io/bbolt"
-	"go.opencensus.io/trace"
 )
 
 const backupsDirectoryName = "backups"

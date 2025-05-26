@@ -5,7 +5,9 @@ import (
 
 	"github.com/stratisproject/prysm-stratis/config/params"
 	"github.com/stratisproject/prysm-stratis/encoding/bytesutil"
+	"github.com/stratisproject/prysm-stratis/runtime/version"
 	"github.com/stratisproject/prysm-stratis/testing/assert"
+	"github.com/stratisproject/prysm-stratis/testing/require"
 )
 
 func TestInitializeDataMaps(t *testing.T) {
@@ -44,8 +46,43 @@ func TestInitializeDataMaps(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.action()
-			_, ok := BlockMap[bytesutil.ToBytes4(params.BeaconConfig().GenesisForkVersion)]
+			bFunc, ok := BlockMap[bytesutil.ToBytes4(params.BeaconConfig().GenesisForkVersion)]
 			assert.Equal(t, tt.exists, ok)
+			if tt.exists {
+				b, err := bFunc()
+				require.NoError(t, err)
+				generic, err := b.PbGenericBlock()
+				require.NoError(t, err)
+				assert.NotNil(t, generic.GetPhase0())
+			}
+			mdFunc, ok := MetaDataMap[bytesutil.ToBytes4(params.BeaconConfig().GenesisForkVersion)]
+			if tt.exists {
+				md, err := mdFunc()
+				require.NoError(t, err)
+				assert.NotNil(t, md.MetadataObjV0())
+			}
+			assert.Equal(t, tt.exists, ok)
+			attFunc, ok := AttestationMap[bytesutil.ToBytes4(params.BeaconConfig().GenesisForkVersion)]
+			if tt.exists {
+				att, err := attFunc()
+				require.NoError(t, err)
+				assert.Equal(t, version.Phase0, att.Version())
+			}
+			assert.Equal(t, tt.exists, ok)
+			aggFunc, ok := AggregateAttestationMap[bytesutil.ToBytes4(params.BeaconConfig().GenesisForkVersion)]
+			assert.Equal(t, tt.exists, ok)
+			if tt.exists {
+				agg, err := aggFunc()
+				require.NoError(t, err)
+				assert.Equal(t, version.Phase0, agg.Version())
+			}
+			attSlashFunc, ok := AttesterSlashingMap[bytesutil.ToBytes4(params.BeaconConfig().GenesisForkVersion)]
+			assert.Equal(t, tt.exists, ok)
+			if tt.exists {
+				attSlash, err := attSlashFunc()
+				require.NoError(t, err)
+				assert.Equal(t, version.Phase0, attSlash.Version())
+			}
 		})
 	}
 }

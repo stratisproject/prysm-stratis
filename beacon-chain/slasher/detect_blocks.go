@@ -5,8 +5,8 @@ import (
 
 	"github.com/pkg/errors"
 	slashertypes "github.com/stratisproject/prysm-stratis/beacon-chain/slasher/types"
+	"github.com/stratisproject/prysm-stratis/monitoring/tracing/trace"
 	ethpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
-	"go.opencensus.io/trace"
 )
 
 // detectProposerSlashings takes in signed block header wrappers and returns a list of proposer slashings detected.

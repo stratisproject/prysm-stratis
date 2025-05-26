@@ -9,7 +9,6 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	fieldparams "github.com/stratisproject/prysm-stratis/config/fieldparams"
 	"github.com/stratisproject/prysm-stratis/config/proposer"
-
 	"github.com/stratisproject/prysm-stratis/consensus-types/interfaces"
 	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
 	ethpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
@@ -106,7 +105,7 @@ func (db *ValidatorDBMock) AttestedPublicKeys(ctx context.Context) ([][fieldpara
 }
 
 func (db *ValidatorDBMock) SlashableAttestationCheck(
-	ctx context.Context, indexedAtt *ethpb.IndexedAttestation, pubKey [fieldparams.BLSPubkeyLength]byte,
+	ctx context.Context, indexedAtt ethpb.IndexedAtt, pubKey [fieldparams.BLSPubkeyLength]byte,
 	signingRoot32 [32]byte,
 	emitAccountMetrics bool,
 	validatorAttestFailVec *prometheus.CounterVec,
@@ -115,7 +114,7 @@ func (db *ValidatorDBMock) SlashableAttestationCheck(
 }
 
 func (db *ValidatorDBMock) SaveAttestationForPubKey(
-	ctx context.Context, pubKey [fieldparams.BLSPubkeyLength]byte, signingRoot [fieldparams.RootLength]byte, att *ethpb.IndexedAttestation,
+	ctx context.Context, pubKey [fieldparams.BLSPubkeyLength]byte, signingRoot [fieldparams.RootLength]byte, att ethpb.IndexedAtt,
 ) error {
 	panic("not implemented")
 }

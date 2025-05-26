@@ -6,7 +6,6 @@ import (
 	"strconv"
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
 	"github.com/stratisproject/prysm-stratis/api/server/structs"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/core/helpers"
@@ -18,10 +17,11 @@ import (
 	"github.com/stratisproject/prysm-stratis/time/slots"
 )
 
+// Deprecated: use SSE from events for `payload attributes` instead
 // ExpectedWithdrawals get the withdrawals computed from the specified state, that will be included in the block that gets built on the specified state.
 func (s *Server) ExpectedWithdrawals(w http.ResponseWriter, r *http.Request) {
 	// Retrieve beacon state
-	stateId := mux.Vars(r)["state_id"]
+	stateId := r.PathValue("state_id")
 	if stateId == "" {
 		httputil.WriteError(w, &httputil.DefaultJsonError{
 			Message: "state_id is required in URL params",
@@ -96,7 +96,7 @@ func (s *Server) ExpectedWithdrawals(w http.ResponseWriter, r *http.Request) {
 		})
 		return
 	}
-	withdrawals, err := st.ExpectedWithdrawals()
+	withdrawals, _, err := st.ExpectedWithdrawals()
 	if err != nil {
 		httputil.WriteError(w, &httputil.DefaultJsonError{
 			Message: "could not get expected withdrawals",
@@ -126,7 +126,7 @@ func buildExpectedWithdrawalsData(withdrawals []*enginev1.Withdrawal) []*structs
 
 func handleWrapError(err error, message string, code int) *httputil.DefaultJsonError {
 	return &httputil.DefaultJsonError{
-		Message: errors.Wrapf(err, message).Error(),
+		Message: errors.Wrap(err, message).Error(),
 		Code:    code,
 	}
 }

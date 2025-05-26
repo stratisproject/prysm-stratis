@@ -7,7 +7,6 @@ import (
 	"github.com/stratisproject/prysm-stratis/beacon-chain/core/epoch"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/core/helpers"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/state"
-	"github.com/stratisproject/prysm-stratis/config/params"
 	"github.com/stratisproject/prysm-stratis/testing/require"
 	"github.com/stratisproject/prysm-stratis/testing/spectest/utils"
 )
@@ -30,7 +29,6 @@ func RunSlashingsTests(t *testing.T, config string) {
 }
 
 func processSlashingsWrapper(t *testing.T, st state.BeaconState) (state.BeaconState, error) {
-	st, err := epoch.ProcessSlashings(st, params.BeaconConfig().ProportionalSlashingMultiplierAltair)
-	require.NoError(t, err, "Could not process slashings")
+	require.NoError(t, epoch.ProcessSlashings(st), "Could not process slashings")
 	return st, nil
 }

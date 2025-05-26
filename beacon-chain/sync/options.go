@@ -2,9 +2,11 @@ package sync
 
 import (
 	"github.com/stratisproject/prysm-stratis/async/event"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/cache"
 	blockfeed "github.com/stratisproject/prysm-stratis/beacon-chain/core/feed/block"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/core/feed/operation"
 	statefeed "github.com/stratisproject/prysm-stratis/beacon-chain/core/feed/state"
+	lightClient "github.com/stratisproject/prysm-stratis/beacon-chain/core/light-client"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/db"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/db/filesystem"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/execution"
@@ -39,6 +41,13 @@ func WithP2P(p2p p2p.P2P) Option {
 func WithDatabase(db db.NoHeadAccessDatabase) Option {
 	return func(s *Service) error {
 		s.cfg.beaconDB = db
+		return nil
+	}
+}
+
+func WithAttestationCache(c *cache.AttestationCache) Option {
+	return func(s *Service) error {
+		s.cfg.attestationCache = c
 		return nil
 	}
 }
@@ -127,9 +136,9 @@ func WithSlasherBlockHeadersFeed(slasherBlockHeadersFeed *event.Feed) Option {
 	}
 }
 
-func WithPayloadReconstructor(r execution.PayloadReconstructor) Option {
+func WithReconstructor(r execution.Reconstructor) Option {
 	return func(s *Service) error {
-		s.cfg.executionPayloadReconstructor = r
+		s.cfg.executionReconstructor = r
 		return nil
 	}
 }
@@ -177,6 +186,22 @@ func WithVerifierWaiter(v *verification.InitializerWaiter) Option {
 func WithAvailableBlocker(avb coverage.AvailableBlocker) Option {
 	return func(s *Service) error {
 		s.availableBlocker = avb
+		return nil
+	}
+}
+
+// WithSlasherEnabled configures the sync package to support slashing detection.
+func WithSlasherEnabled(enabled bool) Option {
+	return func(s *Service) error {
+		s.slasherEnabled = enabled
+		return nil
+	}
+}
+
+// WithLightClientStore allows the sync package to access light client data.
+func WithLightClientStore(lcs *lightClient.Store) Option {
+	return func(s *Service) error {
+		s.lcStore = lcs
 		return nil
 	}
 }

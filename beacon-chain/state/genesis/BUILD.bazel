@@ -4,12 +4,18 @@ go_library(
     name = "go_default_library",
     srcs = [
         "genesis.go",
-        "genesis_mainnet.go",
         "genesis_auroria.go",
+        "genesis_mainnet.go",
     ],
-    embedsrcs = ["mainnet.ssz.snappy","auroria.ssz.snappy"],
+    embedsrcs = [
+        "mainnet.ssz.snappy",
+        "auroria.ssz.snappy",
+    ],
     importpath = "github.com/stratisproject/prysm-stratis/beacon-chain/state/genesis",
-    visibility = ["//beacon-chain/db:__subpackages__"],
+    visibility = [
+        "//beacon-chain/db:__subpackages__",
+        "//config/params:__pkg__",
+    ],
     deps = [
         "//beacon-chain/state:go_default_library",
         "//beacon-chain/state/state-native:go_default_library",

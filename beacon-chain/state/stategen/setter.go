@@ -10,9 +10,9 @@ import (
 	"github.com/stratisproject/prysm-stratis/beacon-chain/state"
 	"github.com/stratisproject/prysm-stratis/config/params"
 	"github.com/stratisproject/prysm-stratis/encoding/bytesutil"
+	"github.com/stratisproject/prysm-stratis/monitoring/tracing/trace"
 	ethpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
 	"github.com/stratisproject/prysm-stratis/time/slots"
-	"go.opencensus.io/trace"
 )
 
 // SaveState saves the state in the cache and/or DB.

@@ -1,9 +1,7 @@
 package beacon_api
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
 	"reflect"
 	"strconv"
 
@@ -23,9 +21,7 @@ type beaconApiChainClient struct {
 	stateValidatorsProvider StateValidatorsProvider
 }
 
-const getValidatorPerformanceEndpoint = "/prysm/validators/performance"
-
-func (c beaconApiChainClient) getHeadBlockHeaders(ctx context.Context) (*structs.GetBlockHeaderResponse, error) {
+func (c beaconApiChainClient) headBlockHeaders(ctx context.Context) (*structs.GetBlockHeaderResponse, error) {
 	blockHeader := structs.GetBlockHeaderResponse{}
 	err := c.jsonRestHandler.Get(ctx, "/eth/v1/beacon/headers/head", &blockHeader)
 	if err != nil {
@@ -43,7 +39,7 @@ func (c beaconApiChainClient) getHeadBlockHeaders(ctx context.Context) (*structs
 	return &blockHeader, nil
 }
 
-func (c beaconApiChainClient) GetChainHead(ctx context.Context, _ *empty.Empty) (*ethpb.ChainHead, error) {
+func (c beaconApiChainClient) ChainHead(ctx context.Context, _ *empty.Empty) (*ethpb.ChainHead, error) {
 	const endpoint = "/eth/v1/beacon/states/head/finality_checkpoints"
 
 	finalityCheckpoints := structs.GetFinalityCheckpointsResponse{}
@@ -112,7 +108,7 @@ func (c beaconApiChainClient) GetChainHead(ctx context.Context, _ *empty.Empty) 
 		return nil, errors.Wrapf(err, "failed to decode previous justified checkpoint root `%s`", finalityCheckpoints.Data.PreviousJustified.Root)
 	}
 
-	blockHeader, err := c.getHeadBlockHeaders(ctx)
+	blockHeader, err := c.headBlockHeaders(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get head block headers")
 	}
@@ -146,16 +142,16 @@ func (c beaconApiChainClient) GetChainHead(ctx context.Context, _ *empty.Empty) 
 	}, nil
 }
 
-func (c beaconApiChainClient) ListValidatorBalances(ctx context.Context, in *ethpb.ListValidatorBalancesRequest) (*ethpb.ValidatorBalances, error) {
+func (c beaconApiChainClient) ValidatorBalances(ctx context.Context, in *ethpb.ListValidatorBalancesRequest) (*ethpb.ValidatorBalances, error) {
 	if c.fallbackClient != nil {
-		return c.fallbackClient.ListValidatorBalances(ctx, in)
+		return c.fallbackClient.ValidatorBalances(ctx, in)
 	}
 
 	// TODO: Implement me
-	panic("beaconApiChainClient.ListValidatorBalances is not implemented. To use a fallback client, pass a fallback client as the last argument of NewBeaconApiChainClientWithFallback.")
+	return nil, errors.New("beaconApiChainClient.ValidatorBalances is not implemented. To use a fallback client, pass a fallback client as the last argument of NewBeaconApiChainClientWithFallback.")
 }
 
-func (c beaconApiChainClient) ListValidators(ctx context.Context, in *ethpb.ListValidatorsRequest) (*ethpb.Validators, error) {
+func (c beaconApiChainClient) Validators(ctx context.Context, in *ethpb.ListValidatorsRequest) (*ethpb.Validators, error) {
 	pageSize := in.PageSize
 
 	// We follow the gRPC behavior here, which returns a maximum of 250 results when pageSize == 0
@@ -191,21 +187,21 @@ func (c beaconApiChainClient) ListValidators(ctx context.Context, in *ethpb.List
 		if err != nil {
 			return nil, errors.Wrapf(err, "failed to get first slot for epoch `%d`", queryFilter.Epoch)
 		}
-		if stateValidators, err = c.stateValidatorsProvider.GetStateValidatorsForSlot(ctx, slot, pubkeys, in.Indices, statuses); err != nil {
+		if stateValidators, err = c.stateValidatorsProvider.StateValidatorsForSlot(ctx, slot, pubkeys, in.Indices, statuses); err != nil {
 			return nil, errors.Wrapf(err, "failed to get state validators for slot `%d`", slot)
 		}
 		epoch = slots.ToEpoch(slot)
 	case *ethpb.ListValidatorsRequest_Genesis:
-		if stateValidators, err = c.stateValidatorsProvider.GetStateValidatorsForSlot(ctx, 0, pubkeys, in.Indices, statuses); err != nil {
+		if stateValidators, err = c.stateValidatorsProvider.StateValidatorsForSlot(ctx, 0, pubkeys, in.Indices, statuses); err != nil {
 			return nil, errors.Wrapf(err, "failed to get genesis state validators")
 		}
 		epoch = 0
 	case nil:
-		if stateValidators, err = c.stateValidatorsProvider.GetStateValidatorsForHead(ctx, pubkeys, in.Indices, statuses); err != nil {
+		if stateValidators, err = c.stateValidatorsProvider.StateValidatorsForHead(ctx, pubkeys, in.Indices, statuses); err != nil {
 			return nil, errors.Wrap(err, "failed to get head state validators")
 		}
 
-		blockHeader, err := c.getHeadBlockHeaders(ctx)
+		blockHeader, err := c.headBlockHeaders(ctx)
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to get head block headers")
 		}
@@ -310,48 +306,31 @@ func (c beaconApiChainClient) ListValidators(ctx context.Context, in *ethpb.List
 	}, nil
 }
 
-func (c beaconApiChainClient) GetValidatorQueue(ctx context.Context, in *empty.Empty) (*ethpb.ValidatorQueue, error) {
+func (c beaconApiChainClient) ValidatorQueue(ctx context.Context, in *empty.Empty) (*ethpb.ValidatorQueue, error) {
 	if c.fallbackClient != nil {
-		return c.fallbackClient.GetValidatorQueue(ctx, in)
+		return c.fallbackClient.ValidatorQueue(ctx, in)
 	}
 
 	// TODO: Implement me
-	panic("beaconApiChainClient.GetValidatorQueue is not implemented. To use a fallback client, pass a fallback client as the last argument of NewBeaconApiChainClientWithFallback.")
+	return nil, errors.New("beaconApiChainClient.ValidatorQueue is not implemented. To use a fallback client, pass a fallback client as the last argument of NewBeaconApiChainClientWithFallback.")
 }
 
-func (c beaconApiChainClient) GetValidatorPerformance(ctx context.Context, in *ethpb.ValidatorPerformanceRequest) (*ethpb.ValidatorPerformanceResponse, error) {
-	request, err := json.Marshal(structs.GetValidatorPerformanceRequest{
-		PublicKeys: in.PublicKeys,
-		Indices:    in.Indices,
-	})
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to marshal request")
-	}
-	resp := &structs.GetValidatorPerformanceResponse{}
-	if err = c.jsonRestHandler.Post(ctx, getValidatorPerformanceEndpoint, nil, bytes.NewBuffer(request), resp); err != nil {
-		return nil, err
-	}
-
-	return &ethpb.ValidatorPerformanceResponse{
-		CurrentEffectiveBalances:      resp.CurrentEffectiveBalances,
-		CorrectlyVotedSource:          resp.CorrectlyVotedSource,
-		CorrectlyVotedTarget:          resp.CorrectlyVotedTarget,
-		CorrectlyVotedHead:            resp.CorrectlyVotedHead,
-		BalancesBeforeEpochTransition: resp.BalancesBeforeEpochTransition,
-		BalancesAfterEpochTransition:  resp.BalancesAfterEpochTransition,
-		MissingValidators:             resp.MissingValidators,
-		PublicKeys:                    resp.PublicKeys,
-		InactivityScores:              resp.InactivityScores,
-	}, nil
-}
-
-func (c beaconApiChainClient) GetValidatorParticipation(ctx context.Context, in *ethpb.GetValidatorParticipationRequest) (*ethpb.ValidatorParticipationResponse, error) {
+func (c beaconApiChainClient) ValidatorPerformance(ctx context.Context, in *ethpb.ValidatorPerformanceRequest) (*ethpb.ValidatorPerformanceResponse, error) {
 	if c.fallbackClient != nil {
-		return c.fallbackClient.GetValidatorParticipation(ctx, in)
+		return c.fallbackClient.ValidatorPerformance(ctx, in)
 	}
 
 	// TODO: Implement me
-	panic("beaconApiChainClient.GetValidatorParticipation is not implemented. To use a fallback client, pass a fallback client as the last argument of NewBeaconApiChainClientWithFallback.")
+	return nil, errors.New("beaconApiChainClient.ValidatorPerformance is not implemented. To use a fallback client, pass a fallback client as the last argument of NewBeaconApiChainClientWithFallback.")
+}
+
+func (c beaconApiChainClient) ValidatorParticipation(ctx context.Context, in *ethpb.GetValidatorParticipationRequest) (*ethpb.ValidatorParticipationResponse, error) {
+	if c.fallbackClient != nil {
+		return c.fallbackClient.ValidatorParticipation(ctx, in)
+	}
+
+	// TODO: Implement me
+	return nil, errors.New("beaconApiChainClient.ValidatorParticipation is not implemented. To use a fallback client, pass a fallback client as the last argument of NewBeaconApiChainClientWithFallback.")
 }
 
 func NewBeaconApiChainClientWithFallback(jsonRestHandler JsonRestHandler, fallbackClient iface.ChainClient) iface.ChainClient {

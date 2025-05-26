@@ -20,9 +20,9 @@ import (
 	"github.com/stratisproject/prysm-stratis/testing/require"
 	"github.com/stratisproject/prysm-stratis/validator/accounts"
 	"github.com/stratisproject/prysm-stratis/validator/accounts/iface"
-	mock "github.com/stratisproject/prysm-stratis/validator/accounts/testing"
 	"github.com/stratisproject/prysm-stratis/validator/accounts/wallet"
 	"github.com/stratisproject/prysm-stratis/validator/client"
+	"github.com/stratisproject/prysm-stratis/validator/client/testutil"
 	"github.com/stratisproject/prysm-stratis/validator/keymanager"
 	"github.com/tyler-smith/go-bip39"
 	keystorev4 "github.com/wealdtech/go-eth2-wallet-encryptor-keystorev4"
@@ -48,7 +48,7 @@ func TestServer_CreateWallet_Local(t *testing.T) {
 	require.NoError(t, err)
 	vs, err := client.NewValidatorService(ctx, &client.Config{
 		Wallet: w,
-		Validator: &mock.Validator{
+		Validator: &testutil.FakeValidator{
 			Km: km,
 		},
 	})
@@ -445,7 +445,7 @@ func TestServer_WalletConfig(t *testing.T) {
 	s.wallet = w
 	vs, err := client.NewValidatorService(ctx, &client.Config{
 		Wallet: w,
-		Validator: &mock.Validator{
+		Validator: &testutil.FakeValidator{
 			Km: km,
 		},
 	})

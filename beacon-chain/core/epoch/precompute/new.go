@@ -11,7 +11,7 @@ import (
 	"github.com/stratisproject/prysm-stratis/beacon-chain/core/time"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/state"
 	"github.com/stratisproject/prysm-stratis/config/params"
-	"go.opencensus.io/trace"
+	"github.com/stratisproject/prysm-stratis/monitoring/tracing/trace"
 )
 
 // New gets called at the beginning of process epoch cycle to return

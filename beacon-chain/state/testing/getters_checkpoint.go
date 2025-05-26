@@ -1,14 +1,14 @@
 package testing
 
 import (
+	"testing"
+
 	"github.com/prysmaticlabs/go-bitfield"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/state"
 	fieldparams "github.com/stratisproject/prysm-stratis/config/fieldparams"
 	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
 	ethpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
 	"github.com/stratisproject/prysm-stratis/testing/require"
-
-	"testing"
 )
 
 func VerifyBeaconStateJustificationBitsNil(t *testing.T, factory getState) {

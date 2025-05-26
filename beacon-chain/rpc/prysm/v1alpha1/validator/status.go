@@ -14,10 +14,10 @@ import (
 	"github.com/stratisproject/prysm-stratis/contracts/deposit"
 	"github.com/stratisproject/prysm-stratis/encoding/bytesutil"
 	"github.com/stratisproject/prysm-stratis/monitoring/tracing"
+	"github.com/stratisproject/prysm-stratis/monitoring/tracing/trace"
 	ethpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
 	"github.com/stratisproject/prysm-stratis/runtime/version"
 	"github.com/stratisproject/prysm-stratis/time/slots"
-	"go.opencensus.io/trace"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -29,6 +29,8 @@ var nonExistentIndex = primitives.ValidatorIndex(^uint64(0))
 
 var errParticipation = status.Errorf(codes.Internal, "Failed to obtain epoch participation")
 
+// Deprecated: The gRPC API will remain the default and fully supported through v8 (expected in 2026) but will be eventually removed in favor of REST API.
+//
 // ValidatorStatus returns the validator status of the current epoch.
 // The status response can be one of the following:
 //
@@ -52,6 +54,8 @@ func (vs *Server) ValidatorStatus(
 	return vStatus, nil
 }
 
+// Deprecated: The gRPC API will remain the default and fully supported through v8 (expected in 2026) but will be eventually removed in favor of REST API.
+//
 // MultipleValidatorStatus is the same as ValidatorStatus. Supports retrieval of multiple
 // validator statuses. Takes a list of public keys or a list of validator indices.
 func (vs *Server) MultipleValidatorStatus(
@@ -100,6 +104,8 @@ func (vs *Server) MultipleValidatorStatus(
 	}, nil
 }
 
+// Deprecated: The gRPC API will remain the default and fully supported through v8 (expected in 2026) but will be eventually removed in favor of REST API.
+//
 // CheckDoppelGanger checks if the provided keys are currently active in the network.
 func (vs *Server) CheckDoppelGanger(ctx context.Context, req *ethpb.DoppelGangerRequest) (*ethpb.DoppelGangerResponse, error) {
 	if vs.SyncChecker.Syncing() {
@@ -269,7 +275,7 @@ func (vs *Server) optimisticStatus(ctx context.Context) error {
 		return nil
 	}
 
-	return status.Errorf(codes.Unavailable, errOptimisticMode.Error())
+	return status.Errorf(codes.Unavailable, "error=%v", errOptimisticMode)
 }
 
 // validatorStatus searches for the requested validator's state and deposit to retrieve its inclusion estimate. Also returns the validators index.
@@ -287,13 +293,16 @@ func (vs *Server) validatorStatus(
 		Status:          ethpb.ValidatorStatus_UNKNOWN_STATUS,
 		ActivationEpoch: params.BeaconConfig().FarFutureEpoch,
 	}
+	if len(pubKey) == 0 {
+		return resp, nonExistentIndex
+	}
 	vStatus, idx, err := statusForPubKey(headState, pubKey)
-	if err != nil && err != errPubkeyDoesNotExist {
+	if err != nil && !errors.Is(err, errPubkeyDoesNotExist) {
 		tracing.AnnotateError(span, err)
 		return resp, nonExistentIndex
 	}
 	resp.Status = vStatus
-	if err != errPubkeyDoesNotExist {
+	if !errors.Is(err, errPubkeyDoesNotExist) {
 		val, err := headState.ValidatorAtIndexReadOnly(idx)
 		if err != nil {
 			tracing.AnnotateError(span, err)
@@ -402,16 +411,13 @@ func statusForPubKey(headState state.ReadOnlyBeaconState, pubKey []byte) (ethpb.
 
 func assignmentStatus(beaconState state.ReadOnlyBeaconState, validatorIndex primitives.ValidatorIndex) ethpb.ValidatorStatus {
 	validator, err := beaconState.ValidatorAtIndexReadOnly(validatorIndex)
-	if err != nil {
+	if err != nil || validator.IsNil() {
 		return ethpb.ValidatorStatus_UNKNOWN_STATUS
 	}
+
 	currentEpoch := time.CurrentEpoch(beaconState)
 	farFutureEpoch := params.BeaconConfig().FarFutureEpoch
 	validatorBalance := validator.EffectiveBalance()
-
-	if validator.IsNil() {
-		return ethpb.ValidatorStatus_UNKNOWN_STATUS
-	}
 	if currentEpoch < validator.ActivationEligibilityEpoch() {
 		return depositStatus(validatorBalance)
 	}

@@ -1,15 +1,19 @@
 package beacon_api
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	neturl "net/url"
 	"strconv"
 	"strings"
 
 	"github.com/pkg/errors"
+	"github.com/stratisproject/prysm-stratis/api/apiutil"
 	"github.com/stratisproject/prysm-stratis/api/server/structs"
 	validator2 "github.com/stratisproject/prysm-stratis/consensus-types/validator"
+	ethpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
 	"github.com/stratisproject/prysm-stratis/validator/client/iface"
 )
 
@@ -26,9 +30,9 @@ type prysmChainClient struct {
 	nodeClient      iface.NodeClient
 }
 
-func (c prysmChainClient) GetValidatorCount(ctx context.Context, stateID string, statuses []validator2.Status) ([]iface.ValidatorCount, error) {
+func (c prysmChainClient) ValidatorCount(ctx context.Context, stateID string, statuses []validator2.Status) ([]iface.ValidatorCount, error) {
 	// Check node version for prysm beacon node as it is a custom endpoint for prysm beacon node.
-	nodeVersion, err := c.nodeClient.GetVersion(ctx, nil)
+	nodeVersion, err := c.nodeClient.Version(ctx, nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get node version")
 	}
@@ -42,7 +46,7 @@ func (c prysmChainClient) GetValidatorCount(ctx context.Context, stateID string,
 		queryParams.Add("status", status.String())
 	}
 
-	queryUrl := buildURL(fmt.Sprintf("/eth/v1/beacon/states/%s/validator_count", stateID), queryParams)
+	queryUrl := apiutil.BuildURL(fmt.Sprintf("/eth/v1/beacon/states/%s/validator_count", stateID), queryParams)
 
 	var validatorCountResponse structs.GetValidatorCountResponse
 	if err = c.jsonRestHandler.Get(ctx, queryUrl, &validatorCountResponse); err != nil {
@@ -71,4 +75,40 @@ func (c prysmChainClient) GetValidatorCount(ctx context.Context, stateID string,
 	}
 
 	return resp, nil
+}
+
+func (c prysmChainClient) ValidatorPerformance(ctx context.Context, in *ethpb.ValidatorPerformanceRequest) (*ethpb.ValidatorPerformanceResponse, error) {
+	// Check node version for prysm beacon node as it is a custom endpoint for prysm beacon node.
+	nodeVersion, err := c.nodeClient.Version(ctx, nil)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get node version")
+	}
+
+	if !strings.Contains(strings.ToLower(nodeVersion.Version), "prysm") {
+		return nil, iface.ErrNotSupported
+	}
+
+	request, err := json.Marshal(structs.GetValidatorPerformanceRequest{
+		PublicKeys: in.PublicKeys,
+		Indices:    in.Indices,
+	})
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to marshal request")
+	}
+	resp := &structs.GetValidatorPerformanceResponse{}
+	if err = c.jsonRestHandler.Post(ctx, "/prysm/validators/performance", nil, bytes.NewBuffer(request), resp); err != nil {
+		return nil, err
+	}
+
+	return &ethpb.ValidatorPerformanceResponse{
+		CurrentEffectiveBalances:      resp.CurrentEffectiveBalances,
+		CorrectlyVotedSource:          resp.CorrectlyVotedSource,
+		CorrectlyVotedTarget:          resp.CorrectlyVotedTarget,
+		CorrectlyVotedHead:            resp.CorrectlyVotedHead,
+		BalancesBeforeEpochTransition: resp.BalancesBeforeEpochTransition,
+		BalancesAfterEpochTransition:  resp.BalancesAfterEpochTransition,
+		MissingValidators:             resp.MissingValidators,
+		PublicKeys:                    resp.PublicKeys,
+		InactivityScores:              resp.InactivityScores,
+	}, nil
 }

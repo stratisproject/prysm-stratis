@@ -1,6 +1,8 @@
 package types
 
 import (
+	"fmt"
+
 	"github.com/pkg/errors"
 	consensus_types "github.com/stratisproject/prysm-stratis/consensus-types"
 )
@@ -83,21 +85,41 @@ func (f FieldIndex) String() string {
 	case LatestExecutionPayloadHeader:
 		return "latestExecutionPayloadHeader"
 	case LatestExecutionPayloadHeaderCapella:
-		return "LatestExecutionPayloadHeaderCapella"
+		return "latestExecutionPayloadHeaderCapella"
+	case LatestExecutionPayloadHeaderDeneb:
+		return "latestExecutionPayloadHeaderDeneb"
 	case NextWithdrawalIndex:
-		return "NextWithdrawalIndex"
+		return "nextWithdrawalIndex"
 	case NextWithdrawalValidatorIndex:
-		return "NextWithdrawalValidatorIndex"
+		return "nextWithdrawalValidatorIndex"
 	case HistoricalSummaries:
-		return "HistoricalSummaries"
+		return "historicalSummaries"
+	case DepositRequestsStartIndex:
+		return "depositRequestsStartIndex"
+	case DepositBalanceToConsume:
+		return "depositBalanceToConsume"
+	case ExitBalanceToConsume:
+		return "exitBalanceToConsume"
+	case EarliestExitEpoch:
+		return "earliestExitEpoch"
+	case ConsolidationBalanceToConsume:
+		return "consolidationBalanceToConsume"
+	case EarliestConsolidationEpoch:
+		return "earliestConsolidationEpoch"
+	case PendingDeposits:
+		return "pendingDeposits"
+	case PendingPartialWithdrawals:
+		return "pendingPartialWithdrawals"
+	case PendingConsolidations:
+		return "pendingConsolidations"
 	case StakingContractAddress:
-		return "StakingContractAddress"
+		return "stakingContractAddress"
 	case LastRewardedProposerIndex:
-		return "LastRewardedProposerIndex"
+		return "lastRewardedProposerIndex"
 	case LastRewardedProposerUpdated:
-		return "LastRewardedProposerUpdated"
+		return "lastRewardedProposerUpdated"
 	default:
-		return ""
+		return fmt.Sprintf("unknown field index number: %d", f)
 	}
 }
 
@@ -167,6 +189,24 @@ func (f FieldIndex) RealPosition() int {
 		return 29
 	case LastRewardedProposerUpdated:
 		return 30
+	case DepositRequestsStartIndex:
+		return 31
+	case DepositBalanceToConsume:
+		return 32
+	case ExitBalanceToConsume:
+		return 33
+	case EarliestExitEpoch:
+		return 34
+	case ConsolidationBalanceToConsume:
+		return 35
+	case EarliestConsolidationEpoch:
+		return 36
+	case PendingDeposits:
+		return 37
+	case PendingPartialWithdrawals:
+		return 38
+	case PendingConsolidations:
+		return 39
 	default:
 		return -1
 	}
@@ -225,6 +265,15 @@ const (
 	StakingContractAddress
 	LastRewardedProposerIndex
 	LastRewardedProposerUpdated
+	DepositRequestsStartIndex     // Electra: EIP-6110
+	DepositBalanceToConsume       // Electra: EIP-7251
+	ExitBalanceToConsume          // Electra: EIP-7251
+	EarliestExitEpoch             // Electra: EIP-7251
+	ConsolidationBalanceToConsume // Electra: EIP-7251
+	EarliestConsolidationEpoch    // Electra: EIP-7251
+	PendingDeposits               // Electra: EIP-7251
+	PendingPartialWithdrawals     // Electra: EIP-7251
+	PendingConsolidations         // Electra: EIP-7251
 )
 
 // Enumerator keeps track of the number of states created since the node's start.

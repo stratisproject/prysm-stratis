@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/stratisproject/prysm-stratis/config/params"
-
 	"github.com/stratisproject/prysm-stratis/testing/require"
 )
 

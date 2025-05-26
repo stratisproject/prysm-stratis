@@ -4,8 +4,8 @@ import (
 	"context"
 
 	fieldparams "github.com/stratisproject/prysm-stratis/config/fieldparams"
+	"github.com/stratisproject/prysm-stratis/monitoring/tracing/trace"
 	bolt "go.etcd.io/bbolt"
-	"go.opencensus.io/trace"
 )
 
 // EIPImportBlacklistedPublicKeys returns keys that were marked as blacklisted during EIP-3076 slashing

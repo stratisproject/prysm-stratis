@@ -8,7 +8,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/state"
 	"github.com/stratisproject/prysm-stratis/encoding/bytesutil"
-	"go.opencensus.io/trace"
+	"github.com/stratisproject/prysm-stratis/monitoring/tracing/trace"
 )
 
 // MigrateToCold advances the finalized info in between the cold and hot state sections.

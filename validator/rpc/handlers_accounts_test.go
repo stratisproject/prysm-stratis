@@ -23,8 +23,8 @@ import (
 	validatormock "github.com/stratisproject/prysm-stratis/testing/validator-mock"
 	"github.com/stratisproject/prysm-stratis/validator/accounts"
 	"github.com/stratisproject/prysm-stratis/validator/accounts/iface"
-	mock "github.com/stratisproject/prysm-stratis/validator/accounts/testing"
 	"github.com/stratisproject/prysm-stratis/validator/client"
+	"github.com/stratisproject/prysm-stratis/validator/client/testutil"
 	"github.com/stratisproject/prysm-stratis/validator/keymanager"
 	"github.com/stratisproject/prysm-stratis/validator/keymanager/derived"
 	constant "github.com/stratisproject/prysm-stratis/validator/testing"
@@ -55,7 +55,7 @@ func TestServer_ListAccounts(t *testing.T) {
 	require.NoError(t, err)
 	vs, err := client.NewValidatorService(ctx, &client.Config{
 		Wallet: w,
-		Validator: &mock.Validator{
+		Validator: &testutil.FakeValidator{
 			Km: km,
 		},
 	})
@@ -160,7 +160,7 @@ func TestServer_BackupAccounts(t *testing.T) {
 	require.NoError(t, err)
 	vs, err := client.NewValidatorService(ctx, &client.Config{
 		Wallet: w,
-		Validator: &mock.Validator{
+		Validator: &testutil.FakeValidator{
 			Km: km,
 		},
 	})
@@ -253,7 +253,7 @@ func TestServer_VoluntaryExit(t *testing.T) {
 	}
 
 	mockNodeClient.EXPECT().
-		GetGenesis(gomock.Any(), gomock.Any()).
+		Genesis(gomock.Any(), gomock.Any()).
 		Return(&ethpb.Genesis{GenesisTime: genesisTime}, nil)
 
 	mockValidatorClient.EXPECT().
@@ -284,7 +284,7 @@ func TestServer_VoluntaryExit(t *testing.T) {
 	require.NoError(t, err)
 	vs, err := client.NewValidatorService(ctx, &client.Config{
 		Wallet: w,
-		Validator: &mock.Validator{
+		Validator: &testutil.FakeValidator{
 			Km: km,
 		},
 	})

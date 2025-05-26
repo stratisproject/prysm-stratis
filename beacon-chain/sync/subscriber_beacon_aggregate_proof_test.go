@@ -34,7 +34,7 @@ func TestBeaconAggregateProofSubscriber_CanSaveAggregatedAttestation(t *testing.
 		Signature: make([]byte, fieldparams.BLSSignatureLength),
 	}
 	require.NoError(t, r.beaconAggregateProofSubscriber(context.Background(), a))
-	assert.DeepSSZEqual(t, []*ethpb.Attestation{a.Message.Aggregate}, r.cfg.attPool.AggregatedAttestations(), "Did not save aggregated attestation")
+	assert.DeepSSZEqual(t, []ethpb.Att{a.Message.Aggregate}, r.cfg.attPool.AggregatedAttestations(), "Did not save aggregated attestation")
 }
 
 func TestBeaconAggregateProofSubscriber_CanSaveUnaggregatedAttestation(t *testing.T) {
@@ -57,7 +57,6 @@ func TestBeaconAggregateProofSubscriber_CanSaveUnaggregatedAttestation(t *testin
 	}
 	require.NoError(t, r.beaconAggregateProofSubscriber(context.Background(), a))
 
-	atts, err := r.cfg.attPool.UnaggregatedAttestations()
-	require.NoError(t, err)
-	assert.DeepEqual(t, []*ethpb.Attestation{a.Message.Aggregate}, atts, "Did not save unaggregated attestation")
+	atts := r.cfg.attPool.UnaggregatedAttestations()
+	assert.DeepEqual(t, []ethpb.Att{a.Message.Aggregate}, atts, "Did not save unaggregated attestation")
 }

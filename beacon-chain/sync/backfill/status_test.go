@@ -5,16 +5,15 @@ import (
 	"context"
 	"testing"
 
+	"github.com/pkg/errors"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/das"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/db"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/state"
 	"github.com/stratisproject/prysm-stratis/consensus-types/blocks"
 	blocktest "github.com/stratisproject/prysm-stratis/consensus-types/blocks/testing"
 	"github.com/stratisproject/prysm-stratis/consensus-types/interfaces"
-	"github.com/stratisproject/prysm-stratis/proto/dbval"
-
-	"github.com/pkg/errors"
 	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
+	"github.com/stratisproject/prysm-stratis/proto/dbval"
 	"github.com/stratisproject/prysm-stratis/testing/require"
 	"github.com/stratisproject/prysm-stratis/testing/util"
 )

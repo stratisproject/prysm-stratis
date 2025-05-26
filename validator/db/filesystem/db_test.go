@@ -11,7 +11,6 @@ import (
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	fieldparams "github.com/stratisproject/prysm-stratis/config/fieldparams"
 	"github.com/stratisproject/prysm-stratis/config/proposer"
-
 	"github.com/stratisproject/prysm-stratis/crypto/bls"
 	"github.com/stratisproject/prysm-stratis/io/file"
 	"github.com/stratisproject/prysm-stratis/testing/require"

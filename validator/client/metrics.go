@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/sirupsen/logrus"
@@ -13,10 +14,11 @@ import (
 	"github.com/stratisproject/prysm-stratis/encoding/bytesutil"
 	ethpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
 	"github.com/stratisproject/prysm-stratis/time/slots"
+	"github.com/stratisproject/prysm-stratis/validator/client/iface"
 )
 
 var (
-	// ValidatorStatusesGaugeVec used to track validator statuses by public key.
+	// ValidatorStatusesGaugeVec used to track validator statuses by public key and validator index.
 	ValidatorStatusesGaugeVec = promauto.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Namespace: "validator",
@@ -24,7 +26,7 @@ var (
 			Help:      "validator statuses: 0 UNKNOWN, 1 DEPOSITED, 2 PENDING, 3 ACTIVE, 4 EXITING, 5 SLASHING, 6 EXITED",
 		},
 		[]string{
-			"pubkey",
+			"pubkey", "index",
 		},
 	)
 	// ValidatorAggSuccessVec used to count successful aggregations.
@@ -62,16 +64,6 @@ var (
 		prometheus.CounterOpts{
 			Namespace: "validator",
 			Name:      "failed_proposals",
-		},
-		[]string{
-			"pubkey",
-		},
-	)
-	// ValidatorProposeFailVecSlasher used to count failed proposals by slashing protection.
-	ValidatorProposeFailVecSlasher = promauto.NewCounterVec(
-		prometheus.CounterOpts{
-			Name: "validator_proposals_rejected_total",
-			Help: "Count the block proposals rejected by slashing protection.",
 		},
 		[]string{
 			"pubkey",
@@ -158,16 +150,6 @@ var (
 			"pubkey",
 		},
 	)
-	// ValidatorAttestFailVecSlasher used to count failed attestations by slashing protection.
-	ValidatorAttestFailVecSlasher = promauto.NewCounterVec(
-		prometheus.CounterOpts{
-			Name: "validator_attestations_rejected_total",
-			Help: "Count the attestations rejected by slashing protection.",
-		},
-		[]string{
-			"pubkey",
-		},
-	)
 	// ValidatorNextAttestationSlotGaugeVec used to track validator statuses by public key.
 	ValidatorNextAttestationSlotGaugeVec = promauto.NewGaugeVec(
 		prometheus.GaugeOpts{
@@ -195,7 +177,7 @@ var (
 		prometheus.GaugeOpts{
 			Namespace: "validator",
 			Name:      "in_sync_committee",
-			Help:      "validator sync committee.New in Altair hardfork",
+			Help:      "validator sync committee.New in Altair hard fork",
 		},
 		[]string{
 			"pubkey",
@@ -206,7 +188,7 @@ var (
 		prometheus.GaugeOpts{
 			Namespace: "validator",
 			Name:      "in_next_sync_committee",
-			Help:      "validator next sync committee. New in Altair hardfork",
+			Help:      "validator next sync committee. New in Altair hard fork",
 		},
 		[]string{
 			"pubkey",
@@ -217,7 +199,7 @@ var (
 		prometheus.GaugeOpts{
 			Namespace: "validator",
 			Name:      "inactivity_score",
-			Help:      "Validator inactivity score. 0 is optimum number. New in Altair hardfork",
+			Help:      "Validator inactivity score. 0 is optimum number. New in Altair hard fork",
 		},
 		[]string{
 			"pubkey",
@@ -249,8 +231,12 @@ func (v *validator) LogValidatorGainsAndLosses(ctx context.Context, slot primiti
 	req := &ethpb.ValidatorPerformanceRequest{
 		PublicKeys: pubKeys,
 	}
-	resp, err := v.chainClient.GetValidatorPerformance(ctx, req)
+	resp, err := v.prysmChainClient.ValidatorPerformance(ctx, req)
 	if err != nil {
+		if errors.Is(err, iface.ErrNotSupported) {
+			log.WithError(err).Debug("Skipping validator performance metric for non-Prysm beacon node")
+			return nil
+		}
 		return err
 	}
 

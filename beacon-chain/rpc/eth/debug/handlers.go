@@ -7,14 +7,13 @@ import (
 	"net/http"
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/gorilla/mux"
 	"github.com/stratisproject/prysm-stratis/api"
 	"github.com/stratisproject/prysm-stratis/api/server/structs"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/rpc/eth/helpers"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/rpc/eth/shared"
+	"github.com/stratisproject/prysm-stratis/monitoring/tracing/trace"
 	"github.com/stratisproject/prysm-stratis/network/httputil"
 	"github.com/stratisproject/prysm-stratis/runtime/version"
-	"go.opencensus.io/trace"
 )
 
 const errMsgStateFromConsensus = "Could not convert consensus state to response"
@@ -24,7 +23,7 @@ func (s *Server) GetBeaconStateV2(w http.ResponseWriter, r *http.Request) {
 	ctx, span := trace.StartSpan(r.Context(), "debug.GetBeaconStateV2")
 	defer span.End()
 
-	stateId := mux.Vars(r)["state_id"]
+	stateId := r.PathValue("state_id")
 	if stateId == "" {
 		httputil.HandleError(w, "state_id is required in URL params", http.StatusBadRequest)
 		return
@@ -89,6 +88,18 @@ func (s *Server) getBeaconStateV2(ctx context.Context, w http.ResponseWriter, id
 			httputil.HandleError(w, errMsgStateFromConsensus+": "+err.Error(), http.StatusInternalServerError)
 			return
 		}
+	case version.Electra:
+		respSt, err = structs.BeaconStateElectraFromConsensus(st)
+		if err != nil {
+			httputil.HandleError(w, errMsgStateFromConsensus+": "+err.Error(), http.StatusInternalServerError)
+			return
+		}
+	case version.Fulu:
+		respSt, err = structs.BeaconStateFuluFromConsensus(st)
+		if err != nil {
+			httputil.HandleError(w, errMsgStateFromConsensus+": "+err.Error(), http.StatusInternalServerError)
+			return
+		}
 	default:
 		httputil.HandleError(w, "Unsupported state version", http.StatusInternalServerError)
 		return
@@ -123,7 +134,7 @@ func (s *Server) getBeaconStateSSZV2(ctx context.Context, w http.ResponseWriter,
 		return
 	}
 	w.Header().Set(api.VersionHeader, version.String(st.Version()))
-	httputil.WriteSsz(w, sszState, "beacon_state.ssz")
+	httputil.WriteSsz(w, sszState)
 }
 
 // GetForkChoiceHeadsV2 retrieves the leaves of the current fork choice tree.
@@ -179,6 +190,7 @@ func (s *Server) GetForkChoice(w http.ResponseWriter, r *http.Request) {
 				Balance:                  fmt.Sprintf("%d", n.Balance),
 				ExecutionOptimistic:      n.ExecutionOptimistic,
 				TimeStamp:                fmt.Sprintf("%d", n.Timestamp),
+				Target:                   fmt.Sprintf("%#x", n.Target),
 			},
 		}
 	}

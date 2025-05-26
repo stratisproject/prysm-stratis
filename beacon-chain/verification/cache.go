@@ -5,14 +5,13 @@ import (
 	"fmt"
 
 	lru "github.com/hashicorp/golang-lru"
-	log "github.com/sirupsen/logrus"
-	lruwrpr "github.com/stratisproject/prysm-stratis/cache/lru"
-
+	"github.com/sirupsen/logrus"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/core/helpers"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/core/signing"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/core/transition"
 	forkchoicetypes "github.com/stratisproject/prysm-stratis/beacon-chain/forkchoice/types"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/state"
+	lruwrpr "github.com/stratisproject/prysm-stratis/cache/lru"
 	"github.com/stratisproject/prysm-stratis/config/params"
 	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
 	"github.com/stratisproject/prysm-stratis/crypto/bls"
@@ -51,8 +50,8 @@ type SignatureData struct {
 	Slot      primitives.Slot
 }
 
-func (d SignatureData) logFields() log.Fields {
-	return log.Fields{
+func (d SignatureData) logFields() logrus.Fields {
+	return logrus.Fields{
 		"root":       fmt.Sprintf("%#x", d.Root),
 		"parentRoot": fmt.Sprintf("%#x", d.Parent),
 		"signature":  fmt.Sprintf("%#x", d.Signature),

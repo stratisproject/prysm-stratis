@@ -16,8 +16,10 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-const errEpoch = "Cannot retrieve information about an epoch in the future, current epoch %d, requesting %d"
+const errEpoch = "cannot retrieve information about an epoch in the future, current epoch %d, requesting %d"
 
+// Deprecated: The gRPC API will remain the default and fully supported through v8 (expected in 2026) but will be eventually removed in favor of REST API.
+//
 // ListValidatorAssignments retrieves the validator assignments for a given epoch,
 // optional validator indices or public keys may be included to filter validator assignments.
 func (bs *Server) ListValidatorAssignments(

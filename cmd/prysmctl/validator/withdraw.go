@@ -18,8 +18,8 @@ import (
 	"github.com/stratisproject/prysm-stratis/api/server/structs"
 	fieldparams "github.com/stratisproject/prysm-stratis/config/fieldparams"
 	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
+	"github.com/stratisproject/prysm-stratis/monitoring/tracing/trace"
 	"github.com/urfave/cli/v2"
-	"go.opencensus.io/trace"
 )
 
 func setWithdrawalAddresses(c *cli.Context) error {

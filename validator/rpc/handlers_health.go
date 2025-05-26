@@ -6,19 +6,19 @@ import (
 	"net/http"
 
 	"github.com/stratisproject/prysm-stratis/api"
+	"github.com/stratisproject/prysm-stratis/monitoring/tracing/trace"
 	"github.com/stratisproject/prysm-stratis/network/httputil"
 	pb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
 	"github.com/stratisproject/prysm-stratis/runtime/version"
-	"go.opencensus.io/trace"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 // GetVersion returns the beacon node and validator client versions
 func (s *Server) GetVersion(w http.ResponseWriter, r *http.Request) {
-	ctx, span := trace.StartSpan(r.Context(), "validator.web.health.GetVersion")
+	ctx, span := trace.StartSpan(r.Context(), "validator.web.health.Version")
 	defer span.End()
 
-	beacon, err := s.nodeClient.GetVersion(ctx, &emptypb.Empty{})
+	beacon, err := s.nodeClient.Version(ctx, &emptypb.Empty{})
 	if err != nil {
 		httputil.HandleError(w, err.Error(), http.StatusInternalServerError)
 		return

@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/pkg/errors"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/verification"
 	"github.com/stratisproject/prysm-stratis/testing/require"
 )
 
@@ -41,4 +42,9 @@ func TestInvalidRoots(t *testing.T) {
 	require.Equal(t, true, IsInvalidBlock(err))
 	require.Equal(t, [32]byte{'a'}, InvalidBlockRoot(newErr))
 	require.DeepEqual(t, roots, InvalidAncestorRoots(newErr))
+}
+
+func TestInvalidRecognition(t *testing.T) {
+	err := invalidBlock{error: errors.New("test"), root: [32]byte{}}
+	require.Equal(t, true, errors.Is(err, verification.ErrInvalid))
 }

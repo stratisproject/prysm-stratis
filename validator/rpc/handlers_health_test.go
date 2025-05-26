@@ -12,7 +12,6 @@ import (
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/stratisproject/prysm-stratis/api"
 	"github.com/stratisproject/prysm-stratis/io/logs/mock"
-	eth "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
 	pb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
 	"github.com/stratisproject/prysm-stratis/testing/require"
 	validatormock "github.com/stratisproject/prysm-stratis/testing/validator-mock"
@@ -26,11 +25,11 @@ type MockBeaconNodeHealthClient struct {
 	err  error
 }
 
-func (m *MockBeaconNodeHealthClient) StreamBeaconLogs(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (eth.Health_StreamBeaconLogsClient, error) {
+func (m *MockBeaconNodeHealthClient) StreamBeaconLogs(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (pb.Health_StreamBeaconLogsClient, error) {
 	return m, m.err
 }
 
-func (m *MockBeaconNodeHealthClient) Recv() (*eth.LogsResponse, error) {
+func (m *MockBeaconNodeHealthClient) Recv() (*pb.LogsResponse, error) {
 	if len(m.logs) == 0 {
 		return nil, io.EOF
 	}
@@ -173,7 +172,7 @@ func TestServer_GetVersion(t *testing.T) {
 		ctx:        ctx,
 		nodeClient: mockNodeClient,
 	}
-	mockNodeClient.EXPECT().GetVersion(gomock.Any(), gomock.Any()).Return(&eth.Version{
+	mockNodeClient.EXPECT().Version(gomock.Any(), gomock.Any()).Return(&pb.Version{
 		Version:  "4.10.1",
 		Metadata: "beacon node",
 	}, nil)

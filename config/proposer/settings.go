@@ -16,7 +16,7 @@ import (
 // SettingFromConsensus converts struct to Settings while verifying the fields
 func SettingFromConsensus(ps *validatorpb.ProposerSettingsPayload) (*Settings, error) {
 	settings := &Settings{}
-	if ps.ProposerConfig != nil && len(ps.ProposerConfig) != 0 {
+	if len(ps.ProposerConfig) != 0 {
 		settings.ProposeConfig = make(map[[fieldparams.BLSPubkeyLength]byte]*Option)
 		for key, optionPayload := range ps.ProposerConfig {
 			decodedKey, err := hexutil.Decode(key)
@@ -108,7 +108,7 @@ type Settings struct {
 	DefaultConfig *Option
 }
 
-// ShouldBeSaved goes through checks to see if the value should be savable
+// ShouldBeSaved goes through checks to see if the value should be saveable
 // Pseudocode: conditions for being saved into the database
 // 1. settings are not nil
 // 2. proposeconfig is not nil (this defines specific settings for each validator key), default config can be nil in this case and fall back to beacon node settings

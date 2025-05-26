@@ -18,7 +18,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/stratisproject/prysm-stratis/config/features"
 	ecdsaprysm "github.com/stratisproject/prysm-stratis/crypto/ecdsa"
-
 	"github.com/stratisproject/prysm-stratis/runtime/version"
 )
 

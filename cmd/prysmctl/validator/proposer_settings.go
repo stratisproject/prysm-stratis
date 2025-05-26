@@ -15,9 +15,9 @@ import (
 	"github.com/stratisproject/prysm-stratis/encoding/bytesutil"
 	"github.com/stratisproject/prysm-stratis/io/file"
 	"github.com/stratisproject/prysm-stratis/io/prompt"
+	"github.com/stratisproject/prysm-stratis/monitoring/tracing/trace"
 	validatorpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1/validator-client"
 	"github.com/urfave/cli/v2"
-	"go.opencensus.io/trace"
 )
 
 func getProposerSettings(c *cli.Context, r io.Reader) error {

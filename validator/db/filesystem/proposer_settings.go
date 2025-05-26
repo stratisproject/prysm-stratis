@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/pkg/errors"
-
 	"github.com/stratisproject/prysm-stratis/config/proposer"
 )
 

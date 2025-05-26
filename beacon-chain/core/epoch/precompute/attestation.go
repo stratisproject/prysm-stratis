@@ -11,10 +11,10 @@ import (
 	"github.com/stratisproject/prysm-stratis/config/params"
 	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
 	"github.com/stratisproject/prysm-stratis/monitoring/tracing"
+	"github.com/stratisproject/prysm-stratis/monitoring/tracing/trace"
 	ethpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
 	"github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1/attestation"
 	"github.com/stratisproject/prysm-stratis/runtime/version"
-	"go.opencensus.io/trace"
 )
 
 // ProcessAttestations process the attestations in state and update individual validator's pre computes,
@@ -54,11 +54,11 @@ func ProcessAttestations(
 			return nil, nil, errors.Wrap(err, "could not check validator attested previous epoch")
 		}
 
-		committee, err := helpers.BeaconCommitteeFromState(ctx, state, a.Data.Slot, a.Data.CommitteeIndex)
+		committee, err := helpers.BeaconCommitteeFromState(ctx, state, a.GetData().Slot, a.GetData().CommitteeIndex)
 		if err != nil {
 			return nil, nil, err
 		}
-		indices, err := attestation.AttestingIndices(a.AggregationBits, committee)
+		indices, err := attestation.AttestingIndices(a, committee)
 		if err != nil {
 			return nil, nil, err
 		}

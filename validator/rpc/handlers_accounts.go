@@ -18,13 +18,13 @@ import (
 	fieldparams "github.com/stratisproject/prysm-stratis/config/fieldparams"
 	"github.com/stratisproject/prysm-stratis/crypto/bls"
 	"github.com/stratisproject/prysm-stratis/encoding/bytesutil"
+	"github.com/stratisproject/prysm-stratis/monitoring/tracing/trace"
 	"github.com/stratisproject/prysm-stratis/network/httputil"
 	"github.com/stratisproject/prysm-stratis/validator/accounts"
 	"github.com/stratisproject/prysm-stratis/validator/accounts/petnames"
 	"github.com/stratisproject/prysm-stratis/validator/keymanager"
 	"github.com/stratisproject/prysm-stratis/validator/keymanager/derived"
 	"github.com/stratisproject/prysm-stratis/validator/keymanager/local"
-	"go.opencensus.io/trace"
 )
 
 // ListAccounts allows retrieval of validating keys and their petnames
@@ -95,7 +95,7 @@ func (s *Server) ListAccounts(w http.ResponseWriter, r *http.Request) {
 	}
 	start, end, nextPageToken, err := pagination.StartAndEndPage(pageToken, int(ps), len(keys))
 	if err != nil {
-		httputil.HandleError(w, fmt.Errorf("Could not paginate results: %v",
+		httputil.HandleError(w, fmt.Errorf("Could not paginate results: %w",
 			err).Error(), http.StatusInternalServerError)
 		return
 	}
@@ -123,7 +123,7 @@ func (s *Server) BackupAccounts(w http.ResponseWriter, r *http.Request) {
 	var req BackupAccountsRequest
 	err := json.NewDecoder(r.Body).Decode(&req)
 	switch {
-	case err == io.EOF:
+	case errors.Is(err, io.EOF):
 		httputil.HandleError(w, "No data submitted", http.StatusBadRequest)
 		return
 	case err != nil:
@@ -131,7 +131,7 @@ func (s *Server) BackupAccounts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if req.PublicKeys == nil || len(req.PublicKeys) < 1 {
+	if len(req.PublicKeys) < 1 {
 		httputil.HandleError(w, "No public keys specified to backup", http.StatusBadRequest)
 		return
 	}
@@ -232,7 +232,7 @@ func (s *Server) VoluntaryExit(w http.ResponseWriter, r *http.Request) {
 	var req VoluntaryExitRequest
 	err := json.NewDecoder(r.Body).Decode(&req)
 	switch {
-	case err == io.EOF:
+	case errors.Is(err, io.EOF):
 		httputil.HandleError(w, "No data submitted", http.StatusBadRequest)
 		return
 	case err != nil:

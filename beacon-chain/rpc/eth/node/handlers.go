@@ -10,10 +10,10 @@ import (
 	"github.com/stratisproject/prysm-stratis/api/server/structs"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/p2p"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/rpc/eth/shared"
+	"github.com/stratisproject/prysm-stratis/monitoring/tracing/trace"
 	"github.com/stratisproject/prysm-stratis/network/httputil"
 	ethpb "github.com/stratisproject/prysm-stratis/proto/eth/v1"
 	"github.com/stratisproject/prysm-stratis/runtime/version"
-	"go.opencensus.io/trace"
 )
 
 var (

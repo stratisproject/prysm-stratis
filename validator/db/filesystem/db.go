@@ -11,14 +11,13 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	fieldparams "github.com/stratisproject/prysm-stratis/config/fieldparams"
 	"github.com/stratisproject/prysm-stratis/io/file"
 	validatorpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1/validator-client"
 	"github.com/stratisproject/prysm-stratis/validator/db/iface"
 	"gopkg.in/yaml.v3"
-
-	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 const (

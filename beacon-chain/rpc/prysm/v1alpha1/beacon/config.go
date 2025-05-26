@@ -10,6 +10,8 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
+// Deprecated: The gRPC API will remain the default and fully supported through v8 (expected in 2026) but will be eventually removed in favor of REST API.
+//
 // GetBeaconConfig retrieves the current configuration parameters of the beacon chain.
 func (_ *Server) GetBeaconConfig(_ context.Context, _ *emptypb.Empty) (*ethpb.BeaconConfig, error) {
 	conf := params.BeaconConfig()

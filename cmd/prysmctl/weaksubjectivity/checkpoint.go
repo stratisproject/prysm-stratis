@@ -8,6 +8,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/stratisproject/prysm-stratis/api/client"
 	"github.com/stratisproject/prysm-stratis/api/client/beacon"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/sync/checkpoint"
 	"github.com/urfave/cli/v2"
 )
 
@@ -52,7 +53,7 @@ func cliActionCheckpoint(_ *cli.Context) error {
 		return err
 	}
 
-	ws, err := beacon.ComputeWeakSubjectivityCheckpoint(ctx, client)
+	ws, err := checkpoint.ComputeWeakSubjectivityCheckpoint(ctx, client)
 	if err != nil {
 		return err
 	}

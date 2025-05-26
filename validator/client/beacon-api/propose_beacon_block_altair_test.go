@@ -7,12 +7,13 @@ import (
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/stratisproject/prysm-stratis/api/apiutil"
 	"github.com/stratisproject/prysm-stratis/api/server/structs"
 	ethpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
 	"github.com/stratisproject/prysm-stratis/testing/assert"
 	"github.com/stratisproject/prysm-stratis/testing/require"
 	"github.com/stratisproject/prysm-stratis/validator/client/beacon-api/mock"
-	test_helpers "github.com/stratisproject/prysm-stratis/validator/client/beacon-api/test-helpers"
+	testhelpers "github.com/stratisproject/prysm-stratis/validator/client/beacon-api/test-helpers"
 	"go.uber.org/mock/gomock"
 )
 
@@ -30,8 +31,8 @@ func TestProposeBeaconBlock_Altair(t *testing.T) {
 		Signature: hexutil.Encode(altairBlock.Altair.Signature),
 		Message: &structs.BeaconBlockAltair{
 			ParentRoot:    hexutil.Encode(altairBlock.Altair.Block.ParentRoot),
-			ProposerIndex: uint64ToString(altairBlock.Altair.Block.ProposerIndex),
-			Slot:          uint64ToString(altairBlock.Altair.Block.Slot),
+			ProposerIndex: apiutil.Uint64ToString(altairBlock.Altair.Block.ProposerIndex),
+			Slot:          apiutil.Uint64ToString(altairBlock.Altair.Block.Slot),
 			StateRoot:     hexutil.Encode(altairBlock.Altair.Block.StateRoot),
 			Body: &structs.BeaconBlockBodyAltair{
 				Attestations:      jsonifyAttestations(altairBlock.Altair.Block.Body.Attestations),
@@ -58,8 +59,8 @@ func TestProposeBeaconBlock_Altair(t *testing.T) {
 	// Make sure that what we send in the POST body is the marshalled version of the protobuf block
 	headers := map[string]string{"Eth-Consensus-Version": "altair"}
 	jsonRestHandler.EXPECT().Post(
-		ctx,
-		"/eth/v1/beacon/blocks",
+		gomock.Any(),
+		"/eth/v2/beacon/blocks",
 		headers,
 		bytes.NewBuffer(marshalledBlock),
 		nil,
@@ -80,8 +81,8 @@ func TestProposeBeaconBlock_Altair(t *testing.T) {
 func generateSignedAltairBlock() *ethpb.GenericSignedBeaconBlock_Altair {
 	return &ethpb.GenericSignedBeaconBlock_Altair{
 		Altair: &ethpb.SignedBeaconBlockAltair{
-			Block:     test_helpers.GenerateProtoAltairBeaconBlock(),
-			Signature: test_helpers.FillByteSlice(96, 112),
+			Block:     testhelpers.GenerateProtoAltairBeaconBlock(),
+			Signature: testhelpers.FillByteSlice(96, 112),
 		},
 	}
 }

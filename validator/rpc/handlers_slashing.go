@@ -7,9 +7,9 @@ import (
 	"net/http"
 
 	"github.com/pkg/errors"
+	"github.com/stratisproject/prysm-stratis/monitoring/tracing/trace"
 	"github.com/stratisproject/prysm-stratis/network/httputil"
 	slashing "github.com/stratisproject/prysm-stratis/validator/slashing-protection-history"
-	"go.opencensus.io/trace"
 )
 
 // ExportSlashingProtection handles the rpc call returning the json slashing history.
@@ -62,7 +62,7 @@ func (s *Server) ImportSlashingProtection(w http.ResponseWriter, r *http.Request
 	var req ImportSlashingProtectionRequest
 	err := json.NewDecoder(r.Body).Decode(&req)
 	switch {
-	case err == io.EOF:
+	case errors.Is(err, io.EOF):
 		httputil.HandleError(w, "No data submitted", http.StatusBadRequest)
 		return
 	case err != nil:

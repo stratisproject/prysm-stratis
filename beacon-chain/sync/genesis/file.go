@@ -5,11 +5,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/stratisproject/prysm-stratis/crypto/hash"
-	"github.com/stratisproject/prysm-stratis/io/file"
-
 	"github.com/pkg/errors"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/db"
+	"github.com/stratisproject/prysm-stratis/crypto/hash"
+	"github.com/stratisproject/prysm-stratis/io/file"
 )
 
 // Initializer describes a type that is able to obtain the checkpoint sync data (BeaconState and SignedBeaconBlock)

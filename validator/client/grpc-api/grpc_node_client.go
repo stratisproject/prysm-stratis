@@ -5,7 +5,7 @@ import (
 
 	"github.com/golang/protobuf/ptypes/empty"
 	log "github.com/sirupsen/logrus"
-	"github.com/stratisproject/prysm-stratis/api/client/beacon"
+	"github.com/stratisproject/prysm-stratis/api/client/beacon/health"
 	ethpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
 	"github.com/stratisproject/prysm-stratis/validator/client/iface"
 	"google.golang.org/grpc"
@@ -17,22 +17,22 @@ var (
 
 type grpcNodeClient struct {
 	nodeClient    ethpb.NodeClient
-	healthTracker *beacon.NodeHealthTracker
+	healthTracker health.Tracker
 }
 
-func (c *grpcNodeClient) GetSyncStatus(ctx context.Context, in *empty.Empty) (*ethpb.SyncStatus, error) {
+func (c *grpcNodeClient) SyncStatus(ctx context.Context, in *empty.Empty) (*ethpb.SyncStatus, error) {
 	return c.nodeClient.GetSyncStatus(ctx, in)
 }
 
-func (c *grpcNodeClient) GetGenesis(ctx context.Context, in *empty.Empty) (*ethpb.Genesis, error) {
+func (c *grpcNodeClient) Genesis(ctx context.Context, in *empty.Empty) (*ethpb.Genesis, error) {
 	return c.nodeClient.GetGenesis(ctx, in)
 }
 
-func (c *grpcNodeClient) GetVersion(ctx context.Context, in *empty.Empty) (*ethpb.Version, error) {
+func (c *grpcNodeClient) Version(ctx context.Context, in *empty.Empty) (*ethpb.Version, error) {
 	return c.nodeClient.GetVersion(ctx, in)
 }
 
-func (c *grpcNodeClient) ListPeers(ctx context.Context, in *empty.Empty) (*ethpb.Peers, error) {
+func (c *grpcNodeClient) Peers(ctx context.Context, in *empty.Empty) (*ethpb.Peers, error) {
 	return c.nodeClient.ListPeers(ctx, in)
 }
 
@@ -45,12 +45,12 @@ func (c *grpcNodeClient) IsHealthy(ctx context.Context) bool {
 	return true
 }
 
-func (c *grpcNodeClient) HealthTracker() *beacon.NodeHealthTracker {
+func (c *grpcNodeClient) HealthTracker() health.Tracker {
 	return c.healthTracker
 }
 
 func NewNodeClient(cc grpc.ClientConnInterface) iface.NodeClient {
 	g := &grpcNodeClient{nodeClient: ethpb.NewNodeClient(cc)}
-	g.healthTracker = beacon.NewNodeHealthTracker(g)
+	g.healthTracker = health.NewTracker(g)
 	return g
 }

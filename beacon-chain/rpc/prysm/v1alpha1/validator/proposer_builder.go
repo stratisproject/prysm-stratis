@@ -10,7 +10,7 @@ import (
 	"github.com/stratisproject/prysm-stratis/config/params"
 	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
 	"github.com/stratisproject/prysm-stratis/monitoring/tracing"
-	"go.opencensus.io/trace"
+	"github.com/stratisproject/prysm-stratis/monitoring/tracing/trace"
 )
 
 // Returns true if builder (ie outsourcing block construction) can be used. Both conditions have to meet:
@@ -24,7 +24,7 @@ func (vs *Server) canUseBuilder(ctx context.Context, slot primitives.Slot, idx p
 		return false, nil
 	}
 	activated, err := vs.circuitBreakBuilder(slot)
-	span.AddAttributes(trace.BoolAttribute("circuitBreakerActivated", activated))
+	span.SetAttributes(trace.BoolAttribute("circuitBreakerActivated", activated))
 	if err != nil {
 		tracing.AnnotateError(span, err)
 		return false, err

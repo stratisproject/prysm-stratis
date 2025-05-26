@@ -12,6 +12,7 @@ import (
 	"github.com/stratisproject/prysm-stratis/beacon-chain/p2p"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/startup"
 	beaconsync "github.com/stratisproject/prysm-stratis/beacon-chain/sync"
+	"github.com/stratisproject/prysm-stratis/beacon-chain/verification"
 	"github.com/stratisproject/prysm-stratis/consensus-types/blocks"
 	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
 	"github.com/stratisproject/prysm-stratis/time/slots"
@@ -93,8 +94,9 @@ type blocksQueue struct {
 
 // blocksQueueFetchedData is a data container that is returned from a queue on each step.
 type blocksQueueFetchedData struct {
-	pid peer.ID
-	bwb []blocks.BlockWithROBlobs
+	blocksFrom peer.ID
+	blobsFrom  peer.ID
+	bwb        []blocks.BlockWithROBlobs
 }
 
 // newBlocksQueue creates initialized priority queue.
@@ -337,13 +339,15 @@ func (q *blocksQueue) onDataReceivedEvent(ctx context.Context) eventHandlerFn {
 			}
 			if errors.Is(response.err, beaconsync.ErrInvalidFetchedData) {
 				// Peer returned invalid data, penalize.
-				q.blocksFetcher.p2p.Peers().Scorers().BadResponsesScorer().Increment(m.pid)
-				log.WithField("pid", response.pid).Debug("Peer is penalized for invalid blocks")
+				q.blocksFetcher.p2p.Peers().Scorers().BadResponsesScorer().Increment(response.blocksFrom)
+				log.WithField("pid", response.blocksFrom).Debug("Peer is penalized for invalid blocks")
+			} else if errors.Is(response.err, verification.ErrBlobInvalid) {
+				q.blocksFetcher.p2p.Peers().Scorers().BadResponsesScorer().Increment(response.blobsFrom)
+				log.WithField("pid", response.blobsFrom).Debug("Peer is penalized for invalid blob response")
 			}
 			return m.state, response.err
 		}
-		m.pid = response.pid
-		m.bwb = response.bwb
+		m.fetched = *response
 		return stateDataParsed, nil
 	}
 }
@@ -358,19 +362,15 @@ func (q *blocksQueue) onReadyToSendEvent(ctx context.Context) eventHandlerFn {
 			return m.state, errInvalidInitialState
 		}
 
-		if len(m.bwb) == 0 {
+		if m.numFetched() == 0 {
 			return stateSkipped, nil
 		}
 
 		send := func() (stateID, error) {
-			data := &blocksQueueFetchedData{
-				pid: m.pid,
-				bwb: m.bwb,
-			}
 			select {
 			case <-ctx.Done():
 				return m.state, ctx.Err()
-			case q.fetchedData <- data:
+			case q.fetchedData <- m.fetched.blocksQueueFetchedData():
 			}
 			return stateSent, nil
 		}

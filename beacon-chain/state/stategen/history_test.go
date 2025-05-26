@@ -6,12 +6,11 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/pkg/errors"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/state"
 	"github.com/stratisproject/prysm-stratis/consensus-types/interfaces"
 	"github.com/stratisproject/prysm-stratis/consensus-types/mock"
 	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
-
-	"github.com/pkg/errors"
 	"github.com/stratisproject/prysm-stratis/testing/require"
 )
 

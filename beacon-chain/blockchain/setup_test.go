@@ -10,9 +10,11 @@ import (
 	"github.com/stratisproject/prysm-stratis/beacon-chain/cache"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/cache/depositsnapshot"
 	statefeed "github.com/stratisproject/prysm-stratis/beacon-chain/core/feed/state"
+	lightclient "github.com/stratisproject/prysm-stratis/beacon-chain/core/light-client"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/db"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/db/filesystem"
 	testDB "github.com/stratisproject/prysm-stratis/beacon-chain/db/testing"
+	mockExecution "github.com/stratisproject/prysm-stratis/beacon-chain/execution/testing"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/forkchoice"
 	doublylinkedtree "github.com/stratisproject/prysm-stratis/beacon-chain/forkchoice/doubly-linked-tree"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/operations/attestations"
@@ -31,7 +33,7 @@ type mockBeaconNode struct {
 }
 
 // StateFeed mocks the same method in the beacon node.
-func (mbn *mockBeaconNode) StateFeed() *event.Feed {
+func (mbn *mockBeaconNode) StateFeed() event.SubscriberSender {
 	mbn.mu.Lock()
 	defer mbn.mu.Unlock()
 	if mbn.stateFeed == nil {
@@ -49,7 +51,7 @@ func (mb *mockBroadcaster) Broadcast(_ context.Context, _ proto.Message) error {
 	return nil
 }
 
-func (mb *mockBroadcaster) BroadcastAttestation(_ context.Context, _ uint64, _ *ethpb.Attestation) error {
+func (mb *mockBroadcaster) BroadcastAttestation(_ context.Context, _ uint64, _ ethpb.Att) error {
 	mb.broadcastCalled = true
 	return nil
 }
@@ -120,6 +122,8 @@ func minimalTestService(t *testing.T, opts ...Option) (*Service, *testServiceReq
 		WithTrackedValidatorsCache(cache.NewTrackedValidatorsCache()),
 		WithBlobStorage(filesystem.NewEphemeralBlobStorage(t)),
 		WithSyncChecker(mock.MockChecker{}),
+		WithExecutionEngineCaller(&mockExecution.EngineClient{}),
+		WithLightClientStore(&lightclient.Store{}),
 	}
 	// append the variadic opts so they override the defaults by being processed afterwards
 	opts = append(defOpts, opts...)

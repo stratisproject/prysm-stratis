@@ -15,13 +15,13 @@ import (
 	fieldparams "github.com/stratisproject/prysm-stratis/config/fieldparams"
 	"github.com/stratisproject/prysm-stratis/crypto/bls"
 	"github.com/stratisproject/prysm-stratis/encoding/bytesutil"
+	"github.com/stratisproject/prysm-stratis/monitoring/tracing/trace"
 	validatorpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1/validator-client"
 	"github.com/stratisproject/prysm-stratis/runtime/interop"
 	"github.com/stratisproject/prysm-stratis/validator/accounts/iface"
 	"github.com/stratisproject/prysm-stratis/validator/accounts/petnames"
 	"github.com/stratisproject/prysm-stratis/validator/keymanager"
 	keystorev4 "github.com/wealdtech/go-eth2-wallet-encryptor-keystorev4"
-	"go.opencensus.io/trace"
 )
 
 var (

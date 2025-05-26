@@ -13,6 +13,7 @@ import (
 	"github.com/stratisproject/prysm-stratis/config/features"
 	"github.com/stratisproject/prysm-stratis/io/file"
 	"github.com/stratisproject/prysm-stratis/io/prompt"
+	"github.com/stratisproject/prysm-stratis/monitoring/tracing/trace"
 	"github.com/stratisproject/prysm-stratis/network/httputil"
 	"github.com/stratisproject/prysm-stratis/validator/accounts"
 	"github.com/stratisproject/prysm-stratis/validator/accounts/wallet"
@@ -20,7 +21,6 @@ import (
 	"github.com/tyler-smith/go-bip39"
 	"github.com/tyler-smith/go-bip39/wordlists"
 	keystorev4 "github.com/wealdtech/go-eth2-wallet-encryptor-keystorev4"
-	"go.opencensus.io/trace"
 )
 
 // CreateWallet via an API request, allowing a user to save a new wallet.
@@ -31,7 +31,7 @@ func (s *Server) CreateWallet(w http.ResponseWriter, r *http.Request) {
 	var req CreateWalletRequest
 	err := json.NewDecoder(r.Body).Decode(&req)
 	switch {
-	case err == io.EOF:
+	case errors.Is(err, io.EOF):
 		httputil.HandleError(w, "No data submitted", http.StatusBadRequest)
 		return
 	case err != nil:
@@ -176,7 +176,7 @@ func (s *Server) RecoverWallet(w http.ResponseWriter, r *http.Request) {
 	var req RecoverWalletRequest
 	err := json.NewDecoder(r.Body).Decode(&req)
 	switch {
-	case err == io.EOF:
+	case errors.Is(err, io.EOF):
 		httputil.HandleError(w, "No data submitted", http.StatusBadRequest)
 		return
 	case err != nil:
@@ -278,7 +278,7 @@ func (*Server) ValidateKeystores(w http.ResponseWriter, r *http.Request) {
 	var req ValidateKeystoresRequest
 	err := json.NewDecoder(r.Body).Decode(&req)
 	switch {
-	case err == io.EOF:
+	case errors.Is(err, io.EOF):
 		httputil.HandleError(w, "No data submitted", http.StatusBadRequest)
 		return
 	case err != nil:
@@ -291,7 +291,7 @@ func (*Server) ValidateKeystores(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Needs to unmarshal the keystores from the requests.
-	if req.Keystores == nil || len(req.Keystores) < 1 {
+	if len(req.Keystores) < 1 {
 		httputil.HandleError(w, "No keystores included in request", http.StatusBadRequest)
 		return
 	}

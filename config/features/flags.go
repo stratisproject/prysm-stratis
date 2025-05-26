@@ -13,6 +13,11 @@ var (
 		Name:  "auroria",
 		Usage: "Run Prysm configured for the Auroria beacon chain test network",
 	}
+	// HoodiTestnet flag for ethereum testnet.
+	HoodiTestnet = &cli.BoolFlag{
+		Name:  "hoodi",
+		Usage: "Runs Prysm configured for the Hoodi test network.",
+	}
 	// Mainnet flag for easier tooling, no-op
 	Mainnet = &cli.BoolFlag{
 		Value: true,
@@ -23,9 +28,9 @@ var (
 		Name:  "dev",
 		Usage: "Enables experimental features still in development. These features may not be stable.",
 	}
-	enableExperimentalState = &cli.BoolFlag{
-		Name:  "enable-experimental-state",
-		Usage: "Turns on the latest and greatest (but potentially unstable) changes to the beacon state.",
+	disableExperimentalState = &cli.BoolFlag{
+		Name:  "disable-experimental-state",
+		Usage: "Turns off the latest and greatest changes to the beacon state. Disabling this is safe to do after the feature has been enabled.",
 	}
 	writeSSZStateTransitionsFlag = &cli.BoolFlag{
 		Name:  "interop-write-ssz-state-transitions",
@@ -40,8 +45,9 @@ var (
 		Usage: "Writes invalid blobs to temp directory.",
 	}
 	disableGRPCConnectionLogging = &cli.BoolFlag{
-		Name:  "disable-grpc-connection-logging",
-		Usage: "Disables displaying logs for newly connected grpc clients.",
+		Name: "disable-grpc-connection-logging",
+		Usage: `WARNING: The gRPC API will remain the default and fully supported through v8 (expected in 2026) but will be eventually removed in favor of REST API..
+		Disables displaying logs for newly connected grpc clients.`,
 	}
 	disablePeerScorer = &cli.BoolFlag{
 		Name:  "disable-peer-scorer",
@@ -83,10 +89,6 @@ var (
 	attestTimely = &cli.BoolFlag{
 		Name:  "attest-timely",
 		Usage: "Fixes validator can attest timely after current block processes. See #8185 for more details.",
-	}
-	enableSlasherFlag = &cli.BoolFlag{
-		Name:  "slasher",
-		Usage: "Enables a slasher in the beacon node for detecting slashable offenses.",
 	}
 	enableSlashingProtectionPruning = &cli.BoolFlag{
 		Name:  "enable-slashing-protection-history-pruning",
@@ -139,7 +141,7 @@ var (
 		Usage: "Informs the engine to prepare all local payloads. Useful for relayers and builders.",
 	}
 	EnableLightClient = &cli.BoolFlag{
-		Name:  "enable-lightclient",
+		Name:  "enable-light-client",
 		Usage: "Enables the light client support in the beacon node",
 	}
 	disableResourceManager = &cli.BoolFlag{
@@ -156,18 +158,36 @@ var (
 		Name:  "blob-save-fsync",
 		Usage: "Forces new blob files to be fysnc'd before continuing, ensuring durable blob writes.",
 	}
-	// EnableQUIC enables connection using the QUIC protocol for peers which support it.
-	EnableQUIC = &cli.BoolFlag{
-		Name:  "enable-quic",
-		Usage: "Enables connection using the QUIC protocol for peers which support it.",
+	// DisableQUIC disables connecting to peers using the QUIC protocol.
+	DisableQUIC = &cli.BoolFlag{
+		Name:  "disable-quic",
+		Usage: "Disables connecting using the QUIC protocol with peers.",
+	}
+	EnableDiscoveryReboot = &cli.BoolFlag{
+		Name:  "enable-discovery-reboot",
+		Usage: "Experimental: Enables the discovery listener to rebooted in the event of connectivity issues.",
+	}
+	enableExperimentalAttestationPool = &cli.BoolFlag{
+		Name:  "enable-experimental-attestation-pool",
+		Usage: "Enables an experimental attestation pool design.",
+	}
+	// forceHeadFlag is a flag to force the head of the beacon chain to a specific block.
+	forceHeadFlag = &cli.StringFlag{
+		Name: "sync-from",
+		Usage: "Forces the head of the beacon chain to a specific block root. Values can be 'head' or a block root." +
+			" The block root has to be known to the beacon node and correspond to a block newer than the current finalized checkpoint.",
+	}
+	// blacklistRoots is a flag for blacklisting block roots from gossip and
+	// downscore peers that send them.
+	blacklistRoots = &cli.StringSliceFlag{
+		Name:  "blacklist-roots",
+		Usage: "A comma-separatted list of 0x-prefixed hexstrings. Declares blocks with the given blockroots to be invalid. It downscores peers that send these blocks.",
 	}
 )
 
 // devModeFlags holds list of flags that are set when development mode is on.
 var devModeFlags = []cli.Flag{
-	enableExperimentalState,
 	backfill.EnableExperimentalBackfill,
-	EnableQUIC,
 }
 
 // ValidatorFlags contains a list of all the feature flags that apply to the validator client.
@@ -189,9 +209,9 @@ var E2EValidatorFlags = []string{
 }
 
 // BeaconChainFlags contains a list of all the feature flags that apply to the beacon-chain client.
-var BeaconChainFlags = append(deprecatedBeaconFlags, append(deprecatedFlags, []cli.Flag{
+var BeaconChainFlags = combinedFlags([]cli.Flag{
 	devModeFlag,
-	enableExperimentalState,
+	disableExperimentalState,
 	writeSSZStateTransitionsFlag,
 	saveInvalidBlockTempFlag,
 	saveInvalidBlobTempFlag,
@@ -200,8 +220,6 @@ var BeaconChainFlags = append(deprecatedBeaconFlags, append(deprecatedFlags, []c
 	Mainnet,
 	disablePeerScorer,
 	disableBroadcastSlashingFlag,
-	enableSlasherFlag,
-	enableHistoricalSpaceRepresentation,
 	disableStakinContractCheck,
 	SaveFullExecutionPayloads,
 	enableStartupOptimistic,
@@ -215,8 +233,23 @@ var BeaconChainFlags = append(deprecatedBeaconFlags, append(deprecatedFlags, []c
 	DisableRegistrationCache,
 	EnableLightClient,
 	BlobSaveFsync,
-	EnableQUIC,
-}...)...)
+	DisableQUIC,
+	EnableDiscoveryReboot,
+	enableExperimentalAttestationPool,
+	forceHeadFlag,
+	blacklistRoots,
+}, deprecatedBeaconFlags, deprecatedFlags, upcomingDeprecation)
+
+func combinedFlags(flags ...[]cli.Flag) []cli.Flag {
+	if len(flags) == 0 {
+		return []cli.Flag{}
+	}
+	collected := flags[0]
+	for _, f := range flags[1:] {
+		collected = append(collected, f...)
+	}
+	return collected
+}
 
 // E2EBeaconChainFlags contains a list of the beacon chain feature flags to be tested in E2E.
 var E2EBeaconChainFlags = []string{

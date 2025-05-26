@@ -6,8 +6,8 @@ import (
 	"github.com/stratisproject/prysm-stratis/config/params"
 	"github.com/stratisproject/prysm-stratis/consensus-types/primitives"
 	"github.com/stratisproject/prysm-stratis/encoding/bytesutil"
+	"github.com/stratisproject/prysm-stratis/monitoring/tracing/trace"
 	bolt "go.etcd.io/bbolt"
-	"go.opencensus.io/trace"
 )
 
 // PruneAttestations loops through every public key in the public keys bucket

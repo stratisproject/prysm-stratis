@@ -5,17 +5,16 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/gorilla/mux"
 	"github.com/libp2p/go-libp2p/core/peer"
 	"github.com/pkg/errors"
 	"github.com/stratisproject/prysm-stratis/api/server/structs"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/p2p"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/p2p/peers"
 	"github.com/stratisproject/prysm-stratis/beacon-chain/p2p/peers/peerdata"
+	"github.com/stratisproject/prysm-stratis/monitoring/tracing/trace"
 	"github.com/stratisproject/prysm-stratis/network/httputil"
 	"github.com/stratisproject/prysm-stratis/proto/migration"
 	eth "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
-	"go.opencensus.io/trace"
 )
 
 // GetPeer retrieves data about the given peer.
@@ -23,7 +22,7 @@ func (s *Server) GetPeer(w http.ResponseWriter, r *http.Request) {
 	_, span := trace.StartSpan(r.Context(), "node.GetPeer")
 	defer span.End()
 
-	rawId := mux.Vars(r)["peer_id"]
+	rawId := r.PathValue("peer_id")
 	if rawId == "" {
 		httputil.HandleError(w, "peer_id is required in URL params", http.StatusBadRequest)
 		return

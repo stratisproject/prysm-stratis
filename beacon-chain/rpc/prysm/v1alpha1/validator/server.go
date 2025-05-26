@@ -32,7 +32,6 @@ import (
 	"github.com/stratisproject/prysm-stratis/network/forks"
 	ethpb "github.com/stratisproject/prysm-stratis/proto/prysm/v1alpha1"
 	"github.com/stratisproject/prysm-stratis/runtime/version"
-	"github.com/stratisproject/prysm-stratis/time/slots"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -43,47 +42,52 @@ import (
 // and committees in which particular validators need to perform their responsibilities,
 // and more.
 type Server struct {
-	Ctx                    context.Context
-	PayloadIDCache         *cache.PayloadIDCache
-	TrackedValidatorsCache *cache.TrackedValidatorsCache
-	HeadFetcher            blockchain.HeadFetcher
-	ForkFetcher            blockchain.ForkFetcher
-	ForkchoiceFetcher      blockchain.ForkchoiceFetcher
-	GenesisFetcher         blockchain.GenesisFetcher
-	FinalizationFetcher    blockchain.FinalizationFetcher
-	TimeFetcher            blockchain.TimeFetcher
-	BlockFetcher           execution.POWBlockFetcher
-	DepositFetcher         cache.DepositFetcher
-	ChainStartFetcher      execution.ChainStartFetcher
-	Eth1InfoFetcher        execution.ChainInfoFetcher
-	OptimisticModeFetcher  blockchain.OptimisticModeFetcher
-	SyncChecker            sync.Checker
-	StateNotifier          statefeed.Notifier
-	BlockNotifier          blockfeed.Notifier
-	P2P                    p2p.Broadcaster
-	AttPool                attestations.Pool
-	SlashingsPool          slashings.PoolManager
-	ExitPool               voluntaryexits.PoolManager
-	SyncCommitteePool      synccommittee.Pool
-	BlockReceiver          blockchain.BlockReceiver
-	BlobReceiver           blockchain.BlobReceiver
-	MockEth1Votes          bool
-	Eth1BlockFetcher       execution.POWBlockFetcher
-	PendingDepositsFetcher depositsnapshot.PendingDepositsFetcher
-	OperationNotifier      opfeed.Notifier
-	StateGen               stategen.StateManager
-	ReplayerBuilder        stategen.ReplayerBuilder
-	BeaconDB               db.HeadAccessDatabase
-	ExecutionEngineCaller  execution.EngineCaller
-	BlockBuilder           builder.BlockBuilder
-	BLSChangesPool         blstoexec.PoolManager
-	ClockWaiter            startup.ClockWaiter
-	CoreService            *core.Service
+	Ctx                     context.Context
+	PayloadIDCache          *cache.PayloadIDCache
+	TrackedValidatorsCache  *cache.TrackedValidatorsCache
+	HeadFetcher             blockchain.HeadFetcher
+	ForkFetcher             blockchain.ForkFetcher
+	ForkchoiceFetcher       blockchain.ForkchoiceFetcher
+	GenesisFetcher          blockchain.GenesisFetcher
+	FinalizationFetcher     blockchain.FinalizationFetcher
+	TimeFetcher             blockchain.TimeFetcher
+	BlockFetcher            execution.POWBlockFetcher
+	DepositFetcher          cache.DepositFetcher
+	ChainStartFetcher       execution.ChainStartFetcher
+	Eth1InfoFetcher         execution.ChainInfoFetcher
+	OptimisticModeFetcher   blockchain.OptimisticModeFetcher
+	SyncChecker             sync.Checker
+	StateNotifier           statefeed.Notifier
+	BlockNotifier           blockfeed.Notifier
+	P2P                     p2p.Broadcaster
+	AttestationCache        *cache.AttestationCache
+	AttPool                 attestations.Pool
+	SlashingsPool           slashings.PoolManager
+	ExitPool                voluntaryexits.PoolManager
+	SyncCommitteePool       synccommittee.Pool
+	BlockReceiver           blockchain.BlockReceiver
+	BlobReceiver            blockchain.BlobReceiver
+	MockEth1Votes           bool
+	Eth1BlockFetcher        execution.POWBlockFetcher
+	PendingDepositsFetcher  depositsnapshot.PendingDepositsFetcher
+	OperationNotifier       opfeed.Notifier
+	StateGen                stategen.StateManager
+	ReplayerBuilder         stategen.ReplayerBuilder
+	BeaconDB                db.HeadAccessDatabase
+	ExecutionEngineCaller   execution.EngineCaller
+	BlockBuilder            builder.BlockBuilder
+	BLSChangesPool          blstoexec.PoolManager
+	ClockWaiter             startup.ClockWaiter
+	CoreService             *core.Service
+	AttestationStateFetcher blockchain.AttestationStateFetcher
 }
 
+// Deprecated: The gRPC API will remain the default and fully supported through v8 (expected in 2026) but will be eventually removed in favor of REST API.
+//
 // WaitForActivation checks if a validator public key exists in the active validator registry of the current
 // beacon state, if not, then it creates a stream which listens for canonical states which contain
 // the validator with the public key as an active validator record.
+// Deprecated: do not use, just poll validator status every epoch.
 func (vs *Server) WaitForActivation(req *ethpb.ValidatorActivationRequest, stream ethpb.BeaconNodeValidator_WaitForActivationServer) error {
 	activeValidatorExists, validatorStatuses, err := vs.activationStatus(stream.Context(), req.PublicKeys)
 	if err != nil {
@@ -100,14 +104,13 @@ func (vs *Server) WaitForActivation(req *ethpb.ValidatorActivationRequest, strea
 	}
 
 	waitTime := time.Duration(params.BeaconConfig().SecondsPerSlot) * time.Second
-	timer := time.NewTimer(waitTime)
-	defer timer.Stop()
+	ticker := time.NewTicker(waitTime)
+	defer ticker.Stop()
 
 	for {
-		timer.Reset(waitTime)
 		select {
 		// Pinging every slot for activation.
-		case <-timer.C:
+		case <-ticker.C:
 			activeValidatorExists, validatorStatuses, err := vs.activationStatus(stream.Context(), req.PublicKeys)
 			if err != nil {
 				return status.Errorf(codes.Internal, "Could not fetch validator status: %v", err)
@@ -129,6 +132,8 @@ func (vs *Server) WaitForActivation(req *ethpb.ValidatorActivationRequest, strea
 	}
 }
 
+// Deprecated: The gRPC API will remain the default and fully supported through v8 (expected in 2026) but will be eventually removed in favor of REST API.
+//
 // ValidatorIndex is called by a validator to get its index location in the beacon state.
 func (vs *Server) ValidatorIndex(ctx context.Context, req *ethpb.ValidatorIndexRequest) (*ethpb.ValidatorIndexResponse, error) {
 	st, err := vs.HeadFetcher.HeadStateReadOnly(ctx)
@@ -146,6 +151,8 @@ func (vs *Server) ValidatorIndex(ctx context.Context, req *ethpb.ValidatorIndexR
 	return &ethpb.ValidatorIndexResponse{Index: index}, nil
 }
 
+// Deprecated: The gRPC API will remain the default and fully supported through v8 (expected in 2026) but will be eventually removed in favor of REST API.
+//
 // DomainData fetches the current domain version information from the beacon state.
 func (vs *Server) DomainData(ctx context.Context, request *ethpb.DomainRequest) (*ethpb.DomainResponse, error) {
 	fork, err := forks.Fork(request.Epoch)
@@ -176,6 +183,8 @@ func (vs *Server) DomainData(ctx context.Context, request *ethpb.DomainRequest) 
 	}, nil
 }
 
+// Deprecated: The gRPC API will remain the default and fully supported through v8 (expected in 2026) but will be eventually removed in favor of REST API.
+//
 // WaitForChainStart queries the logs of the Deposit Contract in order to verify the beacon chain
 // has started its runtime and validators begin their responsibilities. If it has not, it then
 // subscribes to an event stream triggered by the powchain service whenever the ChainStart log does
@@ -207,26 +216,4 @@ func (vs *Server) WaitForChainStart(_ *emptypb.Empty, stream ethpb.BeaconNodeVal
 		GenesisValidatorsRoot: gvr[:],
 	}
 	return stream.Send(res)
-}
-
-// PruneBlobsBundleCacheRoutine prunes the blobs bundle cache at 6s mark of the slot.
-func (vs *Server) PruneBlobsBundleCacheRoutine() {
-	go func() {
-		clock, err := vs.ClockWaiter.WaitForClock(vs.Ctx)
-		if err != nil {
-			log.WithError(err).Error("PruneBlobsBundleCacheRoutine failed to receive genesis data")
-			return
-		}
-
-		pruneInterval := time.Second * time.Duration(params.BeaconConfig().SecondsPerSlot/2)
-		ticker := slots.NewSlotTickerWithIntervals(clock.GenesisTime(), []time.Duration{pruneInterval})
-		for {
-			select {
-			case <-vs.Ctx.Done():
-				return
-			case slotInterval := <-ticker.C():
-				bundleCache.prune(slotInterval.Slot)
-			}
-		}
-	}()
 }

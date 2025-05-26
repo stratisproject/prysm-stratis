@@ -16,7 +16,6 @@ import (
 	"github.com/stratisproject/prysm-stratis/validator/db/common"
 	"github.com/stratisproject/prysm-stratis/validator/db/filesystem"
 	"github.com/stratisproject/prysm-stratis/validator/db/iface"
-
 	"github.com/stratisproject/prysm-stratis/validator/db/kv"
 )
 
